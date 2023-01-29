@@ -16,12 +16,16 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+
+import static org.springframework.http.HttpStatus.OK;
 
 
 /**
@@ -72,5 +76,39 @@ public class UsersController {
 
         LOGGER.info("User created successfully. Retrieving created user with id {}", usersDetailsDto.getUserId());
         return new ResponseEntity<>(usersDetailsDto, HttpStatus.CREATED);
+    }
+
+    /**
+     * Get user by id
+     *
+     * @param userId user id
+     * @return {@link UserDetailsDto} the user wanted and Ok httpStatus
+     */
+    @GetMapping("/{userId}")
+    @Operation(summary = "Get user", description = "Get user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful Operation",
+                    content = @Content(schema = @Schema(implementation = UserDetailsDto.class))),
+            @ApiResponse(responseCode = "404", description = ErrorMessages.USER_NOT_FOUND,
+                    content = @Content(schema = @Schema(implementation = Error.class))),
+            @ApiResponse(responseCode = "500", description = ErrorMessages.ACCESS_DENIED,
+                    content = @Content(schema = @Schema(implementation = Error.class)))})
+    public ResponseEntity<UserDetailsDto> getUserById(@PathVariable long userId) {
+
+        LOGGER.info("Request to get user with id {}", userId);
+        UserDetailsDto usersDetailsDto;
+        try {
+            usersDetailsDto = userServiceImp.getUserById(userId);
+
+        } catch (TicketShopException e) {
+            throw e;
+
+        } catch (Exception e) {
+            LOGGER.error("Failed to get user with id {}", userId, e);
+            throw new TicketShopException(ErrorMessages.OPERATION_FAILED, e);
+        }
+
+        LOGGER.info("Retrieved user with id {}", userId);
+        return new ResponseEntity<>(usersDetailsDto, OK);
     }
 }

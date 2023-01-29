@@ -6,6 +6,7 @@ import com.ticket.shop.enumerators.UserRoles;
 import com.ticket.shop.exception.DatabaseCommunicationException;
 import com.ticket.shop.exception.country.CountryNotFoundException;
 import com.ticket.shop.exception.user.UserAlreadyExistsException;
+import com.ticket.shop.exception.user.UserNotFoundException;
 import com.ticket.shop.persistence.entity.CountryEntity;
 import com.ticket.shop.persistence.entity.UserEntity;
 import com.ticket.shop.persistence.repository.CountryRepository;
@@ -100,6 +101,33 @@ public class UserServiceImpTest {
         // Assert result
         assertThrows(DatabaseCommunicationException.class,
                 () -> this.userServiceImp.createUser(getMockedCreateUserDto()));
+    }
+
+    /**
+     * Get User Tests
+     */
+    @Test
+    public void testGetUserSuccessfully(){
+        // Mocks
+        when(userRepository.findById(any())).thenReturn(Optional.of(getMockedUserEntity()));
+
+        // Call method to be tested
+        UserDetailsDto userDetails = userServiceImp.getUserById(USER_ID);
+
+        // Assert result
+        assertNotNull(userDetails);
+        assertEquals(getMockedUserDetailsDto(), userDetails);
+    }
+
+
+    @Test
+    public void testGetUserFailureDueToUserNotFound() {
+        // Mocks
+        when(userRepository.findById(any())).thenReturn(Optional.empty());
+
+        // Assert result
+        assertThrows(UserNotFoundException.class,
+                () -> userServiceImp.getUserById(USER_ID));
     }
 
     private UserEntity getMockedUserEntity() {
