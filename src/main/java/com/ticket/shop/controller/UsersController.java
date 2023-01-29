@@ -70,7 +70,7 @@ public class UsersController {
             throw new TicketShopException(ErrorMessages.OPERATION_FAILED, e);
         }
 
-        LOGGER.info("User created successfully. Retrieving created user with id {}", usersDetailsDto.getId());
+        LOGGER.info("User created successfully. Retrieving created user with id {}", usersDetailsDto.getUserId());
         return new ResponseEntity<>(usersDetailsDto, HttpStatus.CREATED);
     }
 }

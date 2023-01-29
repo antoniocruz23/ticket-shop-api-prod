@@ -1,6 +1,5 @@
 package com.ticket.shop.command.user;
 
-import com.ticket.shop.enumerators.UserRoles;
 import lombok.Builder;
 import lombok.Data;
 
@@ -10,9 +9,8 @@ import lombok.Data;
 @Data
 @Builder
 public class UserDetailsDto {
-    private long id;
+    private Long userId;
     private String firstname;
     private String lastname;
     private String email;
-    private UserRoles roles;
 }

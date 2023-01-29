@@ -33,10 +33,10 @@ public class CreateUserDto {
     private String password;
 
     @NotNull(message = "Must have role")
-    private List<UserRoles> userRoles;
+    private List<UserRoles> roles;
 
     @NotNull(message = "Must have a country")
-    private long countryId;
+    private Long countryId;
 
     /**
      * Override to String to avoid show the password

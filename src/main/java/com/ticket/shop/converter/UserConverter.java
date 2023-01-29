@@ -19,7 +19,7 @@ public class UserConverter {
                 .lastname(createUserDto.getLastname())
                 .email(createUserDto.getEmail())
                 .encryptedPassword(createUserDto.getPassword())
-                .roles(createUserDto.getUserRoles())
+                .roles(createUserDto.getRoles())
                 .build();
     }
 
@@ -30,7 +30,7 @@ public class UserConverter {
      */
     public static UserDetailsDto fromUserEntityToUserDetailsDto(UserEntity userEntity) {
         return UserDetailsDto.builder()
-                .id(userEntity.getUserId())
+                .userId(userEntity.getUserId())
                 .firstname(userEntity.getFirstname())
                 .lastname(userEntity.getLastname())
                 .email(userEntity.getEmail())
