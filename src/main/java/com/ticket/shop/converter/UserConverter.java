@@ -1,5 +1,6 @@
 package com.ticket.shop.converter;
 
+import com.ticket.shop.command.auth.PrincipalDto;
 import com.ticket.shop.command.user.CreateUserDto;
 import com.ticket.shop.command.user.UserDetailsDto;
 import com.ticket.shop.persistence.entity.UserEntity;
@@ -34,6 +35,20 @@ public class UserConverter {
                 .firstname(userEntity.getFirstname())
                 .lastname(userEntity.getLastname())
                 .email(userEntity.getEmail())
+                .build();
+    }
+
+    /**
+     * Convert from {@link UserEntity} to {@link PrincipalDto}
+     * @param userEntity
+     * @return {@link PrincipalDto}
+     */
+    public static PrincipalDto fromUserEntityToPrincipalDto(UserEntity userEntity) {
+        return PrincipalDto.builder()
+                .userId(userEntity.getUserId())
+                .name(userEntity.getFirstname() + " " + userEntity.getLastname())
+                .email(userEntity.getEmail())
+                .roles(userEntity.getRoles())
                 .build();
     }
 }

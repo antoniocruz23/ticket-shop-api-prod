@@ -22,7 +22,7 @@ import java.util.Arrays;
  */
 @RequiredArgsConstructor
 @Configuration
-public class WebConfigs {
+public class WebConfig {
 
     /**
      * CORS configuration
