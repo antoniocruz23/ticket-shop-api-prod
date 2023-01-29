@@ -34,7 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-//TODO: FIX TESTS
 @SpringBootTest
 public class AuthServiceImpTest {
 
@@ -53,11 +52,12 @@ public class AuthServiceImpTest {
     private final static String ENCRYPTED_PASSWORD = "321drowssaP";
     private final static Long USER_ID = 10L;
     private final static List<UserRoles> USER_ROLE = Collections.singletonList(UserRoles.ADMIN);
+    private final String secretKey = "7f928de2afee05bce432f166d140c04a08f713c7eafd05bce432";
 
     @BeforeEach
     public void setup() {
         this.jwtProperties = new JwtProperties();
-        this.jwtProperties.setSecretKey("faifaksafldbfauybfakjuaajd!@31adfas");
+        this.jwtProperties.setSecretKey(this.secretKey);
         this.jwtProperties.setExpiresInDays(100L);
         this.authServiceImp = new AuthServiceImp(this.userRepository, this.passwordEncoder, this.jwtProperties);
 
@@ -72,7 +72,7 @@ public class AuthServiceImpTest {
     public void testLoginUserSuccessfully() {
 
         // Mocks
-        when(userRepository.findByEmail(any())).thenReturn(Optional.of(getMockedUserEntity()));
+        when(this.userRepository.findByEmail(any())).thenReturn(Optional.of(getMockedUserEntity()));
         when(this.passwordEncoder.matches(any(), any())).thenReturn(true);
 
         // Call method to be tested
@@ -156,21 +156,19 @@ public class AuthServiceImpTest {
     private PrincipalDto getMockedPrincipalDto() {
         return PrincipalDto.builder()
                 .userId(USER_ID)
-                .name(FIRSTNAME)
+                .name(FIRSTNAME + " " + LASTNAME)
                 .email(EMAIL)
                 .roles(USER_ROLE)
                 .build();
     }
 
     private String generateJwtToken(PrincipalDto principalDto) {
-
         SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
         long nowMillis = System.currentTimeMillis();
         Date now = new Date(nowMillis);
         Date expiresAt = new Date(now.getTime() +
                 Duration.ofDays(this.jwtProperties.getExpiresInDays()).toMillis());
-
-        byte[] apiKeySecretBytes = DatatypeConverter.parseBase64Binary("faifaksafldbfauybfakjuaajd!@31adfas");
+        byte[] apiKeySecretBytes = DatatypeConverter.parseBase64Binary(this.secretKey);
         Key signingKey = new SecretKeySpec(apiKeySecretBytes, signatureAlgorithm.getJcaName());
 
         return Jwts.builder()

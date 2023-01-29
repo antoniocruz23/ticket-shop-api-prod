@@ -38,7 +38,7 @@ public class AuthServiceImp implements AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProperties jwtProperties;
-    private String secretKey = "default";
+    private String secretKey = "7f928de2afee05bce432f166d140c04a08f713c7eafd05bce432";
 
     public AuthServiceImp(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtProperties jwtProperties) {
         this.userRepository = userRepository;
@@ -64,7 +64,7 @@ public class AuthServiceImp implements AuthService {
                             return new WrongCredentialsException(ErrorMessages.WRONG_CREDENTIALS);
                         });
 
-        boolean passwordMatches = passwordEncoder.matches(credentialsDto.getPassword(), userEntity.getEncryptedPassword());
+        boolean passwordMatches = this.passwordEncoder.matches(credentialsDto.getPassword(), userEntity.getEncryptedPassword());
         if (!passwordMatches) {
             LOGGER.error("The password doesn't match");
             throw new WrongCredentialsException(ErrorMessages.WRONG_CREDENTIALS);
