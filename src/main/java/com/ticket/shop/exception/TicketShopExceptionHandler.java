@@ -56,7 +56,7 @@ public class TicketShopExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     /**
-     * Handle exception
+     * Handle "database communication" exception
      *
      * @param ex      exception
      * @param request http Servlet Request
@@ -67,13 +67,19 @@ public class TicketShopExceptionHandler extends ResponseEntityExceptionHandler {
         return buildErrorResponse(ex, request, HttpStatus.BAD_REQUEST);
     }
 
+    /**
+     * Handle "access denied" exception
+     * @param ex      exception
+     * @param request http Servlet Request
+     * @return {@link Error}
+     */
     @ExceptionHandler(value = {AccessDeniedException.class})
     public ResponseEntity<Error> handlerForbiddenException(Exception ex, HttpServletRequest request) {
         return buildErrorResponse(ex, request, HttpStatus.FORBIDDEN);
     }
 
     /**
-     * Handle method argument not valid
+     * Handle method other exception
      *
      * @param ex      exception
      * @param request http Servlet Request

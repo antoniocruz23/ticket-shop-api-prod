@@ -8,6 +8,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
+/**
+ * Security Config class
+ */
 @Configuration
 public class SecurityConfig {
 
@@ -17,6 +20,12 @@ public class SecurityConfig {
         this.userAuthenticationEntryPoint = userAuthenticationEntryPoint;
     }
 
+    /**
+     * Method to handle with application security
+     * @param http {@link HttpSecurity}
+     * @return {@link SecurityFilterChain}
+     * @throws Exception throws this if something wrong happens
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http

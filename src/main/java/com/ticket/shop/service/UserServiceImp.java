@@ -17,6 +17,9 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+/**
+ * UserService Implementation
+ */
 @Service
 public class UserServiceImp implements UserService {
 
@@ -25,7 +28,6 @@ public class UserServiceImp implements UserService {
     private final UserRepository userRepository;
     private final CountryRepository countryRepository;
     private final PasswordEncoder passwordEncoder;
-
 
     public UserServiceImp(UserRepository userRepository, CountryRepository countryRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
@@ -66,6 +68,11 @@ public class UserServiceImp implements UserService {
         return UserConverter.fromUserEntityToUserDetailsDto(createdUser);
     }
 
+    /**
+     * Get Country by id
+     * @param countryId country id
+     * @return {@link CountryEntity}
+     */
     protected CountryEntity getCountryEntityById(long countryId) {
         LOGGER.debug("Verifying if country with id {} exists", countryId);
         return countryRepository.findById(countryId)

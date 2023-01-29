@@ -17,6 +17,9 @@ import org.springframework.web.filter.CorsFilter;
 
 import java.util.Arrays;
 
+/**
+ * WebConfigs class
+ */
 @RequiredArgsConstructor
 @Configuration
 public class WebConfigs {
@@ -47,6 +50,10 @@ public class WebConfigs {
         return new BCryptPasswordEncoder(12);
     }
 
+    /**
+     * Swagger
+     * @return {@link OpenAPI}
+     */
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
