@@ -2,6 +2,7 @@ package com.ticket.shop.service;
 
 
 import com.ticket.shop.command.user.CreateUserDto;
+import com.ticket.shop.command.user.UpdateUserDto;
 import com.ticket.shop.command.user.UserDetailsDto;
 import com.ticket.shop.converter.UserConverter;
 import com.ticket.shop.error.ErrorMessages;
@@ -37,11 +38,7 @@ public class UserServiceImp implements UserService {
     }
 
     /**
-     * Create new user
-     *
-     * @param createUserDto {@link CreateUserDto}
-     * @return {@link UserDetailsDto} the user created
-     * @throws UserAlreadyExistsException when the user already exists
+     * @see UserService#createUser(CreateUserDto)
      */
     @Override
     public UserDetailsDto createUser(CreateUserDto createUserDto) throws UserAlreadyExistsException {
@@ -77,23 +74,49 @@ public class UserServiceImp implements UserService {
     }
 
     /**
-     * Get user by id
-     *
-     * @param userId user id to be got
-     * @return {@link UserDetailsDto} the user obtained
-     * @throws UserNotFoundException when the user isn't found
+     * @see UserService#getUserById(Long)
      */
     @Override
-    public UserDetailsDto getUserById(long userId) throws UserNotFoundException {
+    public UserDetailsDto getUserById(Long userId) throws UserNotFoundException {
         return UserConverter.fromUserEntityToUserDetailsDto(getUserEntityById(userId));
     }
 
     /**
+     * @see UserService#updateUser(Long, UpdateUserDto)
+     */
+    @Override
+    public UserDetailsDto updateUser(Long userId, UpdateUserDto updateUserDto) throws UserNotFoundException {
+
+        UserEntity userEntity = getUserEntityById(userId);
+        CountryEntity countryEntity = getCountryEntityById(updateUserDto.getCountryId());
+        String encryptedPassword = passwordEncoder.encode(updateUserDto.getPassword());
+
+        userEntity.setFirstname(updateUserDto.getFirstname());
+        userEntity.setLastname(updateUserDto.getLastname());
+        userEntity.setEmail(updateUserDto.getEmail());
+        userEntity.setEncryptedPassword(encryptedPassword);
+        userEntity.setRoles(updateUserDto.getRoles());
+        userEntity.setCountryEntity(countryEntity);
+
+        LOGGER.debug("Updating user with id {} with new data", userId);
+        try {
+            userRepository.save(userEntity);
+
+        } catch (Exception e) {
+            LOGGER.error("Failed while updating user with id {} with new data - {}", userId, userEntity, e);
+            throw new DatabaseCommunicationException(ErrorMessages.DATABASE_COMMUNICATION_ERROR, e);
+        }
+
+        return UserConverter.fromUserEntityToUserDetailsDto(userEntity);
+    }
+
+    /**
      * Get Country by id
+     *
      * @param countryId country id
      * @return {@link CountryEntity}
      */
-    protected CountryEntity getCountryEntityById(long countryId) {
+    protected CountryEntity getCountryEntityById(Long countryId) {
         LOGGER.debug("Getting country with id {} from database", countryId);
         return countryRepository.findById(countryId)
                 .orElseThrow(() -> {
@@ -104,13 +127,14 @@ public class UserServiceImp implements UserService {
 
     /**
      * Get User by id
+     *
      * @param userId user id
      * @return {@link UserEntity}
      */
-    protected UserEntity getUserEntityById(long userId){
+    protected UserEntity getUserEntityById(Long userId) {
         LOGGER.debug("Getting user with id {} from database", userId);
         return userRepository.findById(userId)
-                .orElseThrow(() ->{
+                .orElseThrow(() -> {
                     LOGGER.error("The user with id {} does not exist in database", userId);
                     return new UserNotFoundException(ErrorMessages.USER_NOT_FOUND);
                 });

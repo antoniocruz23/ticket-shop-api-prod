@@ -43,14 +43,14 @@ public class UserEntity implements Serializable {
     @Column(nullable = false, length = 100)
     private String lastname;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 100, unique = true)
     private String email;
 
     @Column(nullable = false)
     private String encryptedPassword;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name="roles", joinColumns=@JoinColumn(name="user_id"))
+    @CollectionTable(name = "roles", joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)
     private List<UserRoles> roles;
 

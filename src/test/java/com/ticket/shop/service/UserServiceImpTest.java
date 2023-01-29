@@ -1,6 +1,7 @@
 package com.ticket.shop.service;
 
 import com.ticket.shop.command.user.CreateUserDto;
+import com.ticket.shop.command.user.UpdateUserDto;
 import com.ticket.shop.command.user.UserDetailsDto;
 import com.ticket.shop.enumerators.UserRoles;
 import com.ticket.shop.exception.DatabaseCommunicationException;
@@ -27,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 
 @SpringBootTest
 public class UserServiceImpTest {
@@ -76,7 +78,10 @@ public class UserServiceImpTest {
 
     @Test
     public void testCreateUserFailureDueToCountryNotFound() {
-        // Assert result
+        // Mock data
+        when(this.countryRepository.findById(any())).thenReturn(Optional.empty());
+
+        // Assert exception
         assertThrows(CountryNotFoundException.class,
                 () -> this.userServiceImp.createUser(getMockedCreateUserDto()));
     }
@@ -87,7 +92,7 @@ public class UserServiceImpTest {
         when(this.countryRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedCountryEntity()));
         when(this.userRepository.findByEmail(any()).isPresent()).thenThrow(UserAlreadyExistsException.class);
 
-        // Assert result
+        // Assert exception
         assertThrows(UserAlreadyExistsException.class,
                 () -> this.userServiceImp.createUser(getMockedCreateUserDto()));
     }
@@ -98,7 +103,7 @@ public class UserServiceImpTest {
         when(this.countryRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedCountryEntity()));
         when(this.userRepository.save(any())).thenThrow(RuntimeException.class);
 
-        // Assert result
+        // Assert exception
         assertThrows(DatabaseCommunicationException.class,
                 () -> this.userServiceImp.createUser(getMockedCreateUserDto()));
     }
@@ -107,12 +112,12 @@ public class UserServiceImpTest {
      * Get User Tests
      */
     @Test
-    public void testGetUserSuccessfully(){
+    public void testGetUserSuccessfully() {
         // Mocks
-        when(userRepository.findById(any())).thenReturn(Optional.of(getMockedUserEntity()));
+        when(this.userRepository.findById(any())).thenReturn(Optional.of(getMockedUserEntity()));
 
-        // Call method to be tested
-        UserDetailsDto userDetails = userServiceImp.getUserById(USER_ID);
+        // Method to be tested
+        UserDetailsDto userDetails = this.userServiceImp.getUserById(USER_ID);
 
         // Assert result
         assertNotNull(userDetails);
@@ -123,11 +128,71 @@ public class UserServiceImpTest {
     @Test
     public void testGetUserFailureDueToUserNotFound() {
         // Mocks
-        when(userRepository.findById(any())).thenReturn(Optional.empty());
+        when(this.userRepository.findById(any())).thenReturn(Optional.empty());
+
+        // Assert exception
+        assertThrows(UserNotFoundException.class,
+                () -> this.userServiceImp.getUserById(USER_ID));
+    }
+
+    /**
+     * Update User Tests
+     */
+    @Test
+    public void testUpdateUserSuccessfully() {
+        // Mocks
+        when(this.userRepository.findById(any())).thenReturn(Optional.of(getMockedUserEntity()));
+        when(this.countryRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedCountryEntity()));
+        UserDetailsDto user = UserDetailsDto.builder().userId(USER_ID).firstname(FIRSTNAME + 11).lastname(LASTNAME + 11).email(EMAIL).build();
+        UserEntity userEntity = UserEntity.builder()
+                .userId(USER_ID)
+                .firstname(FIRSTNAME + 11)
+                .lastname(LASTNAME + 11)
+                .email(EMAIL)
+                .encryptedPassword(ENCRYPTED_PASSWORD)
+                .roles(List.of(UserRoles.ADMIN, UserRoles.CLIENT))
+                .countryEntity(getMockedCountryEntity()).build();
+
+        // Method to be tested
+        UserDetailsDto userDetails = this.userServiceImp.updateUser(USER_ID, getMockedUpdateUserDto());
 
         // Assert result
+        assertNotNull(userDetails);
+        assertEquals(user, userDetails);
+        verify(this.userRepository).save(userEntity);
+    }
+
+    @Test
+    public void testUpdateUserFailureDueToDatabaseConnectionFailure() {
+        // Mocks
+        when(this.userRepository.findById(any())).thenReturn(Optional.of(getMockedUserEntity()));
+        when(this.countryRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedCountryEntity()));
+        when(this.userRepository.save(any())).thenThrow(RuntimeException.class);
+
+        // Assert exception
+        assertThrows(DatabaseCommunicationException.class,
+                () -> this.userServiceImp.updateUser(USER_ID, getMockedUpdateUserDto()));
+    }
+
+    @Test
+    public void testUpdateUserFailureDueToUserNotFound() {
+        // Mocks
+        when(this.userRepository.findById(any())).thenReturn(Optional.empty());
+
+        // Assert exception
         assertThrows(UserNotFoundException.class,
-                () -> userServiceImp.getUserById(USER_ID));
+                () -> this.userServiceImp.updateUser(USER_ID, getMockedUpdateUserDto()));
+    }
+
+    @Test
+    public void testUpdateUserFailureDueToCountryNotFound() {
+        // Mocks
+        when(this.userRepository.findById(any())).thenReturn(Optional.of(getMockedUserEntity()));
+        when(this.countryRepository.findById(any())).thenReturn(Optional.empty());
+
+        // Assert exception
+        assertThrows(CountryNotFoundException.class,
+                () -> this.userServiceImp.updateUser(USER_ID, getMockedUpdateUserDto()));
     }
 
     private UserEntity getMockedUserEntity() {
@@ -169,6 +234,17 @@ public class UserServiceImpTest {
                 .email(EMAIL)
                 .password(PASSWORD)
                 .roles(USER_ROLE)
+                .countryId(1L)
+                .build();
+    }
+
+    private UpdateUserDto getMockedUpdateUserDto() {
+        return UpdateUserDto.builder()
+                .firstname(FIRSTNAME + "11")
+                .lastname(LASTNAME + "11")
+                .email(EMAIL)
+                .password(PASSWORD + "11")
+                .roles(List.of(UserRoles.ADMIN, UserRoles.CLIENT))
                 .countryId(1L)
                 .build();
     }

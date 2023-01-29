@@ -5,6 +5,7 @@ package com.ticket.shop.enumerators;
  */
 public enum UserRoles {
     ADMIN,
+    COMPANY_ADMIN,
     WORKER,
     CLIENT
 }

@@ -1,6 +1,7 @@
 package com.ticket.shop.service;
 
 import com.ticket.shop.command.user.CreateUserDto;
+import com.ticket.shop.command.user.UpdateUserDto;
 import com.ticket.shop.command.user.UserDetailsDto;
 import com.ticket.shop.exception.user.UserAlreadyExistsException;
 import com.ticket.shop.exception.user.UserNotFoundException;
@@ -26,5 +27,14 @@ public interface UserService {
      * @return {@link UserDetailsDto} the user obtained
      * @throws UserNotFoundException when the user isn't found
      */
-    UserDetailsDto getUserById(long userId) throws UserNotFoundException;
+    UserDetailsDto getUserById(Long userId) throws UserNotFoundException;
+
+    /**
+     * Update user
+     * @param userId user id to be updated
+     * @param updateUserDto {@link UpdateUserDto}
+     * @return {@link UserDetailsDto} the user updated
+     * @throws UserNotFoundException when the user isn't found
+     */
+    UserDetailsDto updateUser(Long userId, UpdateUserDto updateUserDto) throws UserNotFoundException;
 }
