@@ -93,7 +93,7 @@ public class AuthServiceImp implements AuthService {
 
         // Get userId from payload/body
         Long userId = jwtClaims.getBody()
-                .get("userId", Long.class);
+                .get("id", Long.class);
 
         // Get user from database
         UserEntity userEntity = this.userRepository.findById(userId)
