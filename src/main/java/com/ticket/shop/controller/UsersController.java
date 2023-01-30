@@ -124,7 +124,7 @@ public class UsersController {
      * @return the response entity
      */
     @PutMapping("/{userId}")
-    @PreAuthorize("@authorized.hasRole(\"ADMIN\") || @authorized.isUser(#userId)")
+    @PreAuthorize("@authorized.hasRole('ADMIN') || @authorized.isUser(#userId)")
     @Operation(summary = "Update user", description = "Update user")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful Operation",
