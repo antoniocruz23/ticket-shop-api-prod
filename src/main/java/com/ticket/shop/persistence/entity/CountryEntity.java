@@ -49,4 +49,7 @@ public class CountryEntity {
 
     @OneToMany(mappedBy = "countryEntity")
     private List<UserEntity> users;
+
+    @OneToMany(mappedBy = "countryEntity")
+    private List<AddressEntity> addresses;
 }
