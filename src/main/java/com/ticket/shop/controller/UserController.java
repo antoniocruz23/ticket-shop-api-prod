@@ -62,7 +62,7 @@ public class UserController {
                     content = @Content(schema = @Schema(implementation = Error.class))),
             @ApiResponse(responseCode = "500", description = ErrorMessages.ACCESS_DENIED,
                     content = @Content(schema = @Schema(implementation = Error.class)))})
-    public ResponseEntity<UserDetailsDto> usersRegistration(@Valid @RequestBody CreateUserDto createUserDto) {
+    public ResponseEntity<UserDetailsDto> userRegistration(@Valid @RequestBody CreateUserDto createUserDto) {
         LOGGER.info("Request to create new user - {}", createUserDto);
 
         UserDetailsDto usersDetailsDto;
