@@ -36,14 +36,14 @@ import static org.springframework.http.HttpStatus.OK;
  */
 @RestController
 @RequestMapping("/api/users")
-@Tag(name = "Users", description = "Users Controller")
-public class UsersController {
+@Tag(name = "Users", description = "Users API")
+public class UserController {
 
-    private static final Logger LOGGER = LogManager.getLogger(UsersController.class);
+    private static final Logger LOGGER = LogManager.getLogger(UserController.class);
 
     private final UserServiceImp userServiceImp;
 
-    public UsersController(UserServiceImp userServiceImp) {
+    public UserController(UserServiceImp userServiceImp) {
         this.userServiceImp = userServiceImp;
     }
 
@@ -67,7 +67,7 @@ public class UsersController {
 
         UserDetailsDto usersDetailsDto;
         try {
-            usersDetailsDto = userServiceImp.createUser(createUserDto);
+            usersDetailsDto = this.userServiceImp.createUser(createUserDto);
 
         } catch (TicketShopException e) {
             throw e;
@@ -102,7 +102,7 @@ public class UsersController {
         LOGGER.info("Request to get user with id {}", userId);
         UserDetailsDto usersDetailsDto;
         try {
-            usersDetailsDto = userServiceImp.getUserById(userId);
+            usersDetailsDto = this.userServiceImp.getUserById(userId);
 
         } catch (TicketShopException e) {
             throw e;
@@ -141,7 +141,7 @@ public class UsersController {
         LOGGER.info("Request to update user with id {} - {}", userId, updateUserDto);
         UserDetailsDto userDetailsDto;
         try {
-            userDetailsDto = userServiceImp.updateUser(userId, updateUserDto);
+            userDetailsDto = this.userServiceImp.updateUser(userId, updateUserDto);
 
         } catch (TicketShopException e) {
             throw e;

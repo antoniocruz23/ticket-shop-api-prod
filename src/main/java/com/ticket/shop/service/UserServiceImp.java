@@ -49,7 +49,7 @@ public class UserServiceImp implements UserService {
         CountryEntity countryEntity = getCountryEntityById(createUserDto.getCountryId());
         userEntity.setCountryEntity(countryEntity);
 
-        String encryptedPassword = passwordEncoder.encode(createUserDto.getPassword());
+        String encryptedPassword = this.passwordEncoder.encode(createUserDto.getPassword());
         userEntity.setEncryptedPassword(encryptedPassword);
 
         if (userRepository.findByEmail(createUserDto.getEmail()).isPresent()) {
@@ -62,7 +62,7 @@ public class UserServiceImp implements UserService {
         UserEntity createdUser;
         try {
             LOGGER.info("Saving user on database");
-            createdUser = userRepository.save(userEntity);
+            createdUser = this.userRepository.save(userEntity);
 
         } catch (Exception e) {
             LOGGER.error("Failed while saving user into database {}", userEntity, e);
@@ -89,7 +89,7 @@ public class UserServiceImp implements UserService {
 
         UserEntity userEntity = getUserEntityById(userId);
         CountryEntity countryEntity = getCountryEntityById(updateUserDto.getCountryId());
-        String encryptedPassword = passwordEncoder.encode(updateUserDto.getPassword());
+        String encryptedPassword = this.passwordEncoder.encode(updateUserDto.getPassword());
 
         userEntity.setFirstname(updateUserDto.getFirstname());
         userEntity.setLastname(updateUserDto.getLastname());
@@ -100,7 +100,7 @@ public class UserServiceImp implements UserService {
 
         LOGGER.debug("Updating user with id {} with new data", userId);
         try {
-            userRepository.save(userEntity);
+            this.userRepository.save(userEntity);
 
         } catch (Exception e) {
             LOGGER.error("Failed while updating user with id {} with new data - {}", userId, userEntity, e);
@@ -118,7 +118,7 @@ public class UserServiceImp implements UserService {
      */
     protected CountryEntity getCountryEntityById(Long countryId) {
         LOGGER.debug("Getting country with id {} from database", countryId);
-        return countryRepository.findById(countryId)
+        return this.countryRepository.findById(countryId)
                 .orElseThrow(() -> {
                     LOGGER.error("Country with id {} doesn't exist", countryId);
                     return new CountryNotFoundException(ErrorMessages.COUNTRY_NOT_FOUND);
@@ -133,7 +133,7 @@ public class UserServiceImp implements UserService {
      */
     protected UserEntity getUserEntityById(Long userId) {
         LOGGER.debug("Getting user with id {} from database", userId);
-        return userRepository.findById(userId)
+        return this.userRepository.findById(userId)
                 .orElseThrow(() -> {
                     LOGGER.error("The user with id {} does not exist in database", userId);
                     return new UserNotFoundException(ErrorMessages.USER_NOT_FOUND);

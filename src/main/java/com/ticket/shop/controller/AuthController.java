@@ -55,7 +55,7 @@ public class AuthController {
         LOGGER.info("Request to login user with email {}", credentials.getEmail());
         LoggedInDto loggedIn;
         try {
-            loggedIn = authService.loginUser(credentials);
+            loggedIn = this.authService.loginUser(credentials);
 
             ResponseCookie cookie = ResponseCookie
                     .from(COOKIE_NAME, loggedIn.getToken())
