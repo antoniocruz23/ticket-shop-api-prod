@@ -12,13 +12,23 @@ import com.ticket.shop.exception.user.UserNotFoundException;
 public interface UserService {
 
     /**
-     * Create new user
+     * Create new customer
      *
      * @param createUserDto {@link CreateUserDto}
      * @return {@link UserDetailsDto} the user created
      * @throws UserAlreadyExistsException when the user already exists
      */
-    UserDetailsDto createUser(CreateUserDto createUserDto) throws UserAlreadyExistsException;
+    UserDetailsDto createCustomer(CreateUserDto createUserDto) throws UserAlreadyExistsException;
+
+    /**
+     * Create new worker
+     *
+     * @param createUserDto {@link CreateUserDto}
+     * @param userId company admin id
+     * @return {@link UserDetailsDto} the user created
+     * @throws UserAlreadyExistsException when the user already exists
+     */
+    UserDetailsDto createWorker(CreateUserDto createUserDto, Long userId) throws UserAlreadyExistsException;
 
     /**
      * Get user by id

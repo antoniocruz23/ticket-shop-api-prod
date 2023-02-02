@@ -7,5 +7,5 @@ public enum UserRoles {
     ADMIN,
     COMPANY_ADMIN,
     WORKER,
-    CLIENT
+    CUSTOMER
 }

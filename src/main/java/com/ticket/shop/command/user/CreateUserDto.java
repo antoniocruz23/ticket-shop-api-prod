@@ -32,7 +32,6 @@ public class CreateUserDto {
     @NotBlank(message = "Must have password")
     private String password;
 
-    @NotNull(message = "Must have role")
     private List<UserRoles> roles;
 
     @NotNull(message = "Must have a country")

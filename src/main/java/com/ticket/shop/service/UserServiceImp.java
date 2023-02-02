@@ -5,11 +5,13 @@ import com.ticket.shop.command.user.CreateUserDto;
 import com.ticket.shop.command.user.UpdateUserDto;
 import com.ticket.shop.command.user.UserDetailsDto;
 import com.ticket.shop.converter.UserConverter;
+import com.ticket.shop.enumerators.UserRoles;
 import com.ticket.shop.error.ErrorMessages;
 import com.ticket.shop.exception.DatabaseCommunicationException;
 import com.ticket.shop.exception.country.CountryNotFoundException;
 import com.ticket.shop.exception.user.UserAlreadyExistsException;
 import com.ticket.shop.exception.user.UserNotFoundException;
+import com.ticket.shop.persistence.entity.CompanyEntity;
 import com.ticket.shop.persistence.entity.CountryEntity;
 import com.ticket.shop.persistence.entity.UserEntity;
 import com.ticket.shop.persistence.repository.CountryRepository;
@@ -18,6 +20,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * UserService Implementation
@@ -38,21 +42,43 @@ public class UserServiceImp implements UserService {
     }
 
     /**
-     * @see UserService#createUser(CreateUserDto)
+     * @see UserService#createCustomer(CreateUserDto)
      */
     @Override
-    public UserDetailsDto createUser(CreateUserDto createUserDto) throws UserAlreadyExistsException {
+    public UserDetailsDto createCustomer(CreateUserDto createUserDto) throws UserAlreadyExistsException {
 
         LOGGER.debug("Creating user - {}", createUserDto);
         UserEntity userEntity = UserConverter.fromCreateUserDtoToUserEntity(createUserDto);
 
-        CountryEntity countryEntity = getCountryEntityById(createUserDto.getCountryId());
+        userEntity.setRoles(List.of(UserRoles.CUSTOMER));
+
+        return createUser(userEntity, createUserDto.getCountryId(), createUserDto.getPassword());
+    }
+
+    /**
+     * @see UserService#createWorker(CreateUserDto, Long)
+     */
+    @Override
+    public UserDetailsDto createWorker(CreateUserDto createUserDto, Long userId) throws UserAlreadyExistsException {
+
+        LOGGER.debug("Creating user - {}", createUserDto);
+        UserEntity userEntity = UserConverter.fromCreateUserDtoToUserEntity(createUserDto);
+
+        CompanyEntity companyEntity = getUserEntityById(userId).getCompanyEntity();
+        userEntity.setCompanyEntity(companyEntity);
+        userEntity.setRoles(List.of(UserRoles.WORKER));
+
+        return createUser(userEntity, createUserDto.getCountryId(), createUserDto.getPassword());
+    }
+
+    private UserDetailsDto createUser(UserEntity userEntity, Long countryId, String password) {
+        CountryEntity countryEntity = getCountryEntityById(countryId);
         userEntity.setCountryEntity(countryEntity);
 
-        String encryptedPassword = this.passwordEncoder.encode(createUserDto.getPassword());
+        String encryptedPassword = this.passwordEncoder.encode(password);
         userEntity.setEncryptedPassword(encryptedPassword);
 
-        if (userRepository.findByEmail(createUserDto.getEmail()).isPresent()) {
+        if (this.userRepository.findByEmail(userEntity.getEmail()).isPresent()) {
 
             LOGGER.error("Duplicated email - {}", userEntity.getEmail());
             throw new UserAlreadyExistsException(ErrorMessages.EMAIL_ALREADY_EXISTS);

@@ -6,6 +6,7 @@ import com.ticket.shop.command.user.UserDetailsDto;
 import com.ticket.shop.error.ErrorMessages;
 import com.ticket.shop.exception.TicketShopException;
 import com.ticket.shop.persistence.entity.UserEntity;
+import com.ticket.shop.service.UserService;
 import com.ticket.shop.service.UserServiceImp;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -35,26 +36,26 @@ import static org.springframework.http.HttpStatus.OK;
  * REST controller responsible for {@link UserEntity}
  */
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api")
 @Tag(name = "Users", description = "Users API")
 public class UserController {
 
     private static final Logger LOGGER = LogManager.getLogger(UserController.class);
 
-    private final UserServiceImp userServiceImp;
+    private final UserService userService;
 
-    public UserController(UserServiceImp userServiceImp) {
-        this.userServiceImp = userServiceImp;
+    public UserController(UserServiceImp userService) {
+        this.userService = userService;
     }
 
     /**
-     * Create new user
+     * Create new costumer
      *
      * @param createUserDto new user data
      * @return the response entity
      */
-    @PostMapping
-    @Operation(summary = "Registration", description = "Register new user")
+    @PostMapping("/customers")
+    @Operation(summary = "Registration", description = "Register new customer")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Successfully Created",
                     content = @Content(schema = @Schema(implementation = UserDetailsDto.class))),
@@ -62,12 +63,48 @@ public class UserController {
                     content = @Content(schema = @Schema(implementation = Error.class))),
             @ApiResponse(responseCode = "500", description = ErrorMessages.ACCESS_DENIED,
                     content = @Content(schema = @Schema(implementation = Error.class)))})
-    public ResponseEntity<UserDetailsDto> userRegistration(@Valid @RequestBody CreateUserDto createUserDto) {
+    public ResponseEntity<UserDetailsDto> customerRegistration(@Valid @RequestBody CreateUserDto createUserDto) {
         LOGGER.info("Request to create new user - {}", createUserDto);
 
         UserDetailsDto usersDetailsDto;
         try {
-            usersDetailsDto = this.userServiceImp.createUser(createUserDto);
+            usersDetailsDto = this.userService.createCustomer(createUserDto);
+
+        } catch (TicketShopException e) {
+            throw e;
+
+        } catch (Exception e) {
+            LOGGER.error("Failed to created user - {}", createUserDto, e);
+            throw new TicketShopException(ErrorMessages.OPERATION_FAILED, e);
+        }
+
+        LOGGER.info("User created successfully. Retrieving created user with id {}", usersDetailsDto.getUserId());
+        return new ResponseEntity<>(usersDetailsDto, HttpStatus.CREATED);
+    }
+
+    /**
+     * Create new worker
+     *
+     * @param createUserDto new user data
+     * @return the response entity
+     */
+    @PostMapping("/companies/admins/{userId}/workers")
+    @PreAuthorize("@authorized.hasRole('ADMIN') || @authorized.hasRole('COMPANY_ADMIN')")
+    @Operation(summary = "Registration", description = "Register new worker")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Successfully Created",
+                    content = @Content(schema = @Schema(implementation = UserDetailsDto.class))),
+            @ApiResponse(responseCode = "409", description = "User already exists",
+                    content = @Content(schema = @Schema(implementation = Error.class))),
+            @ApiResponse(responseCode = "500", description = ErrorMessages.ACCESS_DENIED,
+                    content = @Content(schema = @Schema(implementation = Error.class)))})
+    public ResponseEntity<UserDetailsDto> workerRegistration(@Valid @RequestBody CreateUserDto createUserDto,
+                                                             @PathVariable Long userId) {
+
+        LOGGER.info("Request to create new user - {}", createUserDto);
+        UserDetailsDto usersDetailsDto;
+        try {
+            usersDetailsDto = this.userService.createWorker(createUserDto, userId);
 
         } catch (TicketShopException e) {
             throw e;
@@ -87,7 +124,7 @@ public class UserController {
      * @param userId user id
      * @return {@link UserDetailsDto} the user wanted and Ok httpStatus
      */
-    @GetMapping("/{userId}")
+    @GetMapping("/users/{userId}")
     @PreAuthorize("@authorized.hasRole('ADMIN') || @authorized.isUser(#userId)")
     @Operation(summary = "Get user", description = "Get user")
     @ApiResponses(value = {
@@ -102,7 +139,7 @@ public class UserController {
         LOGGER.info("Request to get user with id {}", userId);
         UserDetailsDto usersDetailsDto;
         try {
-            usersDetailsDto = this.userServiceImp.getUserById(userId);
+            usersDetailsDto = this.userService.getUserById(userId);
 
         } catch (TicketShopException e) {
             throw e;
@@ -123,7 +160,7 @@ public class UserController {
      * @param updateUserDto data to update
      * @return the response entity
      */
-    @PutMapping("/{userId}")
+    @PutMapping("/users/{userId}")
     @PreAuthorize("@authorized.hasRole('ADMIN') || @authorized.isUser(#userId)")
     @Operation(summary = "Update user", description = "Update user")
     @ApiResponses(value = {
@@ -141,7 +178,7 @@ public class UserController {
         LOGGER.info("Request to update user with id {} - {}", userId, updateUserDto);
         UserDetailsDto userDetailsDto;
         try {
-            userDetailsDto = this.userServiceImp.updateUser(userId, updateUserDto);
+            userDetailsDto = this.userService.updateUser(userId, updateUserDto);
 
         } catch (TicketShopException e) {
             throw e;

@@ -69,7 +69,7 @@ public class UserServiceImpTest {
         when(this.userRepository.save(any())).thenReturn(getMockedUserEntity());
 
         // Method to be tested
-        UserDetailsDto userDetails = this.userServiceImp.createUser(getMockedCreateUserDto());
+        UserDetailsDto userDetails = this.userServiceImp.createCustomer(getMockedCreateUserDto());
 
         // Assert result
         assertNotNull(userDetails);
@@ -83,7 +83,7 @@ public class UserServiceImpTest {
 
         // Assert exception
         assertThrows(CountryNotFoundException.class,
-                () -> this.userServiceImp.createUser(getMockedCreateUserDto()));
+                () -> this.userServiceImp.createCustomer(getMockedCreateUserDto()));
     }
 
     @Test
@@ -94,7 +94,7 @@ public class UserServiceImpTest {
 
         // Assert exception
         assertThrows(UserAlreadyExistsException.class,
-                () -> this.userServiceImp.createUser(getMockedCreateUserDto()));
+                () -> this.userServiceImp.createCustomer(getMockedCreateUserDto()));
     }
 
     @Test
@@ -105,7 +105,7 @@ public class UserServiceImpTest {
 
         // Assert exception
         assertThrows(DatabaseCommunicationException.class,
-                () -> this.userServiceImp.createUser(getMockedCreateUserDto()));
+                () -> this.userServiceImp.createCustomer(getMockedCreateUserDto()));
     }
 
     /**
@@ -150,7 +150,7 @@ public class UserServiceImpTest {
                 .lastname(LASTNAME + 11)
                 .email(EMAIL)
                 .encryptedPassword(ENCRYPTED_PASSWORD)
-                .roles(List.of(UserRoles.ADMIN, UserRoles.CLIENT))
+                .roles(List.of(UserRoles.ADMIN, UserRoles.CUSTOMER))
                 .countryEntity(getMockedCountryEntity()).build();
 
         // Method to be tested
@@ -244,7 +244,7 @@ public class UserServiceImpTest {
                 .lastname(LASTNAME + "11")
                 .email(EMAIL)
                 .password(PASSWORD + "11")
-                .roles(List.of(UserRoles.ADMIN, UserRoles.CLIENT))
+                .roles(List.of(UserRoles.ADMIN, UserRoles.CUSTOMER))
                 .countryId(1L)
                 .build();
     }
