@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -18,6 +19,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.util.List;
 
@@ -53,8 +55,8 @@ public class UserEntity {
     @Enumerated(EnumType.STRING)
     private List<UserRoles> roles;
 
-//    @OneToMany(mappedBy = "userEntity")
-//    private List<AddressEntity> addressEntity;
+    @OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL)
+    private List<AddressEntity> addresses;
 
     @ManyToOne
     @JoinColumn(name = "country_id", nullable = false)

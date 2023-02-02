@@ -11,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -50,4 +51,10 @@ public class AddressEntity {
     @ManyToOne
     @JoinColumn(name = "country_id", nullable = false)
     private CountryEntity countryEntity;
+
+    @ManyToOne
+    @JoinTable(name = "users_addresses",
+            joinColumns = @JoinColumn(name = "address_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id"))
+    private UserEntity userEntity;
 }
