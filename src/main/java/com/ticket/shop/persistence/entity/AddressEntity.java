@@ -13,6 +13,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
 /**
@@ -57,4 +59,8 @@ public class AddressEntity {
             joinColumns = @JoinColumn(name = "address_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
     private UserEntity userEntity;
+
+    @OneToOne(mappedBy = "addressEntity")
+    @PrimaryKeyJoinColumn
+    private CompanyEntity companyEntity;
 }
