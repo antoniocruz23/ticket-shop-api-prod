@@ -4,16 +4,19 @@ package com.ticket.shop.service;
 import com.ticket.shop.command.user.CreateUserDto;
 import com.ticket.shop.command.user.UpdateUserDto;
 import com.ticket.shop.command.user.UserDetailsDto;
+import com.ticket.shop.command.user.WorkerDetailsDto;
 import com.ticket.shop.converter.UserConverter;
 import com.ticket.shop.enumerators.UserRoles;
 import com.ticket.shop.error.ErrorMessages;
 import com.ticket.shop.exception.DatabaseCommunicationException;
+import com.ticket.shop.exception.company.CompanyNotFoundException;
 import com.ticket.shop.exception.country.CountryNotFoundException;
 import com.ticket.shop.exception.user.UserAlreadyExistsException;
 import com.ticket.shop.exception.user.UserNotFoundException;
 import com.ticket.shop.persistence.entity.CompanyEntity;
 import com.ticket.shop.persistence.entity.CountryEntity;
 import com.ticket.shop.persistence.entity.UserEntity;
+import com.ticket.shop.persistence.repository.CompanyRepository;
 import com.ticket.shop.persistence.repository.CountryRepository;
 import com.ticket.shop.persistence.repository.UserRepository;
 import org.apache.logging.log4j.LogManager;
@@ -33,12 +36,14 @@ public class UserServiceImp implements UserService {
 
     private final UserRepository userRepository;
     private final CountryRepository countryRepository;
+    private final CompanyRepository companyRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImp(UserRepository userRepository, CountryRepository countryRepository, PasswordEncoder passwordEncoder) {
+    public UserServiceImp(UserRepository userRepository, CountryRepository countryRepository, PasswordEncoder passwordEncoder, CompanyRepository companyRepository) {
         this.userRepository = userRepository;
         this.countryRepository = countryRepository;
         this.passwordEncoder = passwordEncoder;
+        this.companyRepository = companyRepository;
     }
 
     /**
@@ -71,6 +76,14 @@ public class UserServiceImp implements UserService {
         return createUser(userEntity, createUserDto.getCountryId(), createUserDto.getPassword());
     }
 
+    /**
+     * Create user method common between createCustomer and createWorker
+     *
+     * @param userEntity userEntity
+     * @param countryId  countryId
+     * @param password   password to be encrypted
+     * @return {@link UserDetailsDto}
+     */
     private UserDetailsDto createUser(UserEntity userEntity, Long countryId, String password) {
         CountryEntity countryEntity = getCountryEntityById(countryId);
         userEntity.setCountryEntity(countryEntity);
@@ -137,6 +150,17 @@ public class UserServiceImp implements UserService {
     }
 
     /**
+     * @see UserService#getWorkerById(Long, Long)
+     */
+    @Override
+    public WorkerDetailsDto getWorkerById(Long workerId, Long companyId) throws UserNotFoundException {
+        CompanyEntity companyEntity = getCompanyEntityById(companyId);
+        UserEntity userEntity = getWorkerByIdAndCompany(workerId, companyEntity);
+
+        return UserConverter.fromUserEntityToWorkerDetailsDto(userEntity);
+    }
+
+    /**
      * Get Country by id
      *
      * @param countryId country id
@@ -163,6 +187,37 @@ public class UserServiceImp implements UserService {
                 .orElseThrow(() -> {
                     LOGGER.error("The user with id {} does not exist in database", userId);
                     return new UserNotFoundException(ErrorMessages.USER_NOT_FOUND);
+                });
+    }
+
+    /**
+     * Get Worker by id and company
+     *
+     * @param workerId      worker id
+     * @param companyEntity company entity
+     * @return {@link UserEntity}
+     */
+    protected UserEntity getWorkerByIdAndCompany(Long workerId, CompanyEntity companyEntity) {
+        LOGGER.debug("Getting worker with id {} from database", workerId);
+        return this.userRepository.findByUserIdAndCompanyEntity(workerId, companyEntity)
+                .orElseThrow(() -> {
+                    LOGGER.error("The worker with id {} does not exist in database", workerId);
+                    return new UserNotFoundException(ErrorMessages.USER_NOT_FOUND);
+                });
+    }
+
+    /**
+     * Get Company by id
+     *
+     * @param companyId company id
+     * @return {@link CompanyEntity}
+     */
+    protected CompanyEntity getCompanyEntityById(Long companyId) {
+        LOGGER.debug("Getting company with id {} from database", companyId);
+        return this.companyRepository.findById(companyId)
+                .orElseThrow(() -> {
+                    LOGGER.error("The company with id {} does not exist in database", companyId);
+                    return new CompanyNotFoundException(ErrorMessages.COMPANY_NOT_FOUND);
                 });
     }
 }

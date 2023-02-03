@@ -3,6 +3,7 @@ package com.ticket.shop.service;
 import com.ticket.shop.command.user.CreateUserDto;
 import com.ticket.shop.command.user.UpdateUserDto;
 import com.ticket.shop.command.user.UserDetailsDto;
+import com.ticket.shop.command.user.WorkerDetailsDto;
 import com.ticket.shop.exception.user.UserAlreadyExistsException;
 import com.ticket.shop.exception.user.UserNotFoundException;
 
@@ -24,7 +25,7 @@ public interface UserService {
      * Create new worker
      *
      * @param createUserDto {@link CreateUserDto}
-     * @param userId company admin id
+     * @param userId        company admin id
      * @return {@link UserDetailsDto} the user created
      * @throws UserAlreadyExistsException when the user already exists
      */
@@ -41,10 +42,22 @@ public interface UserService {
 
     /**
      * Update user
-     * @param userId user id to be updated
+     *
+     * @param userId        user id to be updated
      * @param updateUserDto {@link UpdateUserDto}
      * @return {@link UserDetailsDto} the user updated
      * @throws UserNotFoundException when the user isn't found
      */
     UserDetailsDto updateUser(Long userId, UpdateUserDto updateUserDto) throws UserNotFoundException;
+
+    /**
+     * Get worker by id
+     * Only can get a worker from the same company as the userId company
+     *
+     * @param workerId  worker id to be got
+     * @param companyId company id
+     * @return {@link WorkerDetailsDto} the worker obtained
+     * @throws UserNotFoundException when the user isn't found
+     */
+    WorkerDetailsDto getWorkerById(Long workerId, Long companyId) throws UserNotFoundException;
 }

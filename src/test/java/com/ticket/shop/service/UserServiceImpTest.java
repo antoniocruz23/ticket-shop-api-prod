@@ -10,6 +10,7 @@ import com.ticket.shop.exception.user.UserAlreadyExistsException;
 import com.ticket.shop.exception.user.UserNotFoundException;
 import com.ticket.shop.persistence.entity.CountryEntity;
 import com.ticket.shop.persistence.entity.UserEntity;
+import com.ticket.shop.persistence.repository.CompanyRepository;
 import com.ticket.shop.persistence.repository.CountryRepository;
 import com.ticket.shop.persistence.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,6 +40,9 @@ public class UserServiceImpTest {
     @Mock
     private CountryRepository countryRepository;
 
+    @Mock
+    private CompanyRepository companyRepository;
+
     @MockBean
     private PasswordEncoder passwordEncoder;
     private UserServiceImp userServiceImp;
@@ -53,7 +57,7 @@ public class UserServiceImpTest {
 
     @BeforeEach
     public void setup() {
-        this.userServiceImp = new UserServiceImp(this.userRepository, this.countryRepository, this.passwordEncoder);
+        this.userServiceImp = new UserServiceImp(this.userRepository, this.countryRepository, this.passwordEncoder, this.companyRepository);
 
         // Mocks
         when(this.passwordEncoder.encode(any())).thenReturn(ENCRYPTED_PASSWORD);
