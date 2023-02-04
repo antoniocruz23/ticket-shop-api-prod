@@ -1,13 +1,10 @@
 package com.ticket.shop.service;
 
-
 import com.ticket.shop.command.Paginated;
-import com.ticket.shop.command.user.CreateUserDto;
-import com.ticket.shop.command.user.UpdateUserDto;
-import com.ticket.shop.command.user.UserDetailsDto;
-import com.ticket.shop.command.user.WorkerDetailsDto;
+import com.ticket.shop.command.worker.CreateWorkerDto;
+import com.ticket.shop.command.worker.UpdateWorkerDto;
+import com.ticket.shop.command.worker.WorkerDetailsDto;
 import com.ticket.shop.converter.UserConverter;
-import com.ticket.shop.enumerators.UserRoles;
 import com.ticket.shop.error.ErrorMessages;
 import com.ticket.shop.exception.DatabaseCommunicationException;
 import com.ticket.shop.exception.company.CompanyNotFoundException;
@@ -31,19 +28,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * UserService Implementation
+ * WorkerService Implementation
  */
 @Service
-public class UserServiceImp implements UserService {
+public class WorkerServiceImp implements WorkerService {
 
-    private static final Logger LOGGER = LogManager.getLogger(UserService.class);
-
+    private static final Logger LOGGER = LogManager.getLogger(CustomerService.class);
     private final UserRepository userRepository;
     private final CountryRepository countryRepository;
     private final CompanyRepository companyRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImp(UserRepository userRepository, CountryRepository countryRepository, PasswordEncoder passwordEncoder, CompanyRepository companyRepository) {
+    public WorkerServiceImp(UserRepository userRepository, CountryRepository countryRepository, PasswordEncoder passwordEncoder, CompanyRepository companyRepository) {
         this.userRepository = userRepository;
         this.countryRepository = countryRepository;
         this.passwordEncoder = passwordEncoder;
@@ -51,48 +47,21 @@ public class UserServiceImp implements UserService {
     }
 
     /**
-     * @see UserService#createCustomer(CreateUserDto)
+     * @see WorkerService#createWorker(CreateWorkerDto, Long)
      */
     @Override
-    public UserDetailsDto createCustomer(CreateUserDto createUserDto) throws UserAlreadyExistsException {
+    public WorkerDetailsDto createWorker(CreateWorkerDto createWorkerDto, Long companyId) throws UserAlreadyExistsException {
 
-        LOGGER.debug("Creating user - {}", createUserDto);
-        UserEntity userEntity = UserConverter.fromCreateUserDtoToUserEntity(createUserDto);
+        LOGGER.debug("Creating worker - {}", createWorkerDto);
+        UserEntity userEntity = UserConverter.fromCreateWorkerDtoToUserEntity(createWorkerDto);
 
-        userEntity.setRoles(List.of(UserRoles.CUSTOMER));
-
-        return createUser(userEntity, createUserDto.getCountryId(), createUserDto.getPassword());
-    }
-
-    /**
-     * @see UserService#createWorker(CreateUserDto, Long)
-     */
-    @Override
-    public UserDetailsDto createWorker(CreateUserDto createUserDto, Long userId) throws UserAlreadyExistsException {
-
-        LOGGER.debug("Creating user - {}", createUserDto);
-        UserEntity userEntity = UserConverter.fromCreateUserDtoToUserEntity(createUserDto);
-
-        CompanyEntity companyEntity = getUserEntityById(userId).getCompanyEntity();
+        CompanyEntity companyEntity = getCompanyEntityById(companyId);
         userEntity.setCompanyEntity(companyEntity);
-        userEntity.setRoles(List.of(UserRoles.WORKER));
 
-        return createUser(userEntity, createUserDto.getCountryId(), createUserDto.getPassword());
-    }
-
-    /**
-     * Create user method common between createCustomer and createWorker
-     *
-     * @param userEntity userEntity
-     * @param countryId  countryId
-     * @param password   password to be encrypted
-     * @return {@link UserDetailsDto}
-     */
-    private UserDetailsDto createUser(UserEntity userEntity, Long countryId, String password) {
-        CountryEntity countryEntity = getCountryEntityById(countryId);
+        CountryEntity countryEntity = getCountryEntityById(createWorkerDto.getCountryId());
         userEntity.setCountryEntity(countryEntity);
 
-        String encryptedPassword = this.passwordEncoder.encode(password);
+        String encryptedPassword = this.passwordEncoder.encode(createWorkerDto.getPassword());
         userEntity.setEncryptedPassword(encryptedPassword);
 
         if (this.userRepository.findByEmail(userEntity.getEmail()).isPresent()) {
@@ -101,60 +70,23 @@ public class UserServiceImp implements UserService {
             throw new UserAlreadyExistsException(ErrorMessages.EMAIL_ALREADY_EXISTS);
         }
 
-        LOGGER.info("Persisting user into database");
-        UserEntity createdUser;
+        LOGGER.info("Persisting worker into database");
+        UserEntity createdWorker;
         try {
-            LOGGER.info("Saving user on database");
-            createdUser = this.userRepository.save(userEntity);
+            LOGGER.info("Saving worker on database");
+            createdWorker = this.userRepository.save(userEntity);
 
         } catch (Exception e) {
-            LOGGER.error("Failed while saving user into database {}", userEntity, e);
+            LOGGER.error("Failed while saving worker into database {}", userEntity, e);
             throw new DatabaseCommunicationException(ErrorMessages.DATABASE_COMMUNICATION_ERROR, e);
         }
 
-        LOGGER.debug("Retrieving created user");
-        return UserConverter.fromUserEntityToUserDetailsDto(createdUser);
+        LOGGER.debug("Retrieving created worker");
+        return UserConverter.fromUserEntityToWorkerDetailsDto(createdWorker);
     }
 
     /**
-     * @see UserService#getUserById(Long)
-     */
-    @Override
-    public UserDetailsDto getUserById(Long userId) throws UserNotFoundException {
-        return UserConverter.fromUserEntityToUserDetailsDto(getUserEntityById(userId));
-    }
-
-    /**
-     * @see UserService#updateUser(Long, UpdateUserDto)
-     */
-    @Override
-    public UserDetailsDto updateUser(Long userId, UpdateUserDto updateUserDto) throws UserNotFoundException {
-
-        UserEntity userEntity = getUserEntityById(userId);
-        CountryEntity countryEntity = getCountryEntityById(updateUserDto.getCountryId());
-        String encryptedPassword = this.passwordEncoder.encode(updateUserDto.getPassword());
-
-        userEntity.setFirstname(updateUserDto.getFirstname());
-        userEntity.setLastname(updateUserDto.getLastname());
-        userEntity.setEmail(updateUserDto.getEmail());
-        userEntity.setEncryptedPassword(encryptedPassword);
-        userEntity.setRoles(updateUserDto.getRoles());
-        userEntity.setCountryEntity(countryEntity);
-
-        LOGGER.debug("Updating user with id {} with new data", userId);
-        try {
-            this.userRepository.save(userEntity);
-
-        } catch (Exception e) {
-            LOGGER.error("Failed while updating user with id {} with new data - {}", userId, userEntity, e);
-            throw new DatabaseCommunicationException(ErrorMessages.DATABASE_COMMUNICATION_ERROR, e);
-        }
-
-        return UserConverter.fromUserEntityToUserDetailsDto(userEntity);
-    }
-
-    /**
-     * @see UserService#getWorkerById(Long, Long)
+     * @see WorkerService#getWorkerById(Long, Long)
      */
     @Override
     public WorkerDetailsDto getWorkerById(Long workerId, Long companyId) throws UserNotFoundException {
@@ -165,7 +97,7 @@ public class UserServiceImp implements UserService {
     }
 
     /**
-     * @see UserService#getWorkersList(int, int, Long)
+     * @see WorkerService#getWorkersList(int, int, Long)
      */
     @Override
     public Paginated<WorkerDetailsDto> getWorkersList(int page, int size, Long companyId) {
@@ -194,6 +126,35 @@ public class UserServiceImp implements UserService {
                 patientListResponse.size(),
                 workersList.getTotalPages(),
                 workersList.getTotalElements());
+    }
+
+    /**
+     * @see WorkerService#updateWorker(Long, UpdateWorkerDto)
+     */
+    @Override
+    public WorkerDetailsDto updateWorker(Long userId, UpdateWorkerDto updateUserDto) throws UserNotFoundException {
+
+        UserEntity userEntity = getUserEntityById(userId);
+        CountryEntity countryEntity = getCountryEntityById(updateUserDto.getCountryId());
+        String encryptedPassword = this.passwordEncoder.encode(updateUserDto.getPassword());
+
+        userEntity.setFirstname(updateUserDto.getFirstname());
+        userEntity.setLastname(updateUserDto.getLastname());
+        userEntity.setEmail(updateUserDto.getEmail());
+        userEntity.setEncryptedPassword(encryptedPassword);
+        userEntity.setRoles(updateUserDto.getRoles());
+        userEntity.setCountryEntity(countryEntity);
+
+        LOGGER.debug("Updating customer with id {} with new data", userId);
+        try {
+            this.userRepository.save(userEntity);
+
+        } catch (Exception e) {
+            LOGGER.error("Failed while updating customer with id {} with new data - {}", userId, userEntity, e);
+            throw new DatabaseCommunicationException(ErrorMessages.DATABASE_COMMUNICATION_ERROR, e);
+        }
+
+        return UserConverter.fromUserEntityToWorkerDetailsDto(userEntity);
     }
 
     /**

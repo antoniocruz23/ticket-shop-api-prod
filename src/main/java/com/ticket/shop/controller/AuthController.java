@@ -40,7 +40,7 @@ public class AuthController {
 
     /**
      * Login user with email and password
-     * @param credentials
+     * @param credentials user credentials
      * @return {@link LoggedInDto} with user info and jwt token
      */
     @PostMapping("/login")

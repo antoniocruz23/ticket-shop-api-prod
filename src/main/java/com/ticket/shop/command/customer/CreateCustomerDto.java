@@ -1,20 +1,18 @@
-package com.ticket.shop.command.user;
+package com.ticket.shop.command.customer;
 
-import com.ticket.shop.enumerators.UserRoles;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.List;
 
 /**
- * CreateUserDto used to store user info when created
+ * CreateCustomerDto used to store customer info when created
  */
 @Data
 @Builder
-public class CreateUserDto {
+public class CreateCustomerDto {
 
     @Schema(example = "User")
     @NotBlank(message = "Must have firstname")
@@ -32,8 +30,7 @@ public class CreateUserDto {
     @NotBlank(message = "Must have password")
     private String password;
 
-    private List<UserRoles> roles;
-
+    @Schema(example = "1")
     @NotNull(message = "Must have a country")
     private Long countryId;
 
@@ -43,7 +40,7 @@ public class CreateUserDto {
      */
     @Override
     public String toString() {
-        return "CreateUserDto{" +
+        return "CreateCustomerDto{" +
                 "firstname='" + firstname + '\'' +
                 ", lastname='" + lastname + '\'' +
                 ", email='" + email + '\'' +

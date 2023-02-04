@@ -6,6 +6,7 @@ import com.ticket.shop.command.auth.PrincipalDto;
 import com.ticket.shop.enumerators.UserRoles;
 import com.ticket.shop.exception.auth.WrongCredentialsException;
 import com.ticket.shop.exception.user.UserNotFoundException;
+import com.ticket.shop.persistence.entity.CountryEntity;
 import com.ticket.shop.persistence.entity.UserEntity;
 import com.ticket.shop.persistence.repository.UserRepository;
 import com.ticket.shop.properties.JwtProperties;
@@ -143,6 +144,19 @@ public class AuthServiceImpTest {
                 .email(EMAIL)
                 .encryptedPassword(ENCRYPTED_PASSWORD)
                 .roles(USER_ROLE)
+                .countryEntity(getMockedCountryEntity())
+                .build();
+    }
+
+    private CountryEntity getMockedCountryEntity() {
+        return CountryEntity.builder()
+                .countryId(1L)
+                .name("Portugal")
+                .isoCode2("PT")
+                .isoCode3("PRT")
+                .currency("EUR")
+                .language("PT")
+                .phoneCode("+351")
                 .build();
     }
 
@@ -159,6 +173,7 @@ public class AuthServiceImpTest {
                 .name(FIRSTNAME + " " + LASTNAME)
                 .email(EMAIL)
                 .roles(USER_ROLE)
+                .countryId(getMockedCountryEntity().getCountryId())
                 .build();
     }
 

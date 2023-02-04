@@ -1,41 +1,58 @@
 package com.ticket.shop.converter;
 
 import com.ticket.shop.command.auth.PrincipalDto;
-import com.ticket.shop.command.user.CreateUserDto;
-import com.ticket.shop.command.user.UserDetailsDto;
-import com.ticket.shop.command.user.WorkerDetailsDto;
+import com.ticket.shop.command.customer.CreateCustomerDto;
+import com.ticket.shop.command.customer.CustomerDetailsDto;
+import com.ticket.shop.command.worker.CreateWorkerDto;
+import com.ticket.shop.command.worker.WorkerDetailsDto;
 import com.ticket.shop.persistence.entity.UserEntity;
 
 /**
- * User converter
+ * User converter for Worker Service and Customer Service
  */
 public class UserConverter {
+
     /**
-     * From {@link CreateUserDto} to {@link UserEntity}
-     * @param createUserDto {@link CreateUserDto}
+     * From {@link CreateCustomerDto} to {@link UserEntity}
+     * @param createCustomerDto {@link CreateCustomerDto}
      * @return {@link UserEntity}
      */
-    public static UserEntity fromCreateUserDtoToUserEntity(CreateUserDto createUserDto) {
+    public static UserEntity fromCreateCustomerDtoToUserEntity(CreateCustomerDto createCustomerDto) {
         return UserEntity.builder()
-                .firstname(createUserDto.getFirstname())
-                .lastname(createUserDto.getLastname())
-                .email(createUserDto.getEmail())
-                .encryptedPassword(createUserDto.getPassword())
-                .roles(createUserDto.getRoles())
+                .firstname(createCustomerDto.getFirstname())
+                .lastname(createCustomerDto.getLastname())
+                .email(createCustomerDto.getEmail())
+                .encryptedPassword(createCustomerDto.getPassword())
                 .build();
     }
 
     /**
-     * From {@link UserEntity} to {@link UserDetailsDto}
-     * @param userEntity {@link UserEntity}
-     * @return {@link UserDetailsDto}
+     * From {@link CreateWorkerDto} to {@link UserEntity}
+     * @param createWorkerDto {@link CreateWorkerDto}
+     * @return {@link UserEntity}
      */
-    public static UserDetailsDto fromUserEntityToUserDetailsDto(UserEntity userEntity) {
-        return UserDetailsDto.builder()
+    public static UserEntity fromCreateWorkerDtoToUserEntity(CreateWorkerDto createWorkerDto) {
+        return UserEntity.builder()
+                .firstname(createWorkerDto.getFirstname())
+                .lastname(createWorkerDto.getLastname())
+                .email(createWorkerDto.getEmail())
+                .encryptedPassword(createWorkerDto.getPassword())
+                .roles(createWorkerDto.getRoles())
+                .build();
+    }
+
+    /**
+     * From {@link UserEntity} to {@link CustomerDetailsDto}
+     * @param userEntity {@link UserEntity}
+     * @return {@link CustomerDetailsDto}
+     */
+    public static CustomerDetailsDto fromUserEntityToCustomerDetailsDto(UserEntity userEntity) {
+        return CustomerDetailsDto.builder()
                 .userId(userEntity.getUserId())
                 .firstname(userEntity.getFirstname())
                 .lastname(userEntity.getLastname())
                 .email(userEntity.getEmail())
+                .countryId(userEntity.getCountryEntity().getCountryId())
                 .build();
     }
 
@@ -50,8 +67,8 @@ public class UserConverter {
                 .firstname(userEntity.getFirstname())
                 .lastname(userEntity.getLastname())
                 .email(userEntity.getEmail())
-                .company_id(userEntity.getCompanyEntity().getCompanyId())
-                .country_id(userEntity.getCountryEntity().getCountryId())
+                .companyId(userEntity.getCompanyEntity().getCompanyId())
+                .countryId(userEntity.getCountryEntity().getCountryId())
                 .build();
     }
 
@@ -66,6 +83,8 @@ public class UserConverter {
                 .name(userEntity.getFirstname() + " " + userEntity.getLastname())
                 .email(userEntity.getEmail())
                 .roles(userEntity.getRoles())
+                .countryId(userEntity.getCountryEntity().getCountryId())
+                .companyId(userEntity.getCompanyEntity() != null ? userEntity.getCompanyEntity().getCompanyId() : null)
                 .build();
     }
 }

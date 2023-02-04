@@ -1,16 +1,17 @@
-package com.ticket.shop.command.user;
+package com.ticket.shop.command.customer;
 
 import lombok.Builder;
 import lombok.Data;
 
 /**
- * UserDetailDto used to respond with user details
+ * CustomerDetailsDto used to respond with customer details
  */
 @Data
 @Builder
-public class UserDetailsDto {
+public class CustomerDetailsDto {
     private Long userId;
     private String firstname;
     private String lastname;
     private String email;
+    private Long countryId;
 }

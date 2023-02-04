@@ -17,4 +17,6 @@ public class PrincipalDto {
     private String name;
     private String email;
     private List<UserRoles> roles;
+    private Long countryId;
+    private Long companyId;
 }

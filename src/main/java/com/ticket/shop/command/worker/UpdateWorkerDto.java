@@ -1,4 +1,4 @@
-package com.ticket.shop.command.user;
+package com.ticket.shop.command.worker;
 
 import com.ticket.shop.enumerators.UserRoles;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -10,11 +10,11 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
- * UpdateUserDto used to update user info
+ * UpdateWorkerDto used to update worker info
  */
 @Data
 @Builder
-public class UpdateUserDto {
+public class UpdateWorkerDto {
 
     @Schema(example = "new")
     @NotBlank(message = "Must have firstname")
@@ -32,9 +32,11 @@ public class UpdateUserDto {
     @NotBlank(message = "Must have password")
     private String password;
 
+    @Schema(example = "[\"Worker\"]")
     @NotNull(message = "Must have role")
     private List<UserRoles> roles;
 
+    @Schema(example = "1")
     @NotNull(message = "Must have a country id")
     private Long countryId;
 }
