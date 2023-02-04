@@ -16,7 +16,7 @@ public interface WorkerService {
      * Create new worker
      *
      * @param createUserDto {@link CreateWorkerDto}
-     * @param companyId        company id
+     * @param companyId     company id
      * @return {@link WorkerDetailsDto} the worker created
      * @throws UserAlreadyExistsException when the user already exists
      */

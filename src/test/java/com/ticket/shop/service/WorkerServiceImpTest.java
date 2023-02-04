@@ -247,10 +247,10 @@ public class WorkerServiceImpTest {
      * Get workers list tests
      */
     @Test
-    public void testGetWorkersListSuccessfully(){
+    public void testGetWorkersListSuccessfully() {
         //Mocks
         when(this.companyRepository.findById(any())).thenReturn(Optional.of(getMockedCompanyEntity()));
-        when(this.userRepository.findByCompanyEntity(any(), any())).thenReturn(getMockedPagedUserEntity(0,1));
+        when(this.userRepository.findByCompanyEntity(any(), any())).thenReturn(getMockedPagedUserEntity(0, 1));
 
         //Call method
         Paginated<WorkerDetailsDto> workerDetailsDto = this.workerServiceImp.getWorkersList(0, 1, getMockedWorkerDetailsDto().getCompanyId());
@@ -261,7 +261,7 @@ public class WorkerServiceImpTest {
     }
 
     @Test
-    public void testGetWorkersListFailureDueToDatabaseConnectionFailure(){
+    public void testGetWorkersListFailureDueToDatabaseConnectionFailure() {
         //Mocks
         when(this.companyRepository.findById(any())).thenReturn(Optional.of(getMockedCompanyEntity()));
         when(this.userRepository.findByCompanyEntity(any(), any())).thenThrow(RuntimeException.class);
@@ -271,7 +271,7 @@ public class WorkerServiceImpTest {
     }
 
     @Test
-    public void testGetWorkersListFailureDueToCompanyNotFoundException(){
+    public void testGetWorkersListFailureDueToCompanyNotFoundException() {
         //Mocks
         when(this.companyRepository.findById(any())).thenReturn(Optional.empty());
 
