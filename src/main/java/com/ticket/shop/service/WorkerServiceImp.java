@@ -129,11 +129,12 @@ public class WorkerServiceImp implements WorkerService {
     }
 
     /**
-     * @see WorkerService#updateWorker(Long, UpdateWorkerDto)
+     * @see WorkerService#updateWorker(Long, Long, UpdateWorkerDto)
      */
     @Override
-    public WorkerDetailsDto updateWorker(Long userId, UpdateWorkerDto updateUserDto) throws UserNotFoundException {
+    public WorkerDetailsDto updateWorker(Long companyId, Long userId, UpdateWorkerDto updateUserDto) throws UserNotFoundException {
 
+        getCompanyEntityById(companyId);
         UserEntity userEntity = getUserEntityById(userId);
         CountryEntity countryEntity = getCountryEntityById(updateUserDto.getCountryId());
         String encryptedPassword = this.passwordEncoder.encode(updateUserDto.getPassword());

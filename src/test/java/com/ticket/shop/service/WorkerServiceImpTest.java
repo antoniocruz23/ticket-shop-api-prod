@@ -60,6 +60,7 @@ public class WorkerServiceImpTest {
     private final static String PASSWORD = "PasswordWorker!";
     private final static String ENCRYPTED_PASSWORD = "adub1bb891b";
     private final static Long WORKER_ID = 2L;
+    private final static Long COMPANY_ID = 245L;
     private final static List<UserRoles> USER_ROLE = Collections.singletonList(UserRoles.WORKER);
 
     @BeforeEach
@@ -81,7 +82,7 @@ public class WorkerServiceImpTest {
         when(this.userRepository.save(any())).thenReturn(getMockedUserEntity());
 
         // Method to be tested
-        WorkerDetailsDto workerDetailsDto = this.workerServiceImp.createWorker(getMockedCreateWorkerDto(), getMockedCompanyEntity().getCompanyId());
+        WorkerDetailsDto workerDetailsDto = this.workerServiceImp.createWorker(getMockedCreateWorkerDto(), COMPANY_ID);
 
         // Assert result
         assertNotNull(workerDetailsDto);
@@ -96,7 +97,7 @@ public class WorkerServiceImpTest {
 
         // Assert exception
         assertThrows(CountryNotFoundException.class,
-                () -> this.workerServiceImp.createWorker(getMockedCreateWorkerDto(), getMockedCompanyEntity().getCompanyId()));
+                () -> this.workerServiceImp.createWorker(getMockedCreateWorkerDto(), COMPANY_ID));
     }
 
     @Test
@@ -106,7 +107,7 @@ public class WorkerServiceImpTest {
 
         // Assert exception
         assertThrows(CompanyNotFoundException.class,
-                () -> this.workerServiceImp.createWorker(getMockedCreateWorkerDto(), getMockedCompanyEntity().getCompanyId()));
+                () -> this.workerServiceImp.createWorker(getMockedCreateWorkerDto(), COMPANY_ID));
     }
 
     @Test
@@ -118,7 +119,7 @@ public class WorkerServiceImpTest {
 
         // Assert exception
         assertThrows(UserAlreadyExistsException.class,
-                () -> this.workerServiceImp.createWorker(getMockedCreateWorkerDto(), getMockedCompanyEntity().getCompanyId()));
+                () -> this.workerServiceImp.createWorker(getMockedCreateWorkerDto(), COMPANY_ID));
     }
 
     @Test
@@ -130,7 +131,7 @@ public class WorkerServiceImpTest {
 
         // Assert exception
         assertThrows(DatabaseCommunicationException.class,
-                () -> this.workerServiceImp.createWorker(getMockedCreateWorkerDto(), getMockedCompanyEntity().getCompanyId()));
+                () -> this.workerServiceImp.createWorker(getMockedCreateWorkerDto(), COMPANY_ID));
     }
 
     /**
@@ -143,7 +144,7 @@ public class WorkerServiceImpTest {
         when(this.userRepository.findByUserIdAndCompanyEntity(any(), any())).thenReturn(Optional.of(getMockedUserEntity()));
 
         // Method to be tested
-        WorkerDetailsDto workerDetailsDto = this.workerServiceImp.getWorkerById(WORKER_ID, getMockedCompanyEntity().getCompanyId());
+        WorkerDetailsDto workerDetailsDto = this.workerServiceImp.getWorkerById(WORKER_ID, COMPANY_ID);
 
         // Assert result
         assertNotNull(workerDetailsDto);
@@ -159,7 +160,7 @@ public class WorkerServiceImpTest {
 
         // Assert exception
         assertThrows(UserNotFoundException.class,
-                () -> this.workerServiceImp.getWorkerById(WORKER_ID, getMockedCompanyEntity().getCompanyId()));
+                () -> this.workerServiceImp.getWorkerById(WORKER_ID, COMPANY_ID));
     }
 
     @Test
@@ -169,7 +170,7 @@ public class WorkerServiceImpTest {
 
         // Assert exception
         assertThrows(CompanyNotFoundException.class,
-                () -> this.workerServiceImp.getWorkerById(WORKER_ID, getMockedCompanyEntity().getCompanyId()));
+                () -> this.workerServiceImp.getWorkerById(WORKER_ID, COMPANY_ID));
     }
 
     /**
@@ -178,6 +179,7 @@ public class WorkerServiceImpTest {
     @Test
     public void testUpdateWorkerSuccessfully() {
         // Mocks
+        when(this.companyRepository.findById(any())).thenReturn(Optional.of(getMockedCompanyEntity()));
         when(this.userRepository.findById(any())).thenReturn(Optional.of(getMockedUserEntity()));
         when(this.countryRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedCountryEntity()));
 
@@ -202,7 +204,7 @@ public class WorkerServiceImpTest {
                 .build();
 
         // Method to be tested
-        WorkerDetailsDto workerDetailsDto = this.workerServiceImp.updateWorker(WORKER_ID, getMockedUpdateCustomerDto());
+        WorkerDetailsDto workerDetailsDto = this.workerServiceImp.updateWorker(COMPANY_ID, WORKER_ID, getMockedUpdateCustomerDto());
 
         // Assert result
         assertNotNull(workerDetailsDto);
@@ -213,34 +215,47 @@ public class WorkerServiceImpTest {
     @Test
     public void testUpdateUserFailureDueToDatabaseConnectionFailure() {
         // Mocks
+        when(this.companyRepository.findById(any())).thenReturn(Optional.of(getMockedCompanyEntity()));
         when(this.userRepository.findById(any())).thenReturn(Optional.of(getMockedUserEntity()));
         when(this.countryRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedCountryEntity()));
         when(this.userRepository.save(any())).thenThrow(RuntimeException.class);
 
         // Assert exception
         assertThrows(DatabaseCommunicationException.class,
-                () -> this.workerServiceImp.updateWorker(WORKER_ID, getMockedUpdateCustomerDto()));
+                () -> this.workerServiceImp.updateWorker(COMPANY_ID, WORKER_ID, getMockedUpdateCustomerDto()));
     }
 
     @Test
     public void testUpdateUserFailureDueToUserNotFound() {
         // Mocks
+        when(this.companyRepository.findById(any())).thenReturn(Optional.of(getMockedCompanyEntity()));
         when(this.userRepository.findById(any())).thenReturn(Optional.empty());
 
         // Assert exception
         assertThrows(UserNotFoundException.class,
-                () -> this.workerServiceImp.updateWorker(WORKER_ID, getMockedUpdateCustomerDto()));
+                () -> this.workerServiceImp.updateWorker(COMPANY_ID, WORKER_ID, getMockedUpdateCustomerDto()));
     }
 
     @Test
     public void testUpdateUserFailureDueToCountryNotFound() {
         // Mocks
+        when(this.companyRepository.findById(any())).thenReturn(Optional.of(getMockedCompanyEntity()));
         when(this.userRepository.findById(any())).thenReturn(Optional.of(getMockedUserEntity()));
         when(this.countryRepository.findById(any())).thenReturn(Optional.empty());
 
         // Assert exception
         assertThrows(CountryNotFoundException.class,
-                () -> this.workerServiceImp.updateWorker(WORKER_ID, getMockedUpdateCustomerDto()));
+                () -> this.workerServiceImp.updateWorker(COMPANY_ID, WORKER_ID, getMockedUpdateCustomerDto()));
+    }
+
+    @Test
+    public void testUpdateUserFailureDueToCompanyNotFound() {
+        // Mocks
+        when(this.companyRepository.findById(any())).thenReturn(Optional.empty());
+
+        // Assert exception
+        assertThrows(CompanyNotFoundException.class,
+                () -> this.workerServiceImp.updateWorker(COMPANY_ID, WORKER_ID, getMockedUpdateCustomerDto()));
     }
 
     /**
@@ -310,7 +325,7 @@ public class WorkerServiceImpTest {
                 .lastname(LASTNAME)
                 .email(EMAIL)
                 .countryId(getMockedCountryEntity().getCountryId())
-                .companyId(getMockedCompanyEntity().getCompanyId())
+                .companyId(COMPANY_ID)
                 .build();
     }
 
@@ -326,7 +341,7 @@ public class WorkerServiceImpTest {
 
     private CompanyEntity getMockedCompanyEntity() {
         return CompanyEntity.builder()
-                .companyId(111L)
+                .companyId(COMPANY_ID)
                 .name("Company")
                 .email("email@a.com")
                 .website("website.com")

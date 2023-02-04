@@ -7,7 +7,6 @@ import com.ticket.shop.error.ErrorMessages;
 import com.ticket.shop.exception.TicketShopException;
 import com.ticket.shop.persistence.entity.UserEntity;
 import com.ticket.shop.service.CustomerService;
-import com.ticket.shop.service.CustomerServiceImp;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -43,8 +42,8 @@ public class CustomerController {
     private static final Logger LOGGER = LogManager.getLogger(CustomerController.class);
     private final CustomerService customerService;
 
-    public CustomerController(CustomerServiceImp userService) {
-        this.customerService = userService;
+    public CustomerController(CustomerService customerService) {
+        this.customerService = customerService;
     }
 
     /**
@@ -84,7 +83,7 @@ public class CustomerController {
     /**
      * Get customer by id
      *
-     * @param customerId user id
+     * @param customerId customer id
      * @return {@link CustomerDetailsDto} the customer wanted and Ok httpStatus
      */
     @GetMapping("/{customerId}")
@@ -97,7 +96,7 @@ public class CustomerController {
                     content = @Content(schema = @Schema(implementation = Error.class))),
             @ApiResponse(responseCode = "500", description = ErrorMessages.ACCESS_DENIED,
                     content = @Content(schema = @Schema(implementation = Error.class)))})
-    public ResponseEntity<CustomerDetailsDto> getUserById(@PathVariable Long customerId) {
+    public ResponseEntity<CustomerDetailsDto> getCustomerById(@PathVariable Long customerId) {
 
         LOGGER.info("Request to get customer with id {}", customerId);
         CustomerDetailsDto customerDetailsDto;
@@ -125,7 +124,7 @@ public class CustomerController {
      */
     @PutMapping("/{customerId}")
     @PreAuthorize("@authorized.hasRole('ADMIN') || @authorized.isUser(#customerId)")
-    @Operation(summary = "Update user", description = "Update user")
+    @Operation(summary = "Update customer", description = "Update customer")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful Operation",
                     content = @Content(schema = @Schema(implementation = CustomerDetailsDto.class))),

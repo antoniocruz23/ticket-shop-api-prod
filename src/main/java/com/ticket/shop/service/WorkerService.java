@@ -51,5 +51,5 @@ public interface WorkerService {
      * @return {@link WorkerDetailsDto} the worker updated
      * @throws UserNotFoundException when the user isn't found
      */
-    WorkerDetailsDto updateWorker(Long workerId, UpdateWorkerDto updateWorkerDto) throws UserNotFoundException;
+    WorkerDetailsDto updateWorker(Long companyId, Long workerId, UpdateWorkerDto updateWorkerDto) throws UserNotFoundException;
 }

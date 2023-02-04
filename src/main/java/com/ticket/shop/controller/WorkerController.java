@@ -105,9 +105,9 @@ public class WorkerController {
                                                           @PathVariable Long workerId) {
 
         LOGGER.info("Request to get worker with id {}", workerId);
-        WorkerDetailsDto usersDetailsDto;
+        WorkerDetailsDto workerDetailsDto;
         try {
-            usersDetailsDto = this.workerService.getWorkerById(workerId, companyId);
+            workerDetailsDto = this.workerService.getWorkerById(workerId, companyId);
 
         } catch (TicketShopException e) {
             throw e;
@@ -118,7 +118,7 @@ public class WorkerController {
         }
 
         LOGGER.info("Retrieved worker with id {}", workerId);
-        return new ResponseEntity<>(usersDetailsDto, OK);
+        return new ResponseEntity<>(workerDetailsDto, OK);
     }
 
     /**
@@ -163,13 +163,13 @@ public class WorkerController {
     /**
      * Update worker
      *
-     * @param workerId        the worker id
+     * @param companyId       the worker id
      * @param updateWorkerDto data to update
      * @return the response entity
      */
     @PutMapping("/companies/{companyId}/workers/{workerId}")
     @PreAuthorize("@authorized.hasRole('ADMIN') || @authorized.hasRole('COMPANY_ADMIN') || @authorized.isUser(#workerId)")
-    @Operation(summary = "Update user", description = "Update user")
+    @Operation(summary = "Update worker", description = "Update worker")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful Operation",
                     content = @Content(schema = @Schema(implementation = CustomerDetailsDto.class))),
@@ -179,13 +179,14 @@ public class WorkerController {
                     content = @Content(schema = @Schema(implementation = Error.class))),
             @ApiResponse(responseCode = "500", description = ErrorMessages.ACCESS_DENIED,
                     content = @Content(schema = @Schema(implementation = Error.class)))})
-    public ResponseEntity<WorkerDetailsDto> updateWorker(@PathVariable Long workerId,
+    public ResponseEntity<WorkerDetailsDto> updateWorker(@PathVariable Long companyId,
+                                                         @PathVariable Long workerId,
                                                          @Valid @RequestBody UpdateWorkerDto updateWorkerDto) {
 
         LOGGER.info("Request to update worker with id {} - {}", workerId, updateWorkerDto);
         WorkerDetailsDto workerDetailsDto;
         try {
-            workerDetailsDto = this.workerService.updateWorker(workerId, updateWorkerDto);
+            workerDetailsDto = this.workerService.updateWorker(companyId, workerId, updateWorkerDto);
 
         } catch (TicketShopException e) {
             throw e;
