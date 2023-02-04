@@ -2,6 +2,7 @@ package com.ticket.shop.controller;
 
 import com.ticket.shop.command.auth.CredentialsDto;
 import com.ticket.shop.command.auth.LoggedInDto;
+import com.ticket.shop.error.Error;
 import com.ticket.shop.error.ErrorMessages;
 import com.ticket.shop.exception.TicketShopException;
 import com.ticket.shop.service.AuthService;

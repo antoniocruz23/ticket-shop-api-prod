@@ -5,6 +5,7 @@ import com.ticket.shop.command.customer.CustomerDetailsDto;
 import com.ticket.shop.command.worker.CreateWorkerDto;
 import com.ticket.shop.command.worker.UpdateWorkerDto;
 import com.ticket.shop.command.worker.WorkerDetailsDto;
+import com.ticket.shop.error.Error;
 import com.ticket.shop.error.ErrorMessages;
 import com.ticket.shop.exception.TicketShopException;
 import com.ticket.shop.persistence.entity.UserEntity;

@@ -3,6 +3,7 @@ package com.ticket.shop.controller;
 import com.ticket.shop.command.customer.CreateCustomerDto;
 import com.ticket.shop.command.customer.CustomerDetailsDto;
 import com.ticket.shop.command.customer.UpdateCustomerDto;
+import com.ticket.shop.error.Error;
 import com.ticket.shop.error.ErrorMessages;
 import com.ticket.shop.exception.TicketShopException;
 import com.ticket.shop.persistence.entity.UserEntity;
