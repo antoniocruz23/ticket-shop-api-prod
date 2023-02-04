@@ -2,6 +2,8 @@ package com.ticket.shop.persistence.repository;
 
 import com.ticket.shop.persistence.entity.CompanyEntity;
 import com.ticket.shop.persistence.entity.UserEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.Optional;
@@ -28,4 +30,11 @@ public interface UserRepository extends CrudRepository<UserEntity, Long> {
      * @return Optional of {@link UserEntity}
      */
     Optional<UserEntity> findByUserIdAndCompanyEntity(Long userId, CompanyEntity companyEntity);
+
+    /**
+     * Get page of workers by user entity
+     * @param companyEntity company
+     * @return {@link Page<UserEntity>}
+     */
+    Page<UserEntity> findByCompanyEntity(CompanyEntity companyEntity, Pageable pageable);
 }

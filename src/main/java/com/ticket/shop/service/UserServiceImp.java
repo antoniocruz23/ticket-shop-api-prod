@@ -1,6 +1,7 @@
 package com.ticket.shop.service;
 
 
+import com.ticket.shop.command.Paginated;
 import com.ticket.shop.command.user.CreateUserDto;
 import com.ticket.shop.command.user.UpdateUserDto;
 import com.ticket.shop.command.user.UserDetailsDto;
@@ -21,9 +22,12 @@ import com.ticket.shop.persistence.repository.CountryRepository;
 import com.ticket.shop.persistence.repository.UserRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -158,6 +162,38 @@ public class UserServiceImp implements UserService {
         UserEntity userEntity = getWorkerByIdAndCompany(workerId, companyEntity);
 
         return UserConverter.fromUserEntityToWorkerDetailsDto(userEntity);
+    }
+
+    /**
+     * @see UserService#getWorkersList(int, int, Long)
+     */
+    @Override
+    public Paginated<WorkerDetailsDto> getWorkersList(int page, int size, Long companyId) {
+
+        CompanyEntity companyEntity = getCompanyEntityById(companyId);
+
+        LOGGER.debug("Getting all patients from database");
+        Page<UserEntity> workersList;
+        try {
+            workersList = this.userRepository.findByCompanyEntity(companyEntity, PageRequest.of(page, size));
+
+        } catch (Exception e) {
+            LOGGER.error("Failed at getting workers page from database", e);
+            throw new DatabaseCommunicationException(ErrorMessages.DATABASE_COMMUNICATION_ERROR, e);
+        }
+
+        LOGGER.debug("Converting workers list to WorkerDetailsDto");
+        List<WorkerDetailsDto> patientListResponse = new ArrayList<>();
+        for (UserEntity worker : workersList) {
+            patientListResponse.add(UserConverter.fromUserEntityToWorkerDetailsDto(worker));
+        }
+
+        return new Paginated<>(
+                patientListResponse,
+                page,
+                patientListResponse.size(),
+                workersList.getTotalPages(),
+                workersList.getTotalElements());
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.ticket.shop.service;
 
+import com.ticket.shop.command.Paginated;
 import com.ticket.shop.command.user.CreateUserDto;
 import com.ticket.shop.command.user.UpdateUserDto;
 import com.ticket.shop.command.user.UserDetailsDto;
@@ -60,4 +61,6 @@ public interface UserService {
      * @throws UserNotFoundException when the user isn't found
      */
     WorkerDetailsDto getWorkerById(Long workerId, Long companyId) throws UserNotFoundException;
+
+    Paginated<WorkerDetailsDto> getWorkersList(int page, int size, Long companyId);
 }

@@ -1,5 +1,6 @@
 package com.ticket.shop.controller;
 
+import com.ticket.shop.command.Paginated;
 import com.ticket.shop.command.user.CreateUserDto;
 import com.ticket.shop.command.user.UpdateUserDto;
 import com.ticket.shop.command.user.UserDetailsDto;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -228,5 +230,44 @@ public class UserController {
 
         LOGGER.info("Retrieved worker with id {}", workerId);
         return new ResponseEntity<>(usersDetailsDto, OK);
+    }
+
+    /**
+     * Get workers list by company id
+     *
+     * @param page      page number
+     * @param size      page size
+     * @param companyId company id
+     * @return {@link Paginated<WorkerDetailsDto>} workers list wanted and Ok httpStatus
+     */
+    @GetMapping("/companies/{companyId}/workers")
+    @PreAuthorize("@authorized.hasRole('ADMIN') || @authorized.hasRole('COMPANY_ADMIN')")
+    @Operation(summary = "Get workers from a company by pagination", description = "Get workers from a company by pagination")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful Operation",
+                    content = @Content(schema = @Schema(implementation = UserDetailsDto.class))),
+            @ApiResponse(responseCode = "404", description = ErrorMessages.USER_NOT_FOUND,
+                    content = @Content(schema = @Schema(implementation = Error.class))),
+            @ApiResponse(responseCode = "500", description = ErrorMessages.ACCESS_DENIED,
+                    content = @Content(schema = @Schema(implementation = Error.class)))})
+    public ResponseEntity<Paginated<WorkerDetailsDto>> getPatientsList(@RequestParam(defaultValue = "0") int page,
+                                                                       @RequestParam(defaultValue = "10") int size,
+                                                                       @PathVariable Long companyId) {
+
+        LOGGER.info("Request to get workers list - page: {}, size: {}", page, size);
+        Paginated<WorkerDetailsDto> patientsList;
+        try {
+            patientsList = this.userService.getWorkersList(page, size, companyId);
+
+        } catch (TicketShopException e) {
+            throw e;
+
+        } catch (Exception e) {
+            LOGGER.error("Failed to get workers from company {}", companyId, e);
+            throw new TicketShopException(ErrorMessages.OPERATION_FAILED, e);
+        }
+
+        LOGGER.info("Retrieving workers list");
+        return new ResponseEntity<>(patientsList, HttpStatus.OK);
     }
 }
