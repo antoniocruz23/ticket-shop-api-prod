@@ -90,7 +90,7 @@ public class CustomerController {
      * @return {@link CustomerDetailsDto} the customer wanted and Ok httpStatus
      */
     @GetMapping("/{customerId}")
-    @PreAuthorize("@authorized.hasRole('ADMIN') || @authorized.isUser(#customerId)")
+    @PreAuthorize("@authorized.hasRole('ADMIN') || (@authorized.hasRole('CUSTOMER') && @authorized.isUser(#customerId))")
     @Operation(summary = "Get customer", description = "Get customer by id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful Operation",
@@ -126,7 +126,7 @@ public class CustomerController {
      * @return the response entity
      */
     @PutMapping("/{customerId}")
-    @PreAuthorize("@authorized.hasRole('ADMIN') || @authorized.isUser(#customerId)")
+    @PreAuthorize("@authorized.hasRole('ADMIN') || (@authorized.hasRole('CUSTOMER') && @authorized.isUser(#customerId))")
     @Operation(summary = "Update customer", description = "Update customer")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful Operation",

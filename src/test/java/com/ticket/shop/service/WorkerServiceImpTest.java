@@ -142,7 +142,7 @@ public class WorkerServiceImpTest {
     public void testGetWorkerSuccessfully() {
         // Mocks
         when(this.companyRepository.findById(any())).thenReturn(Optional.of(getMockedCompanyEntity()));
-        when(this.userRepository.findByUserIdAndCompanyEntity(any(), any())).thenReturn(Optional.of(getMockedUserEntity()));
+        when(this.userRepository.findByUserIdAndCompanyId(any(), any())).thenReturn(Optional.of(getMockedUserEntity()));
 
         // Method to be tested
         WorkerDetailsDto workerDetailsDto = this.workerServiceImp.getWorkerById(WORKER_ID, COMPANY_ID);
@@ -157,7 +157,7 @@ public class WorkerServiceImpTest {
     public void testGetWorkerFailureDueToUserNotFound() {
         // Mocks
         when(this.companyRepository.findById(any())).thenReturn(Optional.of(getMockedCompanyEntity()));
-        when(this.userRepository.findByUserIdAndCompanyEntity(any(), any())).thenReturn(Optional.empty());
+        when(this.userRepository.findByUserIdAndCompanyId(any(), any())).thenReturn(Optional.empty());
 
         // Assert exception
         assertThrows(UserNotFoundException.class,
@@ -181,7 +181,7 @@ public class WorkerServiceImpTest {
     public void testUpdateWorkerSuccessfully() {
         // Mocks
         when(this.companyRepository.findById(any())).thenReturn(Optional.of(getMockedCompanyEntity()));
-        when(this.userRepository.findByUserIdAndCompanyEntity(any(), any())).thenReturn(Optional.of(getMockedUserEntity()));
+        when(this.userRepository.findByUserIdAndCompanyId(any(), any())).thenReturn(Optional.of(getMockedUserEntity()));
         when(this.countryRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedCountryEntity()));
 
         WorkerDetailsDto worker = WorkerDetailsDto.builder()
@@ -217,7 +217,7 @@ public class WorkerServiceImpTest {
     public void testUpdateUserFailureDueToDatabaseConnectionFailure() {
         // Mocks
         when(this.companyRepository.findById(any())).thenReturn(Optional.of(getMockedCompanyEntity()));
-        when(this.userRepository.findByUserIdAndCompanyEntity(any(), any())).thenReturn(Optional.of(getMockedUserEntity()));
+        when(this.userRepository.findByUserIdAndCompanyId(any(), any())).thenReturn(Optional.of(getMockedUserEntity()));
         when(this.countryRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedCountryEntity()));
         when(this.userRepository.save(any())).thenThrow(RuntimeException.class);
 
@@ -249,7 +249,7 @@ public class WorkerServiceImpTest {
     public void testUpdateUserFailureDueToCountryNotFound() {
         // Mocks
         when(this.countryRepository.findById(any())).thenReturn(Optional.empty());
-        when(this.userRepository.findByUserIdAndCompanyEntity(any(), any())).thenReturn(Optional.of(getMockedUserEntity()));
+        when(this.userRepository.findByUserIdAndCompanyId(any(), any())).thenReturn(Optional.of(getMockedUserEntity()));
         when(this.companyRepository.findById(any())).thenReturn(Optional.of(getMockedCompanyEntity()));
 
         // Assert exception

@@ -96,8 +96,7 @@ public class WorkerServiceImp implements WorkerService {
      */
     @Override
     public WorkerDetailsDto getWorkerById(Long workerId, Long companyId) throws UserNotFoundException {
-        CompanyEntity companyEntity = getCompanyEntityById(companyId);
-        UserEntity userEntity = getWorkerByIdAndCompany(workerId, companyEntity);
+        UserEntity userEntity = getWorkerByIdAndCompany(workerId, companyId);
 
         return UserConverter.fromUserEntityToWorkerDetailsDto(userEntity);
     }
@@ -145,8 +144,7 @@ public class WorkerServiceImp implements WorkerService {
             throw new RoleInvalidException(ErrorMessages.ROLE_INVALID);
         }
 
-        CompanyEntity companyEntity = getCompanyEntityById(companyId);
-        UserEntity userEntity = getUserEntityByIdAndCompanyEntity(userId, companyEntity);
+        UserEntity userEntity = getWorkerByIdAndCompany(userId, companyId);
         CountryEntity countryEntity = getCountryEntityById(updateUserDto.getCountryId());
         String encryptedPassword = this.passwordEncoder.encode(updateUserDto.getPassword());
 
@@ -185,30 +183,15 @@ public class WorkerServiceImp implements WorkerService {
     }
 
     /**
-     * Get User by id
-     *
-     * @param userId user id
-     * @return {@link UserEntity}
-     */
-    private UserEntity getUserEntityByIdAndCompanyEntity(Long userId, CompanyEntity companyEntity) {
-        LOGGER.debug("Getting user with id {} from database", userId);
-        return this.userRepository.findByUserIdAndCompanyEntity(userId, companyEntity)
-                .orElseThrow(() -> {
-                    LOGGER.error("The user with id {} does not exist in database", userId);
-                    return new UserNotFoundException(ErrorMessages.USER_NOT_FOUND);
-                });
-    }
-
-    /**
      * Get Worker by id and company
      *
-     * @param workerId      worker id
-     * @param companyEntity company entity
+     * @param workerId  worker id
+     * @param companyId company id
      * @return {@link UserEntity}
      */
-    private UserEntity getWorkerByIdAndCompany(Long workerId, CompanyEntity companyEntity) {
+    private UserEntity getWorkerByIdAndCompany(Long workerId, Long companyId) {
         LOGGER.debug("Getting worker with id {} from database", workerId);
-        return this.userRepository.findByUserIdAndCompanyEntity(workerId, companyEntity)
+        return this.userRepository.findByUserIdAndCompanyId(workerId, companyId)
                 .orElseThrow(() -> {
                     LOGGER.error("The worker with id {} does not exist in database", workerId);
                     return new UserNotFoundException(ErrorMessages.USER_NOT_FOUND);

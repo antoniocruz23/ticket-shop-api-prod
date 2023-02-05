@@ -67,6 +67,7 @@ public class UserConverter {
                 .firstname(userEntity.getFirstname())
                 .lastname(userEntity.getLastname())
                 .email(userEntity.getEmail())
+                .roles(userEntity.getRoles())
                 .companyId(userEntity.getCompanyEntity().getCompanyId())
                 .countryId(userEntity.getCountryEntity().getCountryId())
                 .build();

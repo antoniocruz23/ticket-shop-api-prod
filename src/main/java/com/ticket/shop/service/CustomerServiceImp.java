@@ -99,7 +99,6 @@ public class CustomerServiceImp implements CustomerService {
         userEntity.setLastname(updateCustomerDto.getLastname());
         userEntity.setEmail(updateCustomerDto.getEmail());
         userEntity.setEncryptedPassword(encryptedPassword);
-        userEntity.setRoles(updateCustomerDto.getRoles());
         userEntity.setCountryEntity(countryEntity);
 
         LOGGER.debug("Updating customer with id {} with new data", userId);

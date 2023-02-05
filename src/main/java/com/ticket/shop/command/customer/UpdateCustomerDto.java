@@ -1,13 +1,11 @@
 package com.ticket.shop.command.customer;
 
-import com.ticket.shop.enumerators.UserRoles;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.List;
 
 /**
  * UpdateCustomerDto used to update customer info
@@ -31,9 +29,6 @@ public class UpdateCustomerDto {
     @Schema(example = "87654321!")
     @NotBlank(message = "Must have password")
     private String password;
-
-    @NotNull(message = "Must have role")
-    private List<UserRoles> roles;
 
     @NotNull(message = "Must have a country id")
     private Long countryId;
