@@ -1,7 +1,7 @@
 package com.ticket.shop.converter;
 
 import com.ticket.shop.command.company.CompanyDetailsDto;
-import com.ticket.shop.command.company.CreateAndUpdateCompanyDto;
+import com.ticket.shop.command.company.CreateOrUpdateCompanyDto;
 import com.ticket.shop.persistence.entity.CompanyEntity;
 
 /**
@@ -9,11 +9,11 @@ import com.ticket.shop.persistence.entity.CompanyEntity;
  */
 public class CompanyConverter {
 
-    public static CompanyEntity fromCreateCompanyDtoToCompanyEntity(CreateAndUpdateCompanyDto createAndUpdateCompanyDto) {
+    public static CompanyEntity fromCreateCompanyDtoToCompanyEntity(CreateOrUpdateCompanyDto createOrUpdateCompanyDto) {
         return CompanyEntity.builder()
-                .name(createAndUpdateCompanyDto.getName())
-                .email(createAndUpdateCompanyDto.getEmail())
-                .website(createAndUpdateCompanyDto.getWebsite())
+                .name(createOrUpdateCompanyDto.getName())
+                .email(createOrUpdateCompanyDto.getEmail())
+                .website(createOrUpdateCompanyDto.getWebsite())
                 .build();
     }
 

@@ -1,7 +1,7 @@
 package com.ticket.shop.controller;
 
 import com.ticket.shop.command.company.CompanyDetailsDto;
-import com.ticket.shop.command.company.CreateAndUpdateCompanyDto;
+import com.ticket.shop.command.company.CreateOrUpdateCompanyDto;
 import com.ticket.shop.command.customer.CustomerDetailsDto;
 import com.ticket.shop.error.Error;
 import com.ticket.shop.error.ErrorMessages;
@@ -48,7 +48,7 @@ public class CompanyController {
     /**
      * Create new company
      *
-     * @param createAndUpdateCompanyDto new company data
+     * @param createOrUpdateCompanyDto new company data
      * @return {@link CompanyDetailsDto} the response entity
      */
     @PostMapping()
@@ -61,18 +61,18 @@ public class CompanyController {
                     content = @Content(schema = @Schema(implementation = Error.class))),
             @ApiResponse(responseCode = "500", description = ErrorMessages.ACCESS_DENIED,
                     content = @Content(schema = @Schema(implementation = Error.class)))})
-    public ResponseEntity<CompanyDetailsDto> companyRegistration(@Valid @RequestBody CreateAndUpdateCompanyDto createAndUpdateCompanyDto) {
+    public ResponseEntity<CompanyDetailsDto> companyRegistration(@Valid @RequestBody CreateOrUpdateCompanyDto createOrUpdateCompanyDto) {
 
-        LOGGER.info("Request to create new company - {}", createAndUpdateCompanyDto);
+        LOGGER.info("Request to create new company - {}", createOrUpdateCompanyDto);
         CompanyDetailsDto companyDetailsDto;
         try {
-            companyDetailsDto = this.companyService.createCompany(createAndUpdateCompanyDto);
+            companyDetailsDto = this.companyService.createCompany(createOrUpdateCompanyDto);
 
         } catch (TicketShopException e) {
             throw e;
 
         } catch (Exception e) {
-            LOGGER.error("Failed to created company - {}", createAndUpdateCompanyDto, e);
+            LOGGER.error("Failed to created company - {}", createOrUpdateCompanyDto, e);
             throw new TicketShopException(ErrorMessages.OPERATION_FAILED, e);
         }
 
@@ -133,7 +133,7 @@ public class CompanyController {
             @ApiResponse(responseCode = "500", description = ErrorMessages.ACCESS_DENIED,
                     content = @Content(schema = @Schema(implementation = Error.class)))})
     public ResponseEntity<CompanyDetailsDto> updateCompany(@PathVariable Long companyId,
-                                                           @Valid @RequestBody CreateAndUpdateCompanyDto updateCompanyDto) {
+                                                           @Valid @RequestBody CreateOrUpdateCompanyDto updateCompanyDto) {
 
         LOGGER.info("Request to update company with id {} - {}", companyId, updateCompanyDto);
         CompanyDetailsDto companyDetailsDto;

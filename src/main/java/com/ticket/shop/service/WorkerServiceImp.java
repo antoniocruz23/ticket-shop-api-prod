@@ -175,7 +175,7 @@ public class WorkerServiceImp implements WorkerService {
      * @param countryId country id
      * @return {@link CountryEntity}
      */
-    protected CountryEntity getCountryEntityById(Long countryId) {
+    private CountryEntity getCountryEntityById(Long countryId) {
         LOGGER.debug("Getting country with id {} from database", countryId);
         return this.countryRepository.findById(countryId)
                 .orElseThrow(() -> {
@@ -190,7 +190,7 @@ public class WorkerServiceImp implements WorkerService {
      * @param userId user id
      * @return {@link UserEntity}
      */
-    protected UserEntity getUserEntityByIdAndCompanyEntity(Long userId, CompanyEntity companyEntity) {
+    private UserEntity getUserEntityByIdAndCompanyEntity(Long userId, CompanyEntity companyEntity) {
         LOGGER.debug("Getting user with id {} from database", userId);
         return this.userRepository.findByUserIdAndCompanyEntity(userId, companyEntity)
                 .orElseThrow(() -> {
@@ -206,7 +206,7 @@ public class WorkerServiceImp implements WorkerService {
      * @param companyEntity company entity
      * @return {@link UserEntity}
      */
-    protected UserEntity getWorkerByIdAndCompany(Long workerId, CompanyEntity companyEntity) {
+    private UserEntity getWorkerByIdAndCompany(Long workerId, CompanyEntity companyEntity) {
         LOGGER.debug("Getting worker with id {} from database", workerId);
         return this.userRepository.findByUserIdAndCompanyEntity(workerId, companyEntity)
                 .orElseThrow(() -> {
@@ -221,7 +221,7 @@ public class WorkerServiceImp implements WorkerService {
      * @param companyId company id
      * @return {@link CompanyEntity}
      */
-    protected CompanyEntity getCompanyEntityById(Long companyId) {
+    private CompanyEntity getCompanyEntityById(Long companyId) {
         LOGGER.debug("Getting company with id {} from database", companyId);
         return this.companyRepository.findById(companyId)
                 .orElseThrow(() -> {

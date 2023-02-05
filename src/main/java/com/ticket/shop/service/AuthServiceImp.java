@@ -109,7 +109,7 @@ public class AuthServiceImp implements AuthService {
      * @param principalDto
      * @return the token as {@link String}
      */
-    public String generateJwtToken(PrincipalDto principalDto) {
+    private String generateJwtToken(PrincipalDto principalDto) {
         SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
         Date now = new Date(System.currentTimeMillis());
         Date expiresAt = new Date(now.getTime() +

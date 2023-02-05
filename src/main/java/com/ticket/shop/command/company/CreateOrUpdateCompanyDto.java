@@ -11,7 +11,7 @@ import javax.validation.constraints.NotBlank;
  */
 @Data
 @Builder
-public class CreateAndUpdateCompanyDto {
+public class CreateOrUpdateCompanyDto {
 
     @Schema(example = "Company")
     @NotBlank(message = "Must have a name")

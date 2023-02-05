@@ -1,7 +1,7 @@
 package com.ticket.shop.service;
 
 import com.ticket.shop.command.company.CompanyDetailsDto;
-import com.ticket.shop.command.company.CreateAndUpdateCompanyDto;
+import com.ticket.shop.command.company.CreateOrUpdateCompanyDto;
 import com.ticket.shop.converter.CompanyConverter;
 import com.ticket.shop.error.ErrorMessages;
 import com.ticket.shop.exception.DatabaseCommunicationException;
@@ -24,12 +24,12 @@ public class CompanyServiceImp implements CompanyService {
     }
 
     /**
-     * @see CompanyService#createCompany(CreateAndUpdateCompanyDto)
+     * @see CompanyService#createCompany(CreateOrUpdateCompanyDto)
      */
     @Override
-    public CompanyDetailsDto createCompany(CreateAndUpdateCompanyDto createAndUpdateCompanyDto) throws CompanyAlreadyExistsException {
+    public CompanyDetailsDto createCompany(CreateOrUpdateCompanyDto createOrUpdateCompanyDto) throws CompanyAlreadyExistsException {
 
-        CompanyEntity companyEntity = CompanyConverter.fromCreateCompanyDtoToCompanyEntity(createAndUpdateCompanyDto);
+        CompanyEntity companyEntity = CompanyConverter.fromCreateCompanyDtoToCompanyEntity(createOrUpdateCompanyDto);
         validateCompany(companyEntity.getName(), companyEntity.getEmail(), companyEntity.getWebsite());
 
         LOGGER.info("Persisting company into database");
@@ -39,7 +39,7 @@ public class CompanyServiceImp implements CompanyService {
             createCompany = this.companyRepository.save(companyEntity);
 
         } catch (Exception e) {
-            LOGGER.error("Failed while saving worker into database {}", createAndUpdateCompanyDto, e);
+            LOGGER.error("Failed while saving worker into database {}", createOrUpdateCompanyDto, e);
             throw new DatabaseCommunicationException(ErrorMessages.DATABASE_COMMUNICATION_ERROR, e);
         }
 
@@ -57,10 +57,10 @@ public class CompanyServiceImp implements CompanyService {
     }
 
     /**
-     * @see CompanyService#updateCompany(Long, CreateAndUpdateCompanyDto)
+     * @see CompanyService#updateCompany(Long, CreateOrUpdateCompanyDto)
      */
     @Override
-    public CompanyDetailsDto updateCompany(Long companyId, CreateAndUpdateCompanyDto updateWorkerDto) throws CompanyNotFoundException {
+    public CompanyDetailsDto updateCompany(Long companyId, CreateOrUpdateCompanyDto updateWorkerDto) throws CompanyNotFoundException {
         CompanyEntity companyEntity = getCompanyEntityById(companyId);
 
         companyEntity.setName(updateWorkerDto.getName());
@@ -105,7 +105,7 @@ public class CompanyServiceImp implements CompanyService {
      * @param companyId company id
      * @return {@link CompanyEntity}
      */
-    protected CompanyEntity getCompanyEntityById(Long companyId) {
+    private CompanyEntity getCompanyEntityById(Long companyId) {
         LOGGER.debug("Getting company with id {} from database", companyId);
         return this.companyRepository.findById(companyId)
                 .orElseThrow(() -> {

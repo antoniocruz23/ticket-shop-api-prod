@@ -120,7 +120,7 @@ public class CustomerServiceImp implements CustomerService {
      * @param countryId country id
      * @return {@link CountryEntity}
      */
-    protected CountryEntity getCountryEntityById(Long countryId) {
+    private CountryEntity getCountryEntityById(Long countryId) {
         LOGGER.debug("Getting country with id {} from database", countryId);
         return this.countryRepository.findById(countryId)
                 .orElseThrow(() -> {
@@ -135,7 +135,7 @@ public class CustomerServiceImp implements CustomerService {
      * @param userId user id
      * @return {@link UserEntity}
      */
-    protected UserEntity getUserEntityById(Long userId) {
+    private UserEntity getUserEntityById(Long userId) {
         LOGGER.debug("Getting user with id {} from database", userId);
         return this.userRepository.findById(userId)
                 .orElseThrow(() -> {
