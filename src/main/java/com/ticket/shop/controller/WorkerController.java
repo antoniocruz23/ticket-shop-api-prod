@@ -56,7 +56,7 @@ public class WorkerController {
      * @return {@link WorkerDetailsDto} the response entity
      */
     @PostMapping("/companies/{companyId}/workers")
-    @PreAuthorize("@authorized.hasRole('ADMIN') || @authorized.hasRole('COMPANY_ADMIN')")
+    @PreAuthorize("@authorized.hasRole('ADMIN') || (@authorized.hasRole('COMPANY_ADMIN') && @authorized.isOnCompany(#companyId))")
     @Operation(summary = "Registration", description = "Register new worker")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Successfully Created",
@@ -93,7 +93,7 @@ public class WorkerController {
      * @return {@link WorkerDetailsDto} the worker wanted and Ok httpStatus
      */
     @GetMapping("/companies/{companyId}/workers/{workerId}")
-    @PreAuthorize("@authorized.hasRole('ADMIN') || @authorized.hasRole('COMPANY_ADMIN') || @authorized.isUser(#workerId)")
+    @PreAuthorize("@authorized.hasRole('ADMIN') || (@authorized.hasRole('COMPANY_ADMIN') && @authorized.isOnCompany(#companyId)) || @authorized.isUser(#workerId)")
     @Operation(summary = "Get worker by company", description = "Get worker by company")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful Operation",
@@ -131,7 +131,7 @@ public class WorkerController {
      * @return {@link Paginated <WorkerDetailsDto>} workers list wanted and Ok httpStatus
      */
     @GetMapping("/companies/{companyId}/workers")
-    @PreAuthorize("@authorized.hasRole('ADMIN') || @authorized.hasRole('COMPANY_ADMIN')")
+    @PreAuthorize("@authorized.hasRole('ADMIN') || (@authorized.hasRole('COMPANY_ADMIN') && @authorized.isOnCompany(#companyId))")
     @Operation(summary = "Get workers from a company by pagination", description = "Get workers from a company by pagination")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful Operation",
@@ -170,7 +170,7 @@ public class WorkerController {
      * @return the response entity
      */
     @PutMapping("/companies/{companyId}/workers/{workerId}")
-    @PreAuthorize("@authorized.hasRole('ADMIN') || @authorized.hasRole('COMPANY_ADMIN') || @authorized.isUser(#workerId)")
+    @PreAuthorize("@authorized.hasRole('ADMIN') || (@authorized.hasRole('COMPANY_ADMIN') && @authorized.isOnCompany(#companyId)) || @authorized.isUser(#workerId)")
     @Operation(summary = "Update worker", description = "Update worker")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful Operation",
