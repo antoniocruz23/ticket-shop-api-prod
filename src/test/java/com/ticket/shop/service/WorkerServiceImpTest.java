@@ -6,6 +6,7 @@ import com.ticket.shop.command.worker.UpdateWorkerDto;
 import com.ticket.shop.command.worker.WorkerDetailsDto;
 import com.ticket.shop.enumerators.UserRoles;
 import com.ticket.shop.exception.DatabaseCommunicationException;
+import com.ticket.shop.exception.auth.RoleInvalidException;
 import com.ticket.shop.exception.company.CompanyNotFoundException;
 import com.ticket.shop.exception.country.CountryNotFoundException;
 import com.ticket.shop.exception.user.UserAlreadyExistsException;
@@ -180,7 +181,7 @@ public class WorkerServiceImpTest {
     public void testUpdateWorkerSuccessfully() {
         // Mocks
         when(this.companyRepository.findById(any())).thenReturn(Optional.of(getMockedCompanyEntity()));
-        when(this.userRepository.findById(any())).thenReturn(Optional.of(getMockedUserEntity()));
+        when(this.userRepository.findByUserIdAndCompanyEntity(any(), any())).thenReturn(Optional.of(getMockedUserEntity()));
         when(this.countryRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedCountryEntity()));
 
         WorkerDetailsDto worker = WorkerDetailsDto.builder()
@@ -198,7 +199,7 @@ public class WorkerServiceImpTest {
                 .lastname(LASTNAME + 11)
                 .email(EMAIL)
                 .encryptedPassword(ENCRYPTED_PASSWORD)
-                .roles(List.of(UserRoles.ADMIN, UserRoles.COMPANY_ADMIN))
+                .roles(List.of(UserRoles.COMPANY_ADMIN))
                 .countryEntity(getMockedCountryEntity())
                 .companyEntity(getMockedCompanyEntity())
                 .build();
@@ -216,13 +217,21 @@ public class WorkerServiceImpTest {
     public void testUpdateUserFailureDueToDatabaseConnectionFailure() {
         // Mocks
         when(this.companyRepository.findById(any())).thenReturn(Optional.of(getMockedCompanyEntity()));
-        when(this.userRepository.findById(any())).thenReturn(Optional.of(getMockedUserEntity()));
+        when(this.userRepository.findByUserIdAndCompanyEntity(any(), any())).thenReturn(Optional.of(getMockedUserEntity()));
         when(this.countryRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedCountryEntity()));
         when(this.userRepository.save(any())).thenThrow(RuntimeException.class);
 
         // Assert exception
         assertThrows(DatabaseCommunicationException.class,
                 () -> this.workerServiceImp.updateWorker(COMPANY_ID, WORKER_ID, getMockedUpdateCustomerDto()));
+    }
+
+    @Test
+    public void testUpdateUserFailureDueToRoleInvalidException() {
+
+        // Assert exception
+        assertThrows(RoleInvalidException.class,
+                () -> this.workerServiceImp.updateWorker(COMPANY_ID, WORKER_ID, getMockedUpdateCustomerDtoWithADMIN()));
     }
 
     @Test
@@ -239,9 +248,9 @@ public class WorkerServiceImpTest {
     @Test
     public void testUpdateUserFailureDueToCountryNotFound() {
         // Mocks
-        when(this.companyRepository.findById(any())).thenReturn(Optional.of(getMockedCompanyEntity()));
-        when(this.userRepository.findById(any())).thenReturn(Optional.of(getMockedUserEntity()));
         when(this.countryRepository.findById(any())).thenReturn(Optional.empty());
+        when(this.userRepository.findByUserIdAndCompanyEntity(any(), any())).thenReturn(Optional.of(getMockedUserEntity()));
+        when(this.companyRepository.findById(any())).thenReturn(Optional.of(getMockedCompanyEntity()));
 
         // Assert exception
         assertThrows(CountryNotFoundException.class,
@@ -335,6 +344,7 @@ public class WorkerServiceImpTest {
                 .lastname(LASTNAME)
                 .email(EMAIL)
                 .password(PASSWORD)
+                .roles(List.of(UserRoles.WORKER))
                 .countryId(getMockedCountryEntity().getCountryId())
                 .build();
     }
@@ -348,13 +358,24 @@ public class WorkerServiceImpTest {
                 .build();
     }
 
-    private UpdateWorkerDto getMockedUpdateCustomerDto() {
+    private UpdateWorkerDto getMockedUpdateCustomerDtoWithADMIN() {
         return UpdateWorkerDto.builder()
                 .firstname(FIRSTNAME + 11)
                 .lastname(LASTNAME + 11)
                 .email(EMAIL)
                 .password(PASSWORD + 11)
                 .roles(List.of(UserRoles.ADMIN, UserRoles.COMPANY_ADMIN))
+                .countryId(getMockedCountryEntity().getCountryId())
+                .build();
+    }
+
+    private UpdateWorkerDto getMockedUpdateCustomerDto() {
+        return UpdateWorkerDto.builder()
+                .firstname(FIRSTNAME + 11)
+                .lastname(LASTNAME + 11)
+                .email(EMAIL)
+                .password(PASSWORD + 11)
+                .roles(List.of(UserRoles.COMPANY_ADMIN))
                 .countryId(getMockedCountryEntity().getCountryId())
                 .build();
     }

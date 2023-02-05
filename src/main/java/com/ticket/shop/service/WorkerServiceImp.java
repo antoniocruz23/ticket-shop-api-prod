@@ -57,7 +57,7 @@ public class WorkerServiceImp implements WorkerService {
         LOGGER.debug("Creating worker - {}", createWorkerDto);
         UserEntity userEntity = UserConverter.fromCreateWorkerDtoToUserEntity(createWorkerDto);
 
-        if (createWorkerDto.getRoles().contains(UserRoles.ADMIN)) {
+        if (userEntity.getRoles().contains(UserRoles.ADMIN)) {
             LOGGER.debug("Failed while trying to create the worker role with ADMIN role");
             throw new RoleInvalidException(ErrorMessages.ROLE_INVALID);
         }
@@ -140,15 +140,15 @@ public class WorkerServiceImp implements WorkerService {
     @Override
     public WorkerDetailsDto updateWorker(Long companyId, Long userId, UpdateWorkerDto updateUserDto) throws UserNotFoundException {
 
-        CompanyEntity companyEntity = getCompanyEntityById(companyId);
-        UserEntity userEntity = getUserEntityById(userId, companyEntity);
-        CountryEntity countryEntity = getCountryEntityById(updateUserDto.getCountryId());
-        String encryptedPassword = this.passwordEncoder.encode(updateUserDto.getPassword());
-
         if (updateUserDto.getRoles().contains(UserRoles.ADMIN)) {
             LOGGER.debug("Failed while trying to update the worker role to application ADMIN");
             throw new RoleInvalidException(ErrorMessages.ROLE_INVALID);
         }
+
+        CompanyEntity companyEntity = getCompanyEntityById(companyId);
+        UserEntity userEntity = getUserEntityByIdAndCompanyEntity(userId, companyEntity);
+        CountryEntity countryEntity = getCountryEntityById(updateUserDto.getCountryId());
+        String encryptedPassword = this.passwordEncoder.encode(updateUserDto.getPassword());
 
         userEntity.setFirstname(updateUserDto.getFirstname());
         userEntity.setLastname(updateUserDto.getLastname());
@@ -190,7 +190,7 @@ public class WorkerServiceImp implements WorkerService {
      * @param userId user id
      * @return {@link UserEntity}
      */
-    protected UserEntity getUserEntityById(Long userId, CompanyEntity companyEntity) {
+    protected UserEntity getUserEntityByIdAndCompanyEntity(Long userId, CompanyEntity companyEntity) {
         LOGGER.debug("Getting user with id {} from database", userId);
         return this.userRepository.findByUserIdAndCompanyEntity(userId, companyEntity)
                 .orElseThrow(() -> {
