@@ -42,7 +42,7 @@ import static org.springframework.http.HttpStatus.OK;
 @Tag(name = "Workers", description = "Worker endpoints")
 public class WorkerController {
 
-    private static final Logger LOGGER = LogManager.getLogger(CustomerController.class);
+    private static final Logger LOGGER = LogManager.getLogger(WorkerController.class);
     private final WorkerService workerService;
 
     public WorkerController(WorkerService workerService) {
@@ -60,10 +60,16 @@ public class WorkerController {
     @Operation(summary = "Registration", description = "Register new worker")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Successfully Created",
-                    content = @Content(schema = @Schema(implementation = CustomerDetailsDto.class))),
-            @ApiResponse(responseCode = "409", description = "User already exists",
+                    content = @Content(schema = @Schema(implementation = WorkerDetailsDto.class))),
+            @ApiResponse(responseCode = "409", description = ErrorMessages.EMAIL_ALREADY_EXISTS,
                     content = @Content(schema = @Schema(implementation = Error.class))),
-            @ApiResponse(responseCode = "500", description = ErrorMessages.ACCESS_DENIED,
+            @ApiResponse(responseCode = "404", description = ErrorMessages.COMPANY_NOT_FOUND + " || " + ErrorMessages.COUNTRY_NOT_FOUND,
+                    content = @Content(schema = @Schema(implementation = Error.class))),
+            @ApiResponse(responseCode = "400", description = ErrorMessages.DATABASE_COMMUNICATION_ERROR,
+                    content = @Content(schema = @Schema(implementation = Error.class))),
+            @ApiResponse(responseCode = "500", description = ErrorMessages.ROLE_INVALID,
+                    content = @Content(schema = @Schema(implementation = Error.class))),
+            @ApiResponse(responseCode = "403", description = ErrorMessages.ACCESS_DENIED,
                     content = @Content(schema = @Schema(implementation = Error.class)))})
     public ResponseEntity<WorkerDetailsDto> workerRegistration(@Valid @RequestBody CreateWorkerDto createWorkerDto,
                                                                @PathVariable Long companyId) {
@@ -97,10 +103,10 @@ public class WorkerController {
     @Operation(summary = "Get worker by company", description = "Get worker by company")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful Operation",
-                    content = @Content(schema = @Schema(implementation = CustomerDetailsDto.class))),
-            @ApiResponse(responseCode = "404", description = ErrorMessages.USER_NOT_FOUND,
+                    content = @Content(schema = @Schema(implementation = WorkerDetailsDto.class))),
+            @ApiResponse(responseCode = "404", description = ErrorMessages.COMPANY_NOT_FOUND + " || " + ErrorMessages.USER_NOT_FOUND,
                     content = @Content(schema = @Schema(implementation = Error.class))),
-            @ApiResponse(responseCode = "500", description = ErrorMessages.ACCESS_DENIED,
+            @ApiResponse(responseCode = "403", description = ErrorMessages.ACCESS_DENIED,
                     content = @Content(schema = @Schema(implementation = Error.class)))})
     public ResponseEntity<WorkerDetailsDto> getWorkerById(@PathVariable Long companyId,
                                                           @PathVariable Long workerId) {
@@ -135,10 +141,12 @@ public class WorkerController {
     @Operation(summary = "Get workers from a company by pagination", description = "Get workers from a company by pagination")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful Operation",
-                    content = @Content(schema = @Schema(implementation = CustomerDetailsDto.class))),
-            @ApiResponse(responseCode = "404", description = ErrorMessages.USER_NOT_FOUND,
+                    content = @Content(schema = @Schema(implementation = WorkerDetailsDto.class))),
+            @ApiResponse(responseCode = "404", description = ErrorMessages.COMPANY_NOT_FOUND,
                     content = @Content(schema = @Schema(implementation = Error.class))),
-            @ApiResponse(responseCode = "500", description = ErrorMessages.ACCESS_DENIED,
+            @ApiResponse(responseCode = "400", description = ErrorMessages.DATABASE_COMMUNICATION_ERROR,
+                    content = @Content(schema = @Schema(implementation = Error.class))),
+            @ApiResponse(responseCode = "403", description = ErrorMessages.ACCESS_DENIED,
                     content = @Content(schema = @Schema(implementation = Error.class)))})
     public ResponseEntity<Paginated<WorkerDetailsDto>> getPatientsList(@RequestParam(defaultValue = "0") int page,
                                                                        @RequestParam(defaultValue = "10") int size,
@@ -175,11 +183,13 @@ public class WorkerController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful Operation",
                     content = @Content(schema = @Schema(implementation = CustomerDetailsDto.class))),
-            @ApiResponse(responseCode = "404", description = ErrorMessages.USER_NOT_FOUND,
+            @ApiResponse(responseCode = "404", description = ErrorMessages.USER_NOT_FOUND + " || " + ErrorMessages.COMPANY_NOT_FOUND + " || " + ErrorMessages.COUNTRY_NOT_FOUND,
                     content = @Content(schema = @Schema(implementation = Error.class))),
             @ApiResponse(responseCode = "400", description = ErrorMessages.DATABASE_COMMUNICATION_ERROR,
                     content = @Content(schema = @Schema(implementation = Error.class))),
-            @ApiResponse(responseCode = "500", description = ErrorMessages.ACCESS_DENIED,
+            @ApiResponse(responseCode = "500", description = ErrorMessages.ROLE_INVALID,
+                    content = @Content(schema = @Schema(implementation = Error.class))),
+            @ApiResponse(responseCode = "403", description = ErrorMessages.ACCESS_DENIED,
                     content = @Content(schema = @Schema(implementation = Error.class)))})
     public ResponseEntity<WorkerDetailsDto> updateWorker(@PathVariable Long companyId,
                                                          @PathVariable Long workerId,

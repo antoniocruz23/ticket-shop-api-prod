@@ -1,6 +1,7 @@
 package com.ticket.shop.exception;
 
 import com.ticket.shop.error.Error;
+import com.ticket.shop.exception.auth.RoleInvalidException;
 import com.ticket.shop.exception.company.CompanyAlreadyExistsException;
 import com.ticket.shop.exception.company.CompanyNotFoundException;
 import com.ticket.shop.exception.country.CountryNotFoundException;
@@ -77,7 +78,10 @@ public class TicketShopExceptionHandler extends ResponseEntityExceptionHandler {
      * @param request http Servlet Request
      * @return {@link Error}
      */
-    @ExceptionHandler(value = {AccessDeniedException.class})
+    @ExceptionHandler(value = {
+            AccessDeniedException.class,
+            RoleInvalidException.class
+    })
     public ResponseEntity<Error> handlerForbiddenException(Exception ex, HttpServletRequest request) {
         return buildErrorResponse(ex, request, HttpStatus.FORBIDDEN);
     }

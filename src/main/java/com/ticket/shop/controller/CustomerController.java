@@ -58,9 +58,11 @@ public class CustomerController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Successfully Created",
                     content = @Content(schema = @Schema(implementation = CustomerDetailsDto.class))),
-            @ApiResponse(responseCode = "409", description = "User already exists",
+            @ApiResponse(responseCode = "404", description = ErrorMessages.COUNTRY_NOT_FOUND,
                     content = @Content(schema = @Schema(implementation = Error.class))),
-            @ApiResponse(responseCode = "500", description = ErrorMessages.ACCESS_DENIED,
+            @ApiResponse(responseCode = "409", description = ErrorMessages.EMAIL_ALREADY_EXISTS,
+                    content = @Content(schema = @Schema(implementation = Error.class))),
+            @ApiResponse(responseCode = "400", description = ErrorMessages.DATABASE_COMMUNICATION_ERROR,
                     content = @Content(schema = @Schema(implementation = Error.class)))})
     public ResponseEntity<CustomerDetailsDto> customerRegistration(@Valid @RequestBody CreateCustomerDto createCustomerDto) {
 
@@ -95,7 +97,7 @@ public class CustomerController {
                     content = @Content(schema = @Schema(implementation = CustomerDetailsDto.class))),
             @ApiResponse(responseCode = "404", description = ErrorMessages.USER_NOT_FOUND,
                     content = @Content(schema = @Schema(implementation = Error.class))),
-            @ApiResponse(responseCode = "500", description = ErrorMessages.ACCESS_DENIED,
+            @ApiResponse(responseCode = "403", description = ErrorMessages.ACCESS_DENIED,
                     content = @Content(schema = @Schema(implementation = Error.class)))})
     public ResponseEntity<CustomerDetailsDto> getCustomerById(@PathVariable Long customerId) {
 
@@ -129,11 +131,11 @@ public class CustomerController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful Operation",
                     content = @Content(schema = @Schema(implementation = CustomerDetailsDto.class))),
-            @ApiResponse(responseCode = "404", description = ErrorMessages.USER_NOT_FOUND,
+            @ApiResponse(responseCode = "404", description = ErrorMessages.USER_NOT_FOUND + " || " + ErrorMessages.COUNTRY_NOT_FOUND,
                     content = @Content(schema = @Schema(implementation = Error.class))),
             @ApiResponse(responseCode = "400", description = ErrorMessages.DATABASE_COMMUNICATION_ERROR,
                     content = @Content(schema = @Schema(implementation = Error.class))),
-            @ApiResponse(responseCode = "500", description = ErrorMessages.ACCESS_DENIED,
+            @ApiResponse(responseCode = "403", description = ErrorMessages.ACCESS_DENIED,
                     content = @Content(schema = @Schema(implementation = Error.class)))})
     public ResponseEntity<CustomerDetailsDto> updateCustomer(@PathVariable Long customerId,
                                                              @Valid @RequestBody UpdateCustomerDto updateCustomerDto) {

@@ -2,7 +2,6 @@ package com.ticket.shop.controller;
 
 import com.ticket.shop.command.company.CompanyDetailsDto;
 import com.ticket.shop.command.company.CreateOrUpdateCompanyDto;
-import com.ticket.shop.command.customer.CustomerDetailsDto;
 import com.ticket.shop.error.Error;
 import com.ticket.shop.error.ErrorMessages;
 import com.ticket.shop.exception.TicketShopException;
@@ -38,7 +37,7 @@ import static org.springframework.http.HttpStatus.OK;
 @Tag(name = "Companies", description = "Company endpoints")
 public class CompanyController {
 
-    private static final Logger LOGGER = LogManager.getLogger(CustomerController.class);
+    private static final Logger LOGGER = LogManager.getLogger(CompanyController.class);
     private final CompanyService companyService;
 
     public CompanyController(CompanyService companyService) {
@@ -57,7 +56,9 @@ public class CompanyController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Successfully Created",
                     content = @Content(schema = @Schema(implementation = CompanyDetailsDto.class))),
-            @ApiResponse(responseCode = "409", description = "Company already exists",
+            @ApiResponse(responseCode = "409", description = ErrorMessages.NAME_ALREADY_EXISTS + " || " + ErrorMessages.EMAIL_ALREADY_EXISTS + " || " + ErrorMessages.WEBSITE_ALREADY_EXISTS,
+                    content = @Content(schema = @Schema(implementation = Error.class))),
+            @ApiResponse(responseCode = "400", description = ErrorMessages.DATABASE_COMMUNICATION_ERROR,
                     content = @Content(schema = @Schema(implementation = Error.class))),
             @ApiResponse(responseCode = "500", description = ErrorMessages.ACCESS_DENIED,
                     content = @Content(schema = @Schema(implementation = Error.class)))})
@@ -125,12 +126,12 @@ public class CompanyController {
     @Operation(summary = "Update company", description = "Update company")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful Operation",
-                    content = @Content(schema = @Schema(implementation = CustomerDetailsDto.class))),
+                    content = @Content(schema = @Schema(implementation = CompanyDetailsDto.class))),
             @ApiResponse(responseCode = "404", description = ErrorMessages.COMPANY_NOT_FOUND,
                     content = @Content(schema = @Schema(implementation = Error.class))),
             @ApiResponse(responseCode = "400", description = ErrorMessages.DATABASE_COMMUNICATION_ERROR,
                     content = @Content(schema = @Schema(implementation = Error.class))),
-            @ApiResponse(responseCode = "500", description = ErrorMessages.ACCESS_DENIED,
+            @ApiResponse(responseCode = "403", description = ErrorMessages.ACCESS_DENIED,
                     content = @Content(schema = @Schema(implementation = Error.class)))})
     public ResponseEntity<CompanyDetailsDto> updateCompany(@PathVariable Long companyId,
                                                            @Valid @RequestBody CreateOrUpdateCompanyDto updateCompanyDto) {
