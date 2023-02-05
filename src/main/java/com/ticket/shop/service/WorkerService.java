@@ -46,6 +46,7 @@ public interface WorkerService {
     /**
      * Update worker
      *
+     * @param companyId       company id
      * @param workerId        worker id to be updated
      * @param updateWorkerDto {@link UpdateWorkerDto}
      * @return {@link WorkerDetailsDto} the worker updated

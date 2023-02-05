@@ -164,7 +164,8 @@ public class WorkerController {
     /**
      * Update worker
      *
-     * @param companyId       the worker id
+     * @param companyId       the company id
+     * @param workerId        the worker id
      * @param updateWorkerDto data to update
      * @return the response entity
      */

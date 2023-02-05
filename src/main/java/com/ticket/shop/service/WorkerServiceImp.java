@@ -57,6 +57,16 @@ public class WorkerServiceImp implements WorkerService {
         LOGGER.debug("Creating worker - {}", createWorkerDto);
         UserEntity userEntity = UserConverter.fromCreateWorkerDtoToUserEntity(createWorkerDto);
 
+        if (createWorkerDto.getRoles().contains(UserRoles.ADMIN)) {
+            LOGGER.debug("Failed while trying to create the worker role with ADMIN role");
+            throw new RoleInvalidException(ErrorMessages.ROLE_INVALID);
+        }
+
+        if (this.userRepository.findByEmail(userEntity.getEmail()).isPresent()) {
+            LOGGER.error("Duplicated email - {}", userEntity.getEmail());
+            throw new UserAlreadyExistsException(ErrorMessages.EMAIL_ALREADY_EXISTS);
+        }
+
         CompanyEntity companyEntity = getCompanyEntityById(companyId);
         userEntity.setCompanyEntity(companyEntity);
 
@@ -65,12 +75,6 @@ public class WorkerServiceImp implements WorkerService {
 
         String encryptedPassword = this.passwordEncoder.encode(createWorkerDto.getPassword());
         userEntity.setEncryptedPassword(encryptedPassword);
-
-        if (this.userRepository.findByEmail(userEntity.getEmail()).isPresent()) {
-
-            LOGGER.error("Duplicated email - {}", userEntity.getEmail());
-            throw new UserAlreadyExistsException(ErrorMessages.EMAIL_ALREADY_EXISTS);
-        }
 
         LOGGER.info("Persisting worker into database");
         UserEntity createdWorker;

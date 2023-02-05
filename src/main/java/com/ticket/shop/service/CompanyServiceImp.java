@@ -1,11 +1,12 @@
 package com.ticket.shop.service;
 
 import com.ticket.shop.command.company.CompanyDetailsDto;
-import com.ticket.shop.command.company.CreateCompanyDto;
+import com.ticket.shop.command.company.CreateAndUpdateCompanyDto;
 import com.ticket.shop.converter.CompanyConverter;
 import com.ticket.shop.error.ErrorMessages;
 import com.ticket.shop.exception.DatabaseCommunicationException;
 import com.ticket.shop.exception.company.CompanyAlreadyExistsException;
+import com.ticket.shop.exception.company.CompanyNotFoundException;
 import com.ticket.shop.persistence.entity.CompanyEntity;
 import com.ticket.shop.persistence.repository.CompanyRepository;
 import org.apache.logging.log4j.LogManager;
@@ -22,11 +23,13 @@ public class CompanyServiceImp implements CompanyService {
         this.companyRepository = companyRepository;
     }
 
+    /**
+     * @see CompanyService#createCompany(CreateAndUpdateCompanyDto)
+     */
     @Override
-    public CompanyDetailsDto createCompany(CreateCompanyDto createCompanyDto) throws CompanyAlreadyExistsException {
+    public CompanyDetailsDto createCompany(CreateAndUpdateCompanyDto createAndUpdateCompanyDto) throws CompanyAlreadyExistsException {
 
-        CompanyEntity companyEntity = CompanyConverter.fromCreateCompanyDtoToCompanyEntity(createCompanyDto);
-
+        CompanyEntity companyEntity = CompanyConverter.fromCreateCompanyDtoToCompanyEntity(createAndUpdateCompanyDto);
         validateCompany(companyEntity.getName(), companyEntity.getEmail(), companyEntity.getWebsite());
 
         LOGGER.info("Persisting company into database");
@@ -36,12 +39,44 @@ public class CompanyServiceImp implements CompanyService {
             createCompany = this.companyRepository.save(companyEntity);
 
         } catch (Exception e) {
-            LOGGER.error("Failed while saving worker into database {}", createCompanyDto, e);
+            LOGGER.error("Failed while saving worker into database {}", createAndUpdateCompanyDto, e);
             throw new DatabaseCommunicationException(ErrorMessages.DATABASE_COMMUNICATION_ERROR, e);
         }
 
         LOGGER.debug("Retrieving created company");
         return CompanyConverter.fromCompanyEntityToCompanyDetailsDto(createCompany);
+    }
+
+    /**
+     * @see CompanyService#getCompanyById(Long)
+     */
+    @Override
+    public CompanyDetailsDto getCompanyById(Long companyId) throws CompanyNotFoundException {
+        CompanyEntity companyEntity = getCompanyEntityById(companyId);
+        return CompanyConverter.fromCompanyEntityToCompanyDetailsDto(companyEntity);
+    }
+
+    /**
+     * @see CompanyService#updateCompany(Long, CreateAndUpdateCompanyDto)
+     */
+    @Override
+    public CompanyDetailsDto updateCompany(Long companyId, CreateAndUpdateCompanyDto updateWorkerDto) throws CompanyNotFoundException {
+        CompanyEntity companyEntity = getCompanyEntityById(companyId);
+
+        companyEntity.setName(updateWorkerDto.getName());
+        companyEntity.setEmail(updateWorkerDto.getEmail());
+        companyEntity.setWebsite(updateWorkerDto.getWebsite());
+
+        LOGGER.debug("Updating company with id {} with new data", companyId);
+        try {
+            this.companyRepository.save(companyEntity);
+
+        } catch (Exception e) {
+            LOGGER.error("Failed while updating company with id {} with new data - {}", companyId, companyEntity, e);
+            throw new DatabaseCommunicationException(ErrorMessages.DATABASE_COMMUNICATION_ERROR, e);
+        }
+
+        return CompanyConverter.fromCompanyEntityToCompanyDetailsDto(companyEntity);
     }
 
     private void validateCompany(String name, String email, String website) {
@@ -62,5 +97,20 @@ public class CompanyServiceImp implements CompanyService {
             LOGGER.error("Duplicated website - {}", website);
             throw new CompanyAlreadyExistsException(ErrorMessages.WEBSITE_ALREADY_EXISTS);
         }
+    }
+
+    /**
+     * Get Company by id
+     *
+     * @param companyId company id
+     * @return {@link CompanyEntity}
+     */
+    protected CompanyEntity getCompanyEntityById(Long companyId) {
+        LOGGER.debug("Getting company with id {} from database", companyId);
+        return this.companyRepository.findById(companyId)
+                .orElseThrow(() -> {
+                    LOGGER.error("The company with id {} does not exist in database", companyId);
+                    return new CompanyNotFoundException(ErrorMessages.COMPANY_NOT_FOUND);
+                });
     }
 }

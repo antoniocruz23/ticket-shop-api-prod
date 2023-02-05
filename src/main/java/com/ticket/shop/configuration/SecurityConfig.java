@@ -1,5 +1,6 @@
 package com.ticket.shop.configuration;
 
+import com.ticket.shop.persistence.repository.CompanyRepository;
 import com.ticket.shop.security.AuthorizationValidatorService;
 import com.ticket.shop.security.CookieAuthFilter;
 import com.ticket.shop.security.JwtAuthFilter;
@@ -25,11 +26,13 @@ public class SecurityConfig {
 
     private final UserAuthenticationEntryPoint userAuthenticationEntryPoint;
     private final UserAuthenticationProvider userAuthenticationProvider;
+    private final CompanyRepository companyRepository;
 
 
-    public SecurityConfig(UserAuthenticationEntryPoint userAuthenticationEntryPoint, UserAuthenticationProvider userAuthenticationProvider) {
+    public SecurityConfig(UserAuthenticationEntryPoint userAuthenticationEntryPoint, UserAuthenticationProvider userAuthenticationProvider, CompanyRepository companyRepository) {
         this.userAuthenticationEntryPoint = userAuthenticationEntryPoint;
         this.userAuthenticationProvider = userAuthenticationProvider;
+        this.companyRepository = companyRepository;
     }
 
     /**
@@ -63,7 +66,7 @@ public class SecurityConfig {
 
     @Bean
     public AuthorizationValidatorService authorized() {
-        return new AuthorizationValidatorService();
+        return new AuthorizationValidatorService(this.companyRepository);
     }
 
 }
