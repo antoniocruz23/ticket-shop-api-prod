@@ -29,7 +29,7 @@ import static com.ticket.shop.security.CookieAuthFilter.COOKIE_NAME;
  */
 @RestController
 @RequestMapping("/api/auth")
-@Tag(name = "Auth", description = "Auth API")
+@Tag(name = "Auth", description = "Auth endpoints")
 public class AuthController {
 
     private static final Logger LOGGER = LogManager.getLogger(AuthController.class);

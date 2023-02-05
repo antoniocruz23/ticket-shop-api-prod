@@ -1,6 +1,7 @@
 package com.ticket.shop.exception;
 
 import com.ticket.shop.error.Error;
+import com.ticket.shop.exception.company.CompanyAlreadyExistsException;
 import com.ticket.shop.exception.company.CompanyNotFoundException;
 import com.ticket.shop.exception.country.CountryNotFoundException;
 import com.ticket.shop.exception.user.UserAlreadyExistsException;
@@ -35,7 +36,8 @@ public class TicketShopExceptionHandler extends ResponseEntityExceptionHandler {
      * @return {@link Error}
      */
     @ExceptionHandler(value = {
-            UserAlreadyExistsException.class
+            UserAlreadyExistsException.class,
+            CompanyAlreadyExistsException.class
     })
     public ResponseEntity<Error> handlerConflictException(Exception ex, HttpServletRequest request) {
         return buildErrorResponse(ex, request, HttpStatus.CONFLICT);

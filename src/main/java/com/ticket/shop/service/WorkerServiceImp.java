@@ -5,8 +5,10 @@ import com.ticket.shop.command.worker.CreateWorkerDto;
 import com.ticket.shop.command.worker.UpdateWorkerDto;
 import com.ticket.shop.command.worker.WorkerDetailsDto;
 import com.ticket.shop.converter.UserConverter;
+import com.ticket.shop.enumerators.UserRoles;
 import com.ticket.shop.error.ErrorMessages;
 import com.ticket.shop.exception.DatabaseCommunicationException;
+import com.ticket.shop.exception.auth.RoleInvalidException;
 import com.ticket.shop.exception.company.CompanyNotFoundException;
 import com.ticket.shop.exception.country.CountryNotFoundException;
 import com.ticket.shop.exception.user.UserAlreadyExistsException;
@@ -134,10 +136,15 @@ public class WorkerServiceImp implements WorkerService {
     @Override
     public WorkerDetailsDto updateWorker(Long companyId, Long userId, UpdateWorkerDto updateUserDto) throws UserNotFoundException {
 
-        getCompanyEntityById(companyId);
-        UserEntity userEntity = getUserEntityById(userId);
+        CompanyEntity companyEntity = getCompanyEntityById(companyId);
+        UserEntity userEntity = getUserEntityById(userId, companyEntity);
         CountryEntity countryEntity = getCountryEntityById(updateUserDto.getCountryId());
         String encryptedPassword = this.passwordEncoder.encode(updateUserDto.getPassword());
+
+        if (updateUserDto.getRoles().contains(UserRoles.ADMIN)) {
+            LOGGER.debug("Failed while trying to update the worker role to application ADMIN");
+            throw new RoleInvalidException(ErrorMessages.ROLE_INVALID);
+        }
 
         userEntity.setFirstname(updateUserDto.getFirstname());
         userEntity.setLastname(updateUserDto.getLastname());
@@ -179,9 +186,9 @@ public class WorkerServiceImp implements WorkerService {
      * @param userId user id
      * @return {@link UserEntity}
      */
-    protected UserEntity getUserEntityById(Long userId) {
+    protected UserEntity getUserEntityById(Long userId, CompanyEntity companyEntity) {
         LOGGER.debug("Getting user with id {} from database", userId);
-        return this.userRepository.findById(userId)
+        return this.userRepository.findByUserIdAndCompanyEntity(userId, companyEntity)
                 .orElseThrow(() -> {
                     LOGGER.error("The user with id {} does not exist in database", userId);
                     return new UserNotFoundException(ErrorMessages.USER_NOT_FOUND);
