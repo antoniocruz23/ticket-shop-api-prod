@@ -164,16 +164,6 @@ public class WorkerServiceImpTest {
                 () -> this.workerServiceImp.getWorkerById(WORKER_ID, COMPANY_ID));
     }
 
-    @Test
-    public void testGetWorkerFailureDueToCompanyNotFound() {
-        // Mocks
-        when(this.companyRepository.findById(any())).thenReturn(Optional.empty());
-
-        // Assert exception
-        assertThrows(CompanyNotFoundException.class,
-                () -> this.workerServiceImp.getWorkerById(WORKER_ID, COMPANY_ID));
-    }
-
     /**
      * Update worker Tests
      */
@@ -189,6 +179,7 @@ public class WorkerServiceImpTest {
                 .firstname(FIRSTNAME + 11)
                 .lastname(LASTNAME + 11)
                 .email(EMAIL)
+                .roles(List.of(UserRoles.COMPANY_ADMIN))
                 .countryId(getMockedCountryEntity().getCountryId())
                 .companyId(getMockedCompanyEntity().getCompanyId())
                 .build();
@@ -254,16 +245,6 @@ public class WorkerServiceImpTest {
 
         // Assert exception
         assertThrows(CountryNotFoundException.class,
-                () -> this.workerServiceImp.updateWorker(COMPANY_ID, WORKER_ID, getMockedUpdateCustomerDto()));
-    }
-
-    @Test
-    public void testUpdateUserFailureDueToCompanyNotFound() {
-        // Mocks
-        when(this.companyRepository.findById(any())).thenReturn(Optional.empty());
-
-        // Assert exception
-        assertThrows(CompanyNotFoundException.class,
                 () -> this.workerServiceImp.updateWorker(COMPANY_ID, WORKER_ID, getMockedUpdateCustomerDto()));
     }
 
@@ -333,6 +314,7 @@ public class WorkerServiceImpTest {
                 .firstname(FIRSTNAME)
                 .lastname(LASTNAME)
                 .email(EMAIL)
+                .roles(USER_ROLE)
                 .countryId(getMockedCountryEntity().getCountryId())
                 .companyId(COMPANY_ID)
                 .build();

@@ -150,7 +150,7 @@ public class CustomerServiceImpTest {
                 .lastname(LASTNAME + 11)
                 .email(EMAIL)
                 .encryptedPassword(ENCRYPTED_PASSWORD)
-                .roles(List.of(UserRoles.ADMIN, UserRoles.CUSTOMER))
+                .roles(List.of(UserRoles.CUSTOMER))
                 .countryEntity(getMockedCountryEntity()).build();
 
         // Method to be tested
@@ -244,7 +244,6 @@ public class CustomerServiceImpTest {
                 .lastname(LASTNAME + "11")
                 .email(EMAIL)
                 .password(PASSWORD + "11")
-                .roles(List.of(UserRoles.ADMIN, UserRoles.CUSTOMER))
                 .countryId(1L)
                 .build();
     }
