@@ -1,1 +1,1 @@
-java -jar build/libs/ticket-shop-api-1.0.0-SNAPSHOT-plain.jar
+web: java -jar build/libs/ticket-shop-api-1.0.0-SNAPSHOT.jar
