@@ -60,7 +60,7 @@ springBoot {
 }
 
 tasks.register('stage') {
-    dependsOn bootJar, bootRun
+    dependsOn bootJar
 }
 
 gradle.taskGraph.whenReady {
