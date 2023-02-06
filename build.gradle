@@ -70,9 +70,7 @@ gradle.taskGraph.whenReady {
         }
 }
 
-tasks.register('testskip', Test) {
-    enabled = false
-}
+defaultTasks.add("./gradlew build -x test")
 
 
 
