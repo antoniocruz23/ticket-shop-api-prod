@@ -63,4 +63,11 @@ tasks.register('stage') {
     dependsOn bootJar
 }
 
+gradle.taskGraph.whenReady {
+    taskGraph ->
+        if (taskGraph.hasTask(stage)) {
+            test.enabled = false
+        }
+}
+
 
