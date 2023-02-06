@@ -70,6 +70,9 @@ gradle.taskGraph.whenReady {
         }
 }
 
-tasks.withType(Test).configureEach { enabled = false }
+tasks.register('testskip', Test) {
+    enabled = false
+}
+
 
 
