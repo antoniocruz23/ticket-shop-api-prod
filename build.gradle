@@ -60,7 +60,7 @@ springBoot {
 }
 
 tasks.register('stage') {
-    dependsOn bootJar
+    dependsOn bootJar, bootRun
 }
 
 gradle.taskGraph.whenReady {
@@ -69,8 +69,6 @@ gradle.taskGraph.whenReady {
             test.enabled = false
         }
 }
-
-defaultTasks.add("./gradlew build -x test")
 
 
 
