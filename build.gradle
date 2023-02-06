@@ -59,4 +59,8 @@ springBoot {
     buildInfo()
 }
 
+tasks.register('stage') {
+    dependsOn bootJar
+}
+
 

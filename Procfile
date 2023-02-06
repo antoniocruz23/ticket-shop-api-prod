@@ -1,1 +1,1 @@
-web: java -jar -Dspring.profiles.active=production build/libs/ticket-shop-api-1.0.0-SNAPSHOT.jar
+web: java -Dserver.port=$PORT $JAVA_OPTS -jar -Dspring.profiles.active=production build/libs/ticket-shop-api-1.0.0-SNAPSHOT.jar
