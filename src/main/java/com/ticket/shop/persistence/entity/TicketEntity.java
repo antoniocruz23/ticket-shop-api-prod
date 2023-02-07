@@ -3,10 +3,8 @@ package com.ticket.shop.persistence.entity;
 import com.ticket.shop.enumerators.TicketStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.Column;
@@ -24,10 +22,7 @@ import javax.persistence.Table;
 /**
  * Ticket Entity
  */
-@Getter
-@Setter
-@ToString
-@RequiredArgsConstructor
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

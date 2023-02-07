@@ -2,6 +2,7 @@ package com.ticket.shop.persistence.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.CascadeType;
@@ -21,6 +22,7 @@ import java.util.List;
 /**
  * Event entity
  */
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

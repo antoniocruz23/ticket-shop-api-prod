@@ -3,10 +3,8 @@ package com.ticket.shop.persistence.entity;
 import com.ticket.shop.enumerators.PriceTypes;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.CascadeType;
@@ -27,10 +25,7 @@ import java.util.List;
 /**
  * Ticket Price entity
  */
-@Getter
-@Setter
-@ToString
-@RequiredArgsConstructor
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

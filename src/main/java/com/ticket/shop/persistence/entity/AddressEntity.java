@@ -2,6 +2,7 @@ package com.ticket.shop.persistence.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
@@ -19,6 +20,7 @@ import javax.persistence.Table;
 /**
  * Address entity
  */
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
