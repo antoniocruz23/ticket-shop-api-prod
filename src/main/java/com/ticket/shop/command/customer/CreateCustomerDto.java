@@ -31,7 +31,7 @@ public class CreateCustomerDto {
     private String password;
 
     @Schema(example = "1")
-    @NotNull(message = "Must have a country")
+    @NotNull(message = "Must have country")
     private Long countryId;
 
     /**

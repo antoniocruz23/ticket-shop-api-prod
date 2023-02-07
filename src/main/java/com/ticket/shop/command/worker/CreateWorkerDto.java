@@ -36,6 +36,7 @@ public class CreateWorkerDto {
     @NotNull(message = "Must have role")
     private List<UserRoles> roles;
 
+    @Schema(example = "1")
     @NotNull(message = "Must have a country")
     private Long countryId;
 
@@ -49,6 +50,7 @@ public class CreateWorkerDto {
                 "firstname='" + firstname + '\'' +
                 ", lastname='" + lastname + '\'' +
                 ", email='" + email + '\'' +
+                ", role='" + roles.stream().map(r -> r.name() + " | ") + '\'' +
                 ", password='***'" +
                 '}';
     }

@@ -14,11 +14,11 @@ import javax.validation.constraints.NotNull;
 @Builder
 public class UpdateCustomerDto {
 
-    @Schema(example = "new")
+    @Schema(example = "New")
     @NotBlank(message = "Must have firstname")
     private String firstname;
 
-    @Schema(example = "name")
+    @Schema(example = "Name")
     @NotBlank(message = "Must have lastname")
     private String lastname;
 
@@ -30,6 +30,21 @@ public class UpdateCustomerDto {
     @NotBlank(message = "Must have password")
     private String password;
 
-    @NotNull(message = "Must have a country id")
+    @Schema(example = "1")
+    @NotNull(message = "Must have country")
     private Long countryId;
+
+    /**
+     * Override to String to avoid show the password
+     * in the logs if printing the entire object
+     */
+    @Override
+    public String toString() {
+        return "UpdateCustomerDto{" +
+                "firstname='" + firstname + '\'' +
+                ", lastname='" + lastname + '\'' +
+                ", email='" + email + '\'' +
+                ", password='***'" +
+                '}';
+    }
 }

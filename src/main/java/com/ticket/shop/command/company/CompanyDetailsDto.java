@@ -1,5 +1,6 @@
 package com.ticket.shop.command.company;
 
+import com.ticket.shop.command.address.AddressDetailsDto;
 import lombok.Builder;
 import lombok.Data;
 
@@ -13,4 +14,5 @@ public class CompanyDetailsDto {
     private String name;
     private String email;
     private String website;
+    private AddressDetailsDto address;
 }

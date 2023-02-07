@@ -37,6 +37,21 @@ public class UpdateWorkerDto {
     private List<UserRoles> roles;
 
     @Schema(example = "1")
-    @NotNull(message = "Must have a country id")
+    @NotNull(message = "Must have a country")
     private Long countryId;
+
+    /**
+     * Override to String to avoid show the password
+     * in the logs if printing the entire object
+     */
+    @Override
+    public String toString() {
+        return "UpdateWorkerDto{" +
+                "firstname='" + firstname + '\'' +
+                ", lastname='" + lastname + '\'' +
+                ", email='" + email + '\'' +
+                ", role='" + roles.stream().map(r -> r.name() + " | ") + '\'' +
+                ", password='***'" +
+                '}';
+    }
 }

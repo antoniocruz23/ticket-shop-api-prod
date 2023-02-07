@@ -3,8 +3,11 @@ package com.ticket.shop.persistence.entity;
 import com.ticket.shop.enumerators.UserRoles;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
@@ -20,13 +23,19 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
+import java.sql.Timestamp;
 import java.util.List;
 
 /**
  * User entity
  */
-@Data
+@Getter
+@Setter
+@ToString
+@RequiredArgsConstructor
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -55,14 +64,37 @@ public class UserEntity {
     @Enumerated(EnumType.STRING)
     private List<UserRoles> roles;
 
-    @OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL)
-    private List<AddressEntity> addresses;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "country_id", nullable = false)
+    @ToString.Exclude
     private CountryEntity countryEntity;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id")
+    @ToString.Exclude
     private CompanyEntity companyEntity;
+
+    @Column(name = "created_at")
+    private Timestamp createdAt;
+
+    @Column(name = "updated_at")
+    private Timestamp updatedAt;
+
+    @OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL)
+    @ToString.Exclude
+    private List<AddressEntity> addresses;
+
+    @OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL)
+    @ToString.Exclude
+    private List<TicketEntity> tickets;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = new Timestamp(System.currentTimeMillis());
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = new Timestamp(System.currentTimeMillis());
+    }
 }
