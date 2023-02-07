@@ -21,9 +21,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
 import java.security.Key;
+import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.util.Base64;
 import java.util.Date;
@@ -38,7 +41,7 @@ public class AuthServiceImp implements AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProperties jwtProperties;
-    private String secretKey = "7f928de2afee05bce432f166d140c04a08f713c7eafd05bce432";
+    private String secretKey = "default";
 
     public AuthServiceImp(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtProperties jwtProperties) {
         this.userRepository = userRepository;
@@ -86,9 +89,9 @@ public class AuthServiceImp implements AuthService {
      */
     @Override
     public PrincipalDto validateToken(String token) {
-        // TODO: Replace deprecated method
-        Jws<Claims> jwtClaims = Jwts.parser()
-                .setSigningKey(this.secretKey)
+        Jws<Claims> jwtClaims = Jwts.parserBuilder()
+                .setSigningKey(keyFromString())
+                .build()
                 .parseClaimsJws(token);
 
         // Get userId from payload/body
@@ -103,10 +106,25 @@ public class AuthServiceImp implements AuthService {
         return UserConverter.fromUserEntityToPrincipalDto(userEntity);
     }
 
+    private SecretKey keyFromString() {
+        byte[] keyBytes = this.secretKey.getBytes();
+        SecretKey key = null;
+        try {
+            KeyGenerator keyGenerator = KeyGenerator.getInstance("HS256");
+            keyGenerator.init(256);
+            key = keyGenerator.generateKey();
+            key = new SecretKeySpec(keyBytes, "HS256");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return key;
+    }
+
+
     /**
      * Helper to create JWT Token
      *
-     * @param principalDto
+     * @param principalDto principal dto
      * @return the token as {@link String}
      */
     private String generateJwtToken(PrincipalDto principalDto) {
