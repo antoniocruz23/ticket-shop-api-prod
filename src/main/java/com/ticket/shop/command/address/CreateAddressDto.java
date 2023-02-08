@@ -36,6 +36,6 @@ public class CreateAddressDto {
     private String city;
 
     @Schema(example = "1")
-    @NotNull(message = "Must have a country")
+    @NotNull(message = "Must have a country id")
     private Long countryId;
 }

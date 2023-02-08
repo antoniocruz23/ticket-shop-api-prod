@@ -9,6 +9,12 @@ import com.ticket.shop.persistence.entity.CompanyEntity;
  */
 public class CompanyConverter {
 
+
+    /**
+     * From {@link CreateOrUpdateCompanyDto} to {@link CompanyEntity}
+     * @param createOrUpdateCompanyDto {@link CreateOrUpdateCompanyDto}
+     * @return {@link CompanyEntity}
+     */
     public static CompanyEntity fromCreateCompanyDtoToCompanyEntity(CreateOrUpdateCompanyDto createOrUpdateCompanyDto) {
         return CompanyEntity.builder()
                 .name(createOrUpdateCompanyDto.getName())
@@ -17,12 +23,18 @@ public class CompanyConverter {
                 .build();
     }
 
+    /**
+     * From {@link CompanyEntity} to {@link CompanyDetailsDto}
+     * @param companyEntity {@link CompanyEntity}
+     * @return {@link CompanyDetailsDto}
+     */
     public static CompanyDetailsDto fromCompanyEntityToCompanyDetailsDto(CompanyEntity companyEntity) {
         return CompanyDetailsDto.builder()
                 .companyId(companyEntity.getCompanyId())
                 .name(companyEntity.getName())
                 .email(companyEntity.getEmail())
                 .website(companyEntity.getWebsite())
+                .address(AddressConverter.fromAddressEntityToAddressDetailsDto(companyEntity.getAddressEntity()))
                 .build();
     }
 }

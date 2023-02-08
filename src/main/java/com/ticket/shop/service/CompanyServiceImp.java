@@ -1,13 +1,18 @@
 package com.ticket.shop.service;
 
+import com.ticket.shop.command.address.AddressDetailsDto;
 import com.ticket.shop.command.company.CompanyDetailsDto;
 import com.ticket.shop.command.company.CreateOrUpdateCompanyDto;
 import com.ticket.shop.converter.CompanyConverter;
 import com.ticket.shop.error.ErrorMessages;
 import com.ticket.shop.exception.DatabaseCommunicationException;
+import com.ticket.shop.exception.address.AddressNotFoundException;
 import com.ticket.shop.exception.company.CompanyAlreadyExistsException;
 import com.ticket.shop.exception.company.CompanyNotFoundException;
+import com.ticket.shop.persistence.entity.AddressEntity;
 import com.ticket.shop.persistence.entity.CompanyEntity;
+import com.ticket.shop.persistence.entity.CountryEntity;
+import com.ticket.shop.persistence.repository.AddressRepository;
 import com.ticket.shop.persistence.repository.CompanyRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,9 +23,13 @@ public class CompanyServiceImp implements CompanyService {
 
     private static final Logger LOGGER = LogManager.getLogger(CustomerService.class);
     private final CompanyRepository companyRepository;
+    private final AddressRepository addressRepository;
+    private final AddressService addressService;
 
-    public CompanyServiceImp(CompanyRepository companyRepository) {
+    public CompanyServiceImp(CompanyRepository companyRepository, AddressService addressService, AddressRepository addressRepository) {
         this.companyRepository = companyRepository;
+        this.addressService = addressService;
+        this.addressRepository = addressRepository;
     }
 
     /**
@@ -31,6 +40,10 @@ public class CompanyServiceImp implements CompanyService {
 
         CompanyEntity companyEntity = CompanyConverter.fromCreateCompanyDtoToCompanyEntity(createOrUpdateCompanyDto);
         validateCompany(companyEntity.getName(), companyEntity.getEmail(), companyEntity.getWebsite());
+
+        AddressDetailsDto address = this.addressService.createAddress(createOrUpdateCompanyDto.getAddress());
+        AddressEntity addressEntityById = getAddressEntityById(address.getAddressId());
+        companyEntity.setAddressEntity(addressEntityById);
 
         LOGGER.info("Persisting company into database");
         CompanyEntity createCompany;
@@ -111,6 +124,21 @@ public class CompanyServiceImp implements CompanyService {
                 .orElseThrow(() -> {
                     LOGGER.error("The company with id {} does not exist in database", companyId);
                     return new CompanyNotFoundException(ErrorMessages.COMPANY_NOT_FOUND);
+                });
+    }
+
+    /**
+     * Get Address by id
+     *
+     * @param addressId address id
+     * @return {@link CountryEntity}
+     */
+    private AddressEntity getAddressEntityById(Long addressId) {
+        LOGGER.debug("Getting address with id {} from database", addressId);
+        return this.addressRepository.findById(addressId)
+                .orElseThrow(() -> {
+                    LOGGER.error("Address with id {} doesn't exist", addressId);
+                    return new AddressNotFoundException(ErrorMessages.ADDRESS_NOT_FOUND);
                 });
     }
 }

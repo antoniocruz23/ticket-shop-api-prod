@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -27,6 +28,7 @@ public class CreateOrUpdateCompanyDto {
     @NotBlank(message = "Must have a website")
     private String website;
 
+    @Valid
     @NotNull(message = "Must have an address")
     private CreateAddressDto address;
 }
