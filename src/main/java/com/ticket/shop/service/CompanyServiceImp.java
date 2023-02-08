@@ -26,10 +26,10 @@ public class CompanyServiceImp implements CompanyService {
     private final AddressRepository addressRepository;
     private final AddressService addressService;
 
-    public CompanyServiceImp(CompanyRepository companyRepository, AddressService addressService, AddressRepository addressRepository) {
+    public CompanyServiceImp(CompanyRepository companyRepository, AddressRepository addressRepository, AddressService addressService) {
         this.companyRepository = companyRepository;
-        this.addressService = addressService;
         this.addressRepository = addressRepository;
+        this.addressService = addressService;
     }
 
     /**

@@ -1,13 +1,21 @@
 package com.ticket.shop.service;
 
+import com.ticket.shop.command.address.AddressDetailsDto;
+import com.ticket.shop.command.address.CreateAddressDto;
 import com.ticket.shop.command.company.CompanyDetailsDto;
 import com.ticket.shop.command.company.CreateOrUpdateCompanyDto;
 import com.ticket.shop.error.ErrorMessages;
 import com.ticket.shop.exception.DatabaseCommunicationException;
+import com.ticket.shop.exception.address.AddressNotFoundException;
 import com.ticket.shop.exception.company.CompanyAlreadyExistsException;
 import com.ticket.shop.exception.company.CompanyNotFoundException;
+import com.ticket.shop.exception.country.CountryNotFoundException;
+import com.ticket.shop.persistence.entity.AddressEntity;
 import com.ticket.shop.persistence.entity.CompanyEntity;
+import com.ticket.shop.persistence.entity.CountryEntity;
+import com.ticket.shop.persistence.repository.AddressRepository;
 import com.ticket.shop.persistence.repository.CompanyRepository;
+import com.ticket.shop.persistence.repository.CountryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -27,6 +35,12 @@ public class CompanyServiceImpTest {
     @Mock
     private CompanyRepository companyRepository;
 
+    @Mock
+    private AddressRepository addressRepository;
+
+    @Mock
+    CountryRepository countryRepository;
+
     private CompanyServiceImp companyServiceImp;
 
     private final static Long COMPANY_ID = 245L;
@@ -36,7 +50,8 @@ public class CompanyServiceImpTest {
 
     @BeforeEach
     public void setup() {
-        this.companyServiceImp = new CompanyServiceImp(this.companyRepository);
+        AddressService addressService = new AddressServiceImp(this.addressRepository, this.countryRepository);
+        this.companyServiceImp = new CompanyServiceImp(this.companyRepository, this.addressRepository, addressService);
     }
 
     /**
@@ -48,6 +63,11 @@ public class CompanyServiceImpTest {
         when(this.companyRepository.findByName(any())).thenReturn(Optional.empty());
         when(this.companyRepository.findByEmail(any())).thenReturn(Optional.empty());
         when(this.companyRepository.findByWebsite(any())).thenReturn(Optional.empty());
+
+        when(this.countryRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedCountryEntity()));
+        when(this.addressRepository.save(any())).thenReturn(getMockedAddressEntity());
+        when(this.addressRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedAddressEntity()));
+
         when(this.companyRepository.save(any())).thenReturn(getMockedCompanyEntity());
 
         // Method to be tested
@@ -56,6 +76,35 @@ public class CompanyServiceImpTest {
         // Assert
         assertNotNull(company);
         assertEquals(getMockedCompanyDetailsDto(), company);
+    }
+
+    @Test
+    public void testCreateCompanyFailureDueToCountryNotFound() {
+        // Mock data
+        when(this.companyRepository.findByName(any())).thenReturn(Optional.empty());
+        when(this.companyRepository.findByEmail(any())).thenReturn(Optional.empty());
+        when(this.companyRepository.findByWebsite(any())).thenReturn(Optional.empty());
+        when(this.countryRepository.findById(any())).thenReturn(Optional.empty());
+
+        // assert
+        assertThrows(CountryNotFoundException.class,
+                () -> this.companyServiceImp.createCompany(getMockedCreateOrUpdateCompanyDto()));
+    }
+
+    @Test
+    public void testCreateCompanyFailureDueToAddressNotFound() {
+        // Mock data
+        when(this.companyRepository.findByName(any())).thenReturn(Optional.empty());
+        when(this.companyRepository.findByEmail(any())).thenReturn(Optional.empty());
+        when(this.companyRepository.findByWebsite(any())).thenReturn(Optional.empty());
+
+        when(this.countryRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedCountryEntity()));
+        when(this.addressRepository.save(any())).thenReturn(getMockedAddressEntity());
+        when(this.addressRepository.findById(any())).thenReturn(Optional.empty());
+
+        // assert
+        assertThrows(AddressNotFoundException.class,
+                () -> this.companyServiceImp.createCompany(getMockedCreateOrUpdateCompanyDto()));
     }
 
     @Test
@@ -112,6 +161,11 @@ public class CompanyServiceImpTest {
         when(this.companyRepository.findByName(any())).thenReturn(Optional.empty());
         when(this.companyRepository.findByEmail(any())).thenReturn(Optional.empty());
         when(this.companyRepository.findByWebsite(any())).thenReturn(Optional.empty());
+
+        when(this.countryRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedCountryEntity()));
+        when(this.addressRepository.save(any())).thenReturn(getMockedAddressEntity());
+        when(this.addressRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedAddressEntity()));
+
         when(this.companyRepository.save(any())).thenThrow(RuntimeException.class);
 
         // assert
@@ -188,6 +242,7 @@ public class CompanyServiceImpTest {
                 .name(NAME)
                 .email(EMAIL)
                 .website(WEBSITE)
+                .address(getMockedCreateAddressDto())
                 .build();
     }
 
@@ -197,6 +252,7 @@ public class CompanyServiceImpTest {
                 .name(NAME)
                 .email(EMAIL)
                 .website(WEBSITE)
+                .addressEntity(getMockedAddressEntity())
                 .build();
     }
 
@@ -206,6 +262,56 @@ public class CompanyServiceImpTest {
                 .name(NAME)
                 .email(EMAIL)
                 .website(WEBSITE)
+                .address(getMockedAddressDto())
+                .build();
+    }
+
+    private CreateAddressDto getMockedCreateAddressDto() {
+        return CreateAddressDto.builder()
+                .line1("line1")
+                .line2("")
+                .line3("")
+                .mobileNumber("")
+                .postCode("code")
+                .city("city")
+                .countryId(getMockedCountryEntity().getCountryId())
+                .build();
+    }
+
+    private CountryEntity getMockedCountryEntity() {
+        return CountryEntity.builder()
+                .countryId(1L)
+                .name("Portugal")
+                .isoCode2("PT")
+                .isoCode3("PRT")
+                .currency("EUR")
+                .language("PT")
+                .build();
+    }
+
+    private AddressDetailsDto getMockedAddressDto() {
+        return AddressDetailsDto.builder()
+                .addressId(1L)
+                .line1("line1")
+                .line2("")
+                .line3("")
+                .mobileNumber("")
+                .postCode("code")
+                .city("city")
+                .countryId(getMockedCountryEntity().getCountryId())
+                .build();
+    }
+
+    private AddressEntity getMockedAddressEntity() {
+        return AddressEntity.builder()
+                .addressId(1L)
+                .line1("line1")
+                .line2("")
+                .line3("")
+                .mobileNumber("")
+                .postCode("code")
+                .city("city")
+                .countryEntity(getMockedCountryEntity())
                 .build();
     }
 }
