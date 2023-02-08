@@ -31,7 +31,11 @@ public class CreateAddressDto {
     @NotBlank(message = "Must have post code")
     private String postCode;
 
+    @Schema(example = "New york")
+    @NotBlank(message = "Must have a city")
+    private String city;
+
     @Schema(example = "1")
     @NotNull(message = "Must have a country")
-    private Long country;
+    private Long countryId;
 }
