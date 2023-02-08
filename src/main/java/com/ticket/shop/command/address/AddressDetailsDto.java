@@ -15,5 +15,6 @@ public class AddressDetailsDto {
     private String line3;
     private String mobileNumber;
     private String postCode;
-    private Long country;
+    private String city;
+    private Long countryId;
 }
