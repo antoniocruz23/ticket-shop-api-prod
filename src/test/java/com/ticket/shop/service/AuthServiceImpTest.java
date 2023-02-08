@@ -10,9 +10,6 @@ import com.ticket.shop.persistence.entity.CountryEntity;
 import com.ticket.shop.persistence.entity.UserEntity;
 import com.ticket.shop.persistence.repository.UserRepository;
 import com.ticket.shop.properties.JwtProperties;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -20,12 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import javax.crypto.spec.SecretKeySpec;
-import javax.xml.bind.DatatypeConverter;
-import java.security.Key;
-import java.time.Duration;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,7 +36,6 @@ public class AuthServiceImpTest {
     @MockBean
     private PasswordEncoder passwordEncoder;
     private AuthServiceImp authServiceImp;
-    private JwtProperties jwtProperties;
 
     private final static String FIRSTNAME = "User";
     private final static String LASTNAME = "Test";
@@ -53,14 +44,13 @@ public class AuthServiceImpTest {
     private final static String ENCRYPTED_PASSWORD = "321drowssaP";
     private final static Long USER_ID = 10L;
     private final static List<UserRoles> USER_ROLE = Collections.singletonList(UserRoles.ADMIN);
-    private final String secretKey = "7f928de2afee05bce432f166d140c04a08f713c7eafd05bce432";
 
     @BeforeEach
     public void setup() {
-        this.jwtProperties = new JwtProperties();
-        this.jwtProperties.setSecretKey(this.secretKey);
-        this.jwtProperties.setExpiresInDays(100L);
-        this.authServiceImp = new AuthServiceImp(this.userRepository, this.passwordEncoder, this.jwtProperties);
+        JwtProperties jwtProperties = new JwtProperties();
+        jwtProperties.setSecretKey("default");
+        jwtProperties.setExpiresInDays(100L);
+        this.authServiceImp = new AuthServiceImp(this.userRepository, this.passwordEncoder, jwtProperties);
 
         // Mocks
         when(this.passwordEncoder.encode(any())).thenReturn(ENCRYPTED_PASSWORD);
@@ -114,7 +104,7 @@ public class AuthServiceImpTest {
         // Mocks
         when(this.userRepository.findById(any())).thenReturn(Optional.of(getMockedUserEntity()));
 
-        String token = generateJwtToken(getMockedPrincipalDto());
+        String token = this.authServiceImp.generateJwtToken(getMockedPrincipalDto());
 
         // Call method to be tested
         PrincipalDto validateToken = this.authServiceImp.validateToken(token);
@@ -129,7 +119,7 @@ public class AuthServiceImpTest {
         // Mocks
         when(this.userRepository.findById(any())).thenReturn(Optional.empty());
 
-        String token = generateJwtToken(getMockedPrincipalDto());
+        String token = this.authServiceImp.generateJwtToken(getMockedPrincipalDto());
 
         // Assert result
         assertThrows(UserNotFoundException.class,
@@ -175,24 +165,5 @@ public class AuthServiceImpTest {
                 .roles(USER_ROLE)
                 .countryId(getMockedCountryEntity().getCountryId())
                 .build();
-    }
-
-    private String generateJwtToken(PrincipalDto principalDto) {
-        SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
-        long nowMillis = System.currentTimeMillis();
-        Date now = new Date(nowMillis);
-        Date expiresAt = new Date(now.getTime() +
-                Duration.ofDays(this.jwtProperties.getExpiresInDays()).toMillis());
-        byte[] apiKeySecretBytes = DatatypeConverter.parseBase64Binary(this.secretKey);
-        Key signingKey = new SecretKeySpec(apiKeySecretBytes, signatureAlgorithm.getJcaName());
-
-        return Jwts.builder()
-                .setIssuedAt(now)
-                .claim("id", principalDto.getUserId())
-                .claim("name", principalDto.getName())
-                .claim("role", principalDto.getRoles())
-                .signWith(Keys.hmacShaKeyFor(signingKey.getEncoded()))
-                .setExpiration(expiresAt)
-                .compact();
     }
 }

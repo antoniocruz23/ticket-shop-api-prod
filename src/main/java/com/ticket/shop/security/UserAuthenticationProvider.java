@@ -23,12 +23,12 @@ public class UserAuthenticationProvider {
 
     /**
      * Validate jwt token
-     * @param token
+     * @param token token
      * @return {@link Authentication} with authenticated user
      */
     public Authentication validateToken(String token) {
-        // validate kwt token and get principal
-        PrincipalDto principal = authService.validateToken(token);
+        // validate jwt token and get principal
+        PrincipalDto principal = this.authService.validateToken(token);
 
         return new UsernamePasswordAuthenticationToken(
                 principal,

@@ -39,7 +39,8 @@ public class AuthServiceImp implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtProperties jwtProperties;
     private final String signatureAlgorithm = SignatureAlgorithm.HS256.getJcaName();
-    private Key signingKey;
+    private final String secretKey = Base64.getEncoder().withoutPadding().encodeToString(new byte[256]);
+    private Key signingKey = new SecretKeySpec(DatatypeConverter.parseBase64Binary(this.secretKey), this.signatureAlgorithm);
 
     public AuthServiceImp(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtProperties jwtProperties) {
         this.userRepository = userRepository;
@@ -111,7 +112,7 @@ public class AuthServiceImp implements AuthService {
      * @param principalDto principal dto
      * @return the token as {@link String}
      */
-    private String generateJwtToken(PrincipalDto principalDto) {
+    protected String generateJwtToken(PrincipalDto principalDto) {
         Date now = new Date(System.currentTimeMillis());
         Date expiresAt = new Date(now.getTime() +
                 Duration.ofDays(this.jwtProperties.getExpiresInDays()).toMillis());
