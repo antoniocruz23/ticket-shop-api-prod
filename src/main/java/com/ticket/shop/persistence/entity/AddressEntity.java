@@ -42,10 +42,10 @@ public class AddressEntity {
     private String line3;
 
     @Column(length = 30)
-    private String mobile_number;
+    private String mobileNumber;
 
     @Column(nullable = false, length = 30)
-    private String post_code;
+    private String postCode;
 
     @Column(nullable = false, length = 30)
     private String city;
