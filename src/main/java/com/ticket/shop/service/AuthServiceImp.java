@@ -21,12 +21,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
 import java.security.Key;
-import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.util.Base64;
 import java.util.Date;
@@ -41,7 +38,8 @@ public class AuthServiceImp implements AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProperties jwtProperties;
-    private String secretKey = "default";
+    private final String signatureAlgorithm = SignatureAlgorithm.HS256.getJcaName();
+    private Key signingKey;
 
     public AuthServiceImp(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtProperties jwtProperties) {
         this.userRepository = userRepository;
@@ -51,7 +49,8 @@ public class AuthServiceImp implements AuthService {
 
     @PostConstruct
     protected void init() {
-        this.secretKey = Base64.getEncoder().encodeToString(this.jwtProperties.getSecretKey().getBytes());
+        String secretKey = Base64.getEncoder().encodeToString(this.jwtProperties.getSecretKey().getBytes());
+        this.signingKey = new SecretKeySpec(DatatypeConverter.parseBase64Binary(secretKey), this.signatureAlgorithm);
     }
 
     /**
@@ -90,7 +89,7 @@ public class AuthServiceImp implements AuthService {
     @Override
     public PrincipalDto validateToken(String token) {
         Jws<Claims> jwtClaims = Jwts.parserBuilder()
-                .setSigningKey(keyFromString())
+                .setSigningKey(this.signingKey)
                 .build()
                 .parseClaimsJws(token);
 
@@ -106,21 +105,6 @@ public class AuthServiceImp implements AuthService {
         return UserConverter.fromUserEntityToPrincipalDto(userEntity);
     }
 
-    private SecretKey keyFromString() {
-        byte[] keyBytes = this.secretKey.getBytes();
-        SecretKey key = null;
-        try {
-            KeyGenerator keyGenerator = KeyGenerator.getInstance("HS256");
-            keyGenerator.init(256);
-            key = keyGenerator.generateKey();
-            key = new SecretKeySpec(keyBytes, "HS256");
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        return key;
-    }
-
-
     /**
      * Helper to create JWT Token
      *
@@ -128,20 +112,16 @@ public class AuthServiceImp implements AuthService {
      * @return the token as {@link String}
      */
     private String generateJwtToken(PrincipalDto principalDto) {
-        SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
         Date now = new Date(System.currentTimeMillis());
         Date expiresAt = new Date(now.getTime() +
                 Duration.ofDays(this.jwtProperties.getExpiresInDays()).toMillis());
-
-        byte[] apiKeySecretBytes = DatatypeConverter.parseBase64Binary(this.secretKey);
-        Key signingKey = new SecretKeySpec(apiKeySecretBytes, signatureAlgorithm.getJcaName());
 
         return Jwts.builder()
                 .setIssuedAt(now)
                 .claim("id", principalDto.getUserId())
                 .claim("name", principalDto.getName())
                 .claim("role", principalDto.getRoles())
-                .signWith(Keys.hmacShaKeyFor(signingKey.getEncoded()))
+                .signWith(Keys.hmacShaKeyFor(this.signingKey.getEncoded()))
                 .setExpiration(expiresAt)
                 .compact();
     }
