@@ -9,7 +9,6 @@ import com.ticket.shop.persistence.entity.CompanyEntity;
  */
 public class CompanyConverter {
 
-
     /**
      * From {@link CreateOrUpdateCompanyDto} to {@link CompanyEntity}
      * @param createOrUpdateCompanyDto {@link CreateOrUpdateCompanyDto}

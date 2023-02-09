@@ -1,10 +1,8 @@
 package com.ticket.shop.command.event;
 
-import com.ticket.shop.command.prices.PricesDetailsDto;
+import com.ticket.shop.command.address.AddressDetailsDto;
 import lombok.Builder;
 import lombok.Data;
-
-import java.util.List;
 
 /**
  * EventDetailsDto used to respond with event details
@@ -14,7 +12,6 @@ import java.util.List;
 public class EventDetailsDto {
     private Long eventId;
     private String name;
-    private String address;
     private String description;
-    private List<PricesDetailsDto> eventPrices;
+    private AddressDetailsDto address;
 }
