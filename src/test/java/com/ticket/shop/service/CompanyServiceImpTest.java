@@ -39,7 +39,7 @@ public class CompanyServiceImpTest {
     private AddressRepository addressRepository;
 
     @Mock
-    CountryRepository countryRepository;
+    private CountryRepository countryRepository;
 
     private CompanyServiceImp companyServiceImp;
 
@@ -49,7 +49,7 @@ public class CompanyServiceImpTest {
     private final static String WEBSITE = "website.com";
 
     @BeforeEach
-    public void setup() {
+    public void setUp() {
         AddressService addressService = new AddressServiceImp(this.addressRepository, this.countryRepository);
         this.companyServiceImp = new CompanyServiceImp(this.companyRepository, this.addressRepository, addressService);
     }

@@ -46,7 +46,7 @@ public class AuthServiceImpTest {
     private final static List<UserRoles> USER_ROLE = Collections.singletonList(UserRoles.ADMIN);
 
     @BeforeEach
-    public void setup() {
+    public void setUp() {
         JwtProperties jwtProperties = new JwtProperties();
         jwtProperties.setSecretKey("default");
         jwtProperties.setExpiresInDays(100L);

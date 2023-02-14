@@ -52,7 +52,7 @@ public class CustomerServiceImpTest {
     private final static List<UserRoles> USER_ROLE = Collections.singletonList(UserRoles.CUSTOMER);
 
     @BeforeEach
-    public void setup() {
+    public void setUp() {
         this.userServiceImp = new CustomerServiceImp(this.userRepository, this.countryRepository, this.passwordEncoder);
 
         // Mocks

@@ -65,7 +65,7 @@ public class WorkerServiceImpTest {
     private final static List<UserRoles> USER_ROLE = Collections.singletonList(UserRoles.WORKER);
 
     @BeforeEach
-    public void setup() {
+    public void setUp() {
         this.workerServiceImp = new WorkerServiceImp(this.userRepository, this.countryRepository, this.passwordEncoder, this.companyRepository);
 
         // Mocks
