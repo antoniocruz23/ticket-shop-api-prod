@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.joda.time.DateTime;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -16,7 +17,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.time.LocalTime;
-import java.util.Date;
 
 /**
  * Calendar Entity
@@ -34,7 +34,7 @@ public class CalendarEntity {
     private Long calendarId;
 
     @Column(nullable = false)
-    private Date date;
+    private DateTime date;
 
     @Column(nullable = false)
     private LocalTime startTime;

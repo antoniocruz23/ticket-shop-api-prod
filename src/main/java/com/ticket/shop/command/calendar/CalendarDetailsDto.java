@@ -2,9 +2,9 @@ package com.ticket.shop.command.calendar;
 
 import lombok.Builder;
 import lombok.Data;
+import org.joda.time.DateTime;
 
 import java.time.LocalTime;
-import java.util.Date;
 
 /**
  * CalendarDetailsDto used to respond with calendar details
@@ -13,7 +13,7 @@ import java.util.Date;
 @Builder
 public class CalendarDetailsDto {
     private Long calendarId;
-    private Date date;
+    private DateTime date;
     private LocalTime startTime;
     private LocalTime endTime;
 }
