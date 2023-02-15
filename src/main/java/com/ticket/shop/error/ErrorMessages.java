@@ -15,6 +15,7 @@ public class ErrorMessages {
     public static final String COMPANY_NOT_FOUND = "Can't find any company with the given id";
     public static final String COUNTRY_NOT_FOUND = "Can't find any country with the given id";
     public static final String ADDRESS_NOT_FOUND = "Can't find any address with the given id";
+    public static final String EVENT_NOT_FOUND = "Can't find any event with the given id";
 
     public static final String EMAIL_ALREADY_EXISTS = "The given email already exists";
     public static final String NAME_ALREADY_EXISTS = "The given name already exists";
