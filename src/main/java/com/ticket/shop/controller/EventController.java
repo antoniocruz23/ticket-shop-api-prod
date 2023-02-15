@@ -74,7 +74,7 @@ public class EventController {
             LOGGER.error("Failed to created event - {}", createEventDto, e);
             throw new TicketShopException(ErrorMessages.OPERATION_FAILED, e);
         }
-        LOGGER.info("Event created successfully. Retrieving created event with id {}", 1L);//eventDetailsDto.getCompanyId());
+        LOGGER.info("Event created successfully. Retrieving created event with id {}", eventDetailsDto.getEventId());
         return new ResponseEntity<>(eventDetailsDto, HttpStatus.CREATED);
     }
 }
