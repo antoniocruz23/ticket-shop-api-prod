@@ -60,8 +60,8 @@ public class CalendarController {
             @ApiResponse(responseCode = "400", description = ErrorMessages.DATABASE_COMMUNICATION_ERROR,
                     content = @Content(schema = @Schema(implementation = Error.class)))})
     public ResponseEntity<CalendarDetailsDto> createCalendar(@Valid @RequestBody CreateCalendarDto createCalendarDto,
-                                                       @PathVariable Long companyId,
-                                                       @PathVariable Long eventId) {
+                                                             @PathVariable Long companyId,
+                                                             @PathVariable Long eventId) {
 
         LOGGER.info("Request to create new calendar - {}", createCalendarDto);
         CalendarDetailsDto calendarDetailsDto;

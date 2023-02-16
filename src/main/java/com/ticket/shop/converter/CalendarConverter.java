@@ -16,9 +16,8 @@ public class CalendarConverter {
      */
     public static CalendarEntity fromCreateCalendarDtoToCalendarEntity(CreateCalendarDto createCalendarDto) {
         return CalendarEntity.builder()
-                .date(createCalendarDto.getDate())
-                .startTime(createCalendarDto.getStartTime())
-                .endTime(createCalendarDto.getEndTime())
+                .startDate(createCalendarDto.getStartDate())
+                .endDate(createCalendarDto.getEndDate())
                 .build();
     }
 
@@ -30,9 +29,8 @@ public class CalendarConverter {
     public static CalendarDetailsDto fromCalendarEntityToCalendarDetailsDto(CalendarEntity calendarEntity) {
         return CalendarDetailsDto.builder()
                 .calendarId(calendarEntity.getCalendarId())
-                .date(calendarEntity.getDate())
-                .startTime(calendarEntity.getStartTime())
-                .endTime(calendarEntity.getEndTime())
+                .startDate(calendarEntity.getStartDate())
+                .endDate(calendarEntity.getEndDate())
                 .build();
     }
 }

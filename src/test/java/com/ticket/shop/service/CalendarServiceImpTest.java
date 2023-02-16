@@ -4,7 +4,6 @@ import com.ticket.shop.command.calendar.CalendarDetailsDto;
 import com.ticket.shop.command.calendar.CreateCalendarDto;
 import com.ticket.shop.exception.DatabaseCommunicationException;
 import com.ticket.shop.exception.company.CompanyNotFoundException;
-import com.ticket.shop.exception.country.CountryNotFoundException;
 import com.ticket.shop.exception.event.EventNotFoundException;
 import com.ticket.shop.persistence.entity.AddressEntity;
 import com.ticket.shop.persistence.entity.CalendarEntity;
@@ -14,14 +13,12 @@ import com.ticket.shop.persistence.entity.EventEntity;
 import com.ticket.shop.persistence.repository.CalendarRepository;
 import com.ticket.shop.persistence.repository.CompanyRepository;
 import com.ticket.shop.persistence.repository.EventRepository;
-import org.joda.time.DateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.time.LocalTime;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -43,7 +40,7 @@ public class CalendarServiceImpTest {
     private EventRepository eventRepository;
 
     private CalendarServiceImp calendarServiceImp;
-    private final DateTime refDate = new DateTime();
+    private final LocalDateTime refDate = LocalDateTime.now();
 
     @BeforeEach
     public void setUp() {
@@ -144,27 +141,24 @@ public class CalendarServiceImpTest {
     private CalendarEntity getMockedCalendarEntity() {
         return CalendarEntity.builder()
                 .calendarId(4L)
-                .date(refDate)
-                .startTime(LocalTime.of(10,0))
-                .endTime(LocalTime.of(23,0))
+                .startDate(refDate)
+                .endDate(refDate.plusDays(1))
                 .eventEntity(getMockedEventEntity())
                 .build();
     }
 
     private CreateCalendarDto getMockedCreateCalendarDto() {
         return CreateCalendarDto.builder()
-                .date(refDate)
-                .startTime(LocalTime.of(10,0))
-                .endTime(LocalTime.of(23,0))
+                .startDate(refDate)
+                .endDate(refDate.plusDays(1))
                 .build();
     }
 
     private CalendarDetailsDto getMockedCalendarDetailsDto() {
         return CalendarDetailsDto.builder()
                 .calendarId(4L)
-                .date(refDate)
-                .startTime(LocalTime.of(10,0))
-                .endTime(LocalTime.of(23,0))
+                .startDate(refDate)
+                .endDate(refDate.plusDays(1))
                 .build();
     }
 }
