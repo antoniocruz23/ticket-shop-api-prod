@@ -50,7 +50,7 @@ public class CompanyServiceImpTest {
 
     @BeforeEach
     public void setUp() {
-        AddressService addressService = new AddressServiceImp(this.addressRepository, this.countryRepository);
+        AddressServiceImp addressService = new AddressServiceImp(this.addressRepository, this.countryRepository);
         this.companyServiceImp = new CompanyServiceImp(this.companyRepository, this.addressRepository, addressService);
     }
 

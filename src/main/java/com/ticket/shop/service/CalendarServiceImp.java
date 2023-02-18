@@ -30,9 +30,9 @@ public class CalendarServiceImp implements CalendarService {
     private final CalendarRepository calendarRepository;
     private final CompanyRepository companyRepository;
     private final EventRepository eventRepository;
-    private final TicketService ticketService;
+    private final TicketServiceImp ticketService;
 
-    public CalendarServiceImp(CalendarRepository calendarRepository, CompanyRepository companyRepository, EventRepository eventRepository, TicketService ticketService) {
+    public CalendarServiceImp(CalendarRepository calendarRepository, CompanyRepository companyRepository, EventRepository eventRepository, TicketServiceImp ticketService) {
         this.calendarRepository = calendarRepository;
         this.companyRepository = companyRepository;
         this.eventRepository = eventRepository;
@@ -50,7 +50,6 @@ public class CalendarServiceImp implements CalendarService {
 
         LOGGER.debug("Creating calendar - {}", createCalendarDto);
         CalendarEntity calendarEntity = CalendarConverter.fromCreateCalendarDtoToCalendarEntity(createCalendarDto, eventEntity);
-
 
         LOGGER.info("Persisting calendar into database");
         CalendarEntity createdCalendar;

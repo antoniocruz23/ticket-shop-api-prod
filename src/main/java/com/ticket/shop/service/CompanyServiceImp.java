@@ -24,12 +24,12 @@ public class CompanyServiceImp implements CompanyService {
     private static final Logger LOGGER = LogManager.getLogger(CompanyService.class);
     private final CompanyRepository companyRepository;
     private final AddressRepository addressRepository;
-    private final AddressService addressService;
+    private final AddressServiceImp addressServiceImp;
 
-    public CompanyServiceImp(CompanyRepository companyRepository, AddressRepository addressRepository, AddressService addressService) {
+    public CompanyServiceImp(CompanyRepository companyRepository, AddressRepository addressRepository, AddressServiceImp addressService) {
         this.companyRepository = companyRepository;
         this.addressRepository = addressRepository;
-        this.addressService = addressService;
+        this.addressServiceImp = addressService;
     }
 
     /**
@@ -41,7 +41,7 @@ public class CompanyServiceImp implements CompanyService {
         CompanyEntity companyEntity = CompanyConverter.fromCreateCompanyDtoToCompanyEntity(createOrUpdateCompanyDto);
         validateCompany(companyEntity.getName(), companyEntity.getEmail(), companyEntity.getWebsite());
 
-        AddressDetailsDto address = this.addressService.createAddress(createOrUpdateCompanyDto.getAddress());
+        AddressDetailsDto address = this.addressServiceImp.createAddress(createOrUpdateCompanyDto.getAddress());
         AddressEntity addressEntityById = getAddressEntityById(address.getAddressId());
         companyEntity.setAddressEntity(addressEntityById);
 

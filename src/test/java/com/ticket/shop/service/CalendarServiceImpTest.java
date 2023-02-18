@@ -2,6 +2,9 @@ package com.ticket.shop.service;
 
 import com.ticket.shop.command.calendar.CalendarDetailsDto;
 import com.ticket.shop.command.calendar.CreateCalendarDto;
+import com.ticket.shop.command.ticket.CreateTicketDto;
+import com.ticket.shop.enumerators.TicketStatus;
+import com.ticket.shop.enumerators.TicketType;
 import com.ticket.shop.exception.DatabaseCommunicationException;
 import com.ticket.shop.exception.company.CompanyNotFoundException;
 import com.ticket.shop.exception.event.EventNotFoundException;
@@ -10,15 +13,20 @@ import com.ticket.shop.persistence.entity.CalendarEntity;
 import com.ticket.shop.persistence.entity.CompanyEntity;
 import com.ticket.shop.persistence.entity.CountryEntity;
 import com.ticket.shop.persistence.entity.EventEntity;
+import com.ticket.shop.persistence.entity.TicketEntity;
 import com.ticket.shop.persistence.repository.CalendarRepository;
 import com.ticket.shop.persistence.repository.CompanyRepository;
 import com.ticket.shop.persistence.repository.EventRepository;
+import com.ticket.shop.persistence.repository.TicketPriceRepository;
+import com.ticket.shop.persistence.repository.TicketRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -39,12 +47,19 @@ public class CalendarServiceImpTest {
     @Mock
     private EventRepository eventRepository;
 
+    @Mock
+    private TicketRepository ticketRepository;
+
+    @Mock
+    private TicketPriceRepository ticketPriceRepository;
+
     private CalendarServiceImp calendarServiceImp;
     private final LocalDateTime refDate = LocalDateTime.now();
 
     @BeforeEach
     public void setUp() {
-        this.calendarServiceImp = new CalendarServiceImp(this.calendarRepository, this.companyRepository, this.eventRepository);
+        TicketServiceImp ticketServiceImp = new TicketServiceImp(this.ticketRepository, this.ticketPriceRepository);
+        this.calendarServiceImp = new CalendarServiceImp(this.calendarRepository, this.companyRepository, this.eventRepository, ticketServiceImp);
     }
 
     /**
@@ -56,6 +71,7 @@ public class CalendarServiceImpTest {
         when(this.companyRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedCompanyEntity()));
         when(this.eventRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedEventEntity()));
         when(this.calendarRepository.save(any())).thenReturn(getMockedCalendarEntity());
+        when(this.ticketRepository.saveAll(any())).thenReturn(getMockedTicketEntities());
 
         // Method to be tested
         CalendarDetailsDto calendar = this.calendarServiceImp.createCalendar(getMockedCreateCalendarDto(), 1L, 2L);
@@ -151,6 +167,7 @@ public class CalendarServiceImpTest {
         return CreateCalendarDto.builder()
                 .startDate(refDate)
                 .endDate(refDate.plusDays(1))
+                .tickets(getMockedCreateTicketDto())
                 .build();
     }
 
@@ -159,6 +176,27 @@ public class CalendarServiceImpTest {
                 .calendarId(4L)
                 .startDate(refDate)
                 .endDate(refDate.plusDays(1))
+                .tickets(Map.of(TicketType.VIP, 1L))
                 .build();
+    }
+
+    private Iterable<TicketEntity> getMockedTicketEntities() {
+        return List.of(
+                TicketEntity.builder()
+                        .ticketId(2L)
+                        .type(TicketType.VIP)
+                        .status(TicketStatus.AVAILABLE)
+                        .calendarEntity(getMockedCalendarEntity())
+                        .build()
+        );
+    }
+
+    private List<CreateTicketDto> getMockedCreateTicketDto() {
+        return List.of(
+                CreateTicketDto.builder()
+                        .type(TicketType.VIP)
+                        .total(1L)
+                        .build()
+        );
     }
 }
