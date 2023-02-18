@@ -24,11 +24,11 @@ public class EventServiceImp implements EventService {
 
     private static final Logger LOGGER = LogManager.getLogger(EventService.class);
     private final EventRepository eventRepository;
-    private final AddressService addressService;
+    private final AddressServiceImp addressService;
     private final AddressRepository addressRepository;
     private final CompanyRepository companyRepository;
 
-    public EventServiceImp(EventRepository eventRepository, AddressService addressService, AddressRepository addressRepository,
+    public EventServiceImp(EventRepository eventRepository, AddressServiceImp addressService, AddressRepository addressRepository,
                            CompanyRepository companyRepository) {
         this.eventRepository = eventRepository;
         this.addressService = addressService;
