@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class AddressServiceImp implements AddressService {
 
-    private static final Logger LOGGER = LogManager.getLogger(CustomerService.class);
+    private static final Logger LOGGER = LogManager.getLogger(AddressService.class);
     private final AddressRepository addressRepository;
     private final CountryRepository countryRepository;
 

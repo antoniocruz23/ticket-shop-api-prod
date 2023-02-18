@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class EventServiceImp implements EventService {
 
-    private static final Logger LOGGER = LogManager.getLogger(CustomerService.class);
+    private static final Logger LOGGER = LogManager.getLogger(EventService.class);
     private final EventRepository eventRepository;
     private final AddressService addressService;
     private final AddressRepository addressRepository;

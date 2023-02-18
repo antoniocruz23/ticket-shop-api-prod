@@ -35,7 +35,7 @@ import java.util.List;
 @Service
 public class WorkerServiceImp implements WorkerService {
 
-    private static final Logger LOGGER = LogManager.getLogger(CustomerService.class);
+    private static final Logger LOGGER = LogManager.getLogger(WorkerService.class);
     private final UserRepository userRepository;
     private final CountryRepository countryRepository;
     private final CompanyRepository companyRepository;

@@ -21,7 +21,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class CompanyServiceImp implements CompanyService {
 
-    private static final Logger LOGGER = LogManager.getLogger(CustomerService.class);
+    private static final Logger LOGGER = LogManager.getLogger(CompanyService.class);
     private final CompanyRepository companyRepository;
     private final AddressRepository addressRepository;
     private final AddressService addressService;
