@@ -1,11 +1,11 @@
 package com.ticket.shop.persistence.entity;
 
 import com.ticket.shop.enumerators.TicketStatus;
+import com.ticket.shop.enumerators.TicketType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -38,10 +38,13 @@ public class TicketEntity {
     @Enumerated(EnumType.STRING)
     private TicketStatus status;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private TicketType type;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ticket_price_id", nullable = false)
-    @ToString.Exclude
-    private TicketPriceEntity ticketPriceEntity;
+    @JoinColumn(name = "calendar_id", nullable = false)
+    private CalendarEntity calendarEntity;
 
     @ManyToOne()
     @JoinColumn(name = "user_id")

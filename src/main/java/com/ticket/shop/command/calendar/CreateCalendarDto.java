@@ -1,11 +1,14 @@
 package com.ticket.shop.command.calendar;
 
+import com.ticket.shop.command.ticket.CreateTicketDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * CreateCalendarDto used to store calendar info when created
@@ -22,8 +25,7 @@ public class CreateCalendarDto {
     @NotNull(message = "Must have a end date")
     private LocalDateTime endDate;
 
-//TODO
-//    @Valid
-//    @NotNull(message = "Must have tickets")
-//    private List<TicketDetailsDto> tickets;
+    @Valid
+    @NotNull(message = "Must have tickets")
+    private List<CreateTicketDto> tickets;
 }

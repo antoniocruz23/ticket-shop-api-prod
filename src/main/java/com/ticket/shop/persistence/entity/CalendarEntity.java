@@ -14,8 +14,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Calendar Entity
@@ -41,4 +43,7 @@ public class CalendarEntity {
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "event_id", nullable = false)
     private EventEntity eventEntity;
+
+    @OneToMany(mappedBy = "calendarEntity")
+    private List<TicketEntity> tickets;
 }

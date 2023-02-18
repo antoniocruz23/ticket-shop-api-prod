@@ -3,6 +3,7 @@ package com.ticket.shop.exception;
 import com.ticket.shop.error.Error;
 import com.ticket.shop.exception.address.AddressNotFoundException;
 import com.ticket.shop.exception.auth.RoleInvalidException;
+import com.ticket.shop.exception.calendar.CalendarNotFoundException;
 import com.ticket.shop.exception.company.CompanyAlreadyExistsException;
 import com.ticket.shop.exception.company.CompanyNotFoundException;
 import com.ticket.shop.exception.country.CountryNotFoundException;
@@ -58,7 +59,8 @@ public class TicketShopExceptionHandler extends ResponseEntityExceptionHandler {
             CountryNotFoundException.class,
             CompanyNotFoundException.class,
             AddressNotFoundException.class,
-            EventNotFoundException.class
+            EventNotFoundException.class,
+            CalendarNotFoundException.class
     })
     public ResponseEntity<Error> handlerNotFoundException(Exception ex, HttpServletRequest request) {
         return buildErrorResponse(ex, request, HttpStatus.NOT_FOUND);

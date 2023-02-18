@@ -1,6 +1,6 @@
 package com.ticket.shop.command.ticketPrice;
 
-import com.ticket.shop.enumerators.PriceTypes;
+import com.ticket.shop.enumerators.TicketType;
 import lombok.Builder;
 import lombok.Data;
 
@@ -12,5 +12,5 @@ import lombok.Data;
 public class TicketPriceDetailsDto {
     private Long ticketPriceId;
     private Double value;
-    private PriceTypes type;
+    private TicketType type;
 }

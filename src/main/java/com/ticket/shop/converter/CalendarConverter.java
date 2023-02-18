@@ -3,6 +3,7 @@ package com.ticket.shop.converter;
 import com.ticket.shop.command.calendar.CalendarDetailsDto;
 import com.ticket.shop.command.calendar.CreateCalendarDto;
 import com.ticket.shop.persistence.entity.CalendarEntity;
+import com.ticket.shop.persistence.entity.EventEntity;
 
 /**
  * Calendar converter
@@ -12,12 +13,14 @@ public class CalendarConverter {
     /**
      * From {@link CreateCalendarDto} to {@link CalendarEntity}
      * @param createCalendarDto {@link CreateCalendarDto}
+     * @param eventEntity {@link EventEntity}
      * @return {@link CalendarEntity}
      */
-    public static CalendarEntity fromCreateCalendarDtoToCalendarEntity(CreateCalendarDto createCalendarDto) {
+    public static CalendarEntity fromCreateCalendarDtoToCalendarEntity(CreateCalendarDto createCalendarDto, EventEntity eventEntity) {
         return CalendarEntity.builder()
                 .startDate(createCalendarDto.getStartDate())
                 .endDate(createCalendarDto.getEndDate())
+                .eventEntity(eventEntity)
                 .build();
     }
 
