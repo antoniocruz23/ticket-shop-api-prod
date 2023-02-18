@@ -1,6 +1,6 @@
 package com.ticket.shop.command.worker;
 
-import com.ticket.shop.enumerators.UserRoles;
+import com.ticket.shop.enumerators.UserRole;
 import lombok.Builder;
 import lombok.Data;
 
@@ -16,7 +16,7 @@ public class WorkerDetailsDto {
     private String firstname;
     private String lastname;
     private String email;
-    private List<UserRoles> roles;
+    private List<UserRole> roles;
     private Long countryId;
     private Long companyId;
 }

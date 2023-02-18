@@ -3,7 +3,7 @@ package com.ticket.shop.service;
 import com.ticket.shop.command.customer.CreateCustomerDto;
 import com.ticket.shop.command.customer.CustomerDetailsDto;
 import com.ticket.shop.command.customer.UpdateCustomerDto;
-import com.ticket.shop.enumerators.UserRoles;
+import com.ticket.shop.enumerators.UserRole;
 import com.ticket.shop.exception.DatabaseCommunicationException;
 import com.ticket.shop.exception.country.CountryNotFoundException;
 import com.ticket.shop.exception.user.UserAlreadyExistsException;
@@ -49,7 +49,7 @@ public class CustomerServiceImpTest {
     private final static String PASSWORD = "Password123!";
     private final static String ENCRYPTED_PASSWORD = "adub1bb891b";
     private final static Long USER_ID = 3L;
-    private final static List<UserRoles> USER_ROLE = Collections.singletonList(UserRoles.CUSTOMER);
+    private final static List<UserRole> USER_ROLE = Collections.singletonList(UserRole.CUSTOMER);
 
     @BeforeEach
     public void setUp() {
@@ -150,7 +150,7 @@ public class CustomerServiceImpTest {
                 .lastname(LASTNAME + 11)
                 .email(EMAIL)
                 .encryptedPassword(ENCRYPTED_PASSWORD)
-                .roles(List.of(UserRoles.CUSTOMER))
+                .roles(List.of(UserRole.CUSTOMER))
                 .countryEntity(getMockedCountryEntity()).build();
 
         // Method to be tested

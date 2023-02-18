@@ -4,7 +4,7 @@ import com.ticket.shop.command.Paginated;
 import com.ticket.shop.command.worker.CreateWorkerDto;
 import com.ticket.shop.command.worker.UpdateWorkerDto;
 import com.ticket.shop.command.worker.WorkerDetailsDto;
-import com.ticket.shop.enumerators.UserRoles;
+import com.ticket.shop.enumerators.UserRole;
 import com.ticket.shop.exception.DatabaseCommunicationException;
 import com.ticket.shop.exception.auth.RoleInvalidException;
 import com.ticket.shop.exception.company.CompanyNotFoundException;
@@ -62,7 +62,7 @@ public class WorkerServiceImpTest {
     private final static String ENCRYPTED_PASSWORD = "adub1bb891b";
     private final static Long WORKER_ID = 2L;
     private final static Long COMPANY_ID = 245L;
-    private final static List<UserRoles> USER_ROLE = Collections.singletonList(UserRoles.WORKER);
+    private final static List<UserRole> USER_ROLE = Collections.singletonList(UserRole.WORKER);
 
     @BeforeEach
     public void setUp() {
@@ -179,7 +179,7 @@ public class WorkerServiceImpTest {
                 .firstname(FIRSTNAME + 11)
                 .lastname(LASTNAME + 11)
                 .email(EMAIL)
-                .roles(List.of(UserRoles.COMPANY_ADMIN))
+                .roles(List.of(UserRole.COMPANY_ADMIN))
                 .countryId(getMockedCountryEntity().getCountryId())
                 .companyId(getMockedCompanyEntity().getCompanyId())
                 .build();
@@ -190,7 +190,7 @@ public class WorkerServiceImpTest {
                 .lastname(LASTNAME + 11)
                 .email(EMAIL)
                 .encryptedPassword(ENCRYPTED_PASSWORD)
-                .roles(List.of(UserRoles.COMPANY_ADMIN))
+                .roles(List.of(UserRole.COMPANY_ADMIN))
                 .countryEntity(getMockedCountryEntity())
                 .companyEntity(getMockedCompanyEntity())
                 .build();
@@ -326,7 +326,7 @@ public class WorkerServiceImpTest {
                 .lastname(LASTNAME)
                 .email(EMAIL)
                 .password(PASSWORD)
-                .roles(List.of(UserRoles.WORKER))
+                .roles(List.of(UserRole.WORKER))
                 .countryId(getMockedCountryEntity().getCountryId())
                 .build();
     }
@@ -346,7 +346,7 @@ public class WorkerServiceImpTest {
                 .lastname(LASTNAME + 11)
                 .email(EMAIL)
                 .password(PASSWORD + 11)
-                .roles(List.of(UserRoles.ADMIN, UserRoles.COMPANY_ADMIN))
+                .roles(List.of(UserRole.ADMIN, UserRole.COMPANY_ADMIN))
                 .countryId(getMockedCountryEntity().getCountryId())
                 .build();
     }
@@ -357,7 +357,7 @@ public class WorkerServiceImpTest {
                 .lastname(LASTNAME + 11)
                 .email(EMAIL)
                 .password(PASSWORD + 11)
-                .roles(List.of(UserRoles.COMPANY_ADMIN))
+                .roles(List.of(UserRole.COMPANY_ADMIN))
                 .countryId(getMockedCountryEntity().getCountryId())
                 .build();
     }

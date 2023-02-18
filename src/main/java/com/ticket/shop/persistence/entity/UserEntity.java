@@ -1,6 +1,6 @@
 package com.ticket.shop.persistence.entity;
 
-import com.ticket.shop.enumerators.UserRoles;
+import com.ticket.shop.enumerators.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -57,7 +57,7 @@ public class UserEntity {
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "roles", joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)
-    private List<UserRoles> roles;
+    private List<UserRole> roles;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "country_id", nullable = false)

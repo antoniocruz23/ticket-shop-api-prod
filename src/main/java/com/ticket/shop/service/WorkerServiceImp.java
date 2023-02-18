@@ -5,7 +5,7 @@ import com.ticket.shop.command.worker.CreateWorkerDto;
 import com.ticket.shop.command.worker.UpdateWorkerDto;
 import com.ticket.shop.command.worker.WorkerDetailsDto;
 import com.ticket.shop.converter.UserConverter;
-import com.ticket.shop.enumerators.UserRoles;
+import com.ticket.shop.enumerators.UserRole;
 import com.ticket.shop.error.ErrorMessages;
 import com.ticket.shop.exception.DatabaseCommunicationException;
 import com.ticket.shop.exception.auth.RoleInvalidException;
@@ -57,7 +57,7 @@ public class WorkerServiceImp implements WorkerService {
         LOGGER.debug("Creating worker - {}", createWorkerDto);
         UserEntity userEntity = UserConverter.fromCreateWorkerDtoToUserEntity(createWorkerDto);
 
-        if (userEntity.getRoles().contains(UserRoles.ADMIN)) {
+        if (userEntity.getRoles().contains(UserRole.ADMIN)) {
             LOGGER.debug("Failed while trying to create the worker role with ADMIN role");
             throw new RoleInvalidException(ErrorMessages.ROLE_INVALID);
         }
@@ -139,7 +139,7 @@ public class WorkerServiceImp implements WorkerService {
     @Override
     public WorkerDetailsDto updateWorker(Long companyId, Long userId, UpdateWorkerDto updateUserDto) throws UserNotFoundException {
 
-        if (updateUserDto.getRoles().contains(UserRoles.ADMIN)) {
+        if (updateUserDto.getRoles().contains(UserRole.ADMIN)) {
             LOGGER.debug("Failed while trying to update the worker role to application ADMIN");
             throw new RoleInvalidException(ErrorMessages.ROLE_INVALID);
         }

@@ -5,7 +5,7 @@ import com.ticket.shop.command.customer.CreateCustomerDto;
 import com.ticket.shop.command.customer.UpdateCustomerDto;
 import com.ticket.shop.command.customer.CustomerDetailsDto;
 import com.ticket.shop.converter.UserConverter;
-import com.ticket.shop.enumerators.UserRoles;
+import com.ticket.shop.enumerators.UserRole;
 import com.ticket.shop.error.ErrorMessages;
 import com.ticket.shop.exception.DatabaseCommunicationException;
 import com.ticket.shop.exception.country.CountryNotFoundException;
@@ -48,7 +48,7 @@ public class CustomerServiceImp implements CustomerService {
         LOGGER.debug("Creating customer - {}", createUserDto);
         UserEntity userEntity = UserConverter.fromCreateCustomerDtoToUserEntity(createUserDto);
 
-        userEntity.setRoles(List.of(UserRoles.CUSTOMER));
+        userEntity.setRoles(List.of(UserRole.CUSTOMER));
 
         CountryEntity countryEntity = getCountryEntityById(createUserDto.getCountryId());
         userEntity.setCountryEntity(countryEntity);

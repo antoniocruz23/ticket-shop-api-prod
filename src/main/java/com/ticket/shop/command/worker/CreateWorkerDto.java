@@ -1,6 +1,6 @@
 package com.ticket.shop.command.worker;
 
-import com.ticket.shop.enumerators.UserRoles;
+import com.ticket.shop.enumerators.UserRole;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
@@ -34,7 +34,7 @@ public class CreateWorkerDto {
 
     @Schema(example = "[\"Worker\"]")
     @NotNull(message = "Must have role")
-    private List<UserRoles> roles;
+    private List<UserRole> roles;
 
     @Schema(example = "1")
     @NotNull(message = "Must have a country")

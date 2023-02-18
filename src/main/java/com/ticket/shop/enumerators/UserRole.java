@@ -3,7 +3,7 @@ package com.ticket.shop.enumerators;
 /**
  * Enumerator for users roles
  */
-public enum UserRoles {
+public enum UserRole {
     ADMIN,
     COMPANY_ADMIN,
     WORKER,

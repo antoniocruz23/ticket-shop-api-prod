@@ -3,7 +3,7 @@ package com.ticket.shop.service;
 import com.ticket.shop.command.auth.CredentialsDto;
 import com.ticket.shop.command.auth.LoggedInDto;
 import com.ticket.shop.command.auth.PrincipalDto;
-import com.ticket.shop.enumerators.UserRoles;
+import com.ticket.shop.enumerators.UserRole;
 import com.ticket.shop.exception.auth.WrongCredentialsException;
 import com.ticket.shop.exception.user.UserNotFoundException;
 import com.ticket.shop.persistence.entity.CountryEntity;
@@ -43,7 +43,7 @@ public class AuthServiceImpTest {
     private final static String PASSWORD = "Password123";
     private final static String ENCRYPTED_PASSWORD = "321drowssaP";
     private final static Long USER_ID = 10L;
-    private final static List<UserRoles> USER_ROLE = Collections.singletonList(UserRoles.ADMIN);
+    private final static List<UserRole> USER_ROLE = Collections.singletonList(UserRole.ADMIN);
 
     @BeforeEach
     public void setUp() {

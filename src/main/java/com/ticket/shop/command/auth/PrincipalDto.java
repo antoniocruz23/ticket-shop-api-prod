@@ -1,6 +1,6 @@
 package com.ticket.shop.command.auth;
 
-import com.ticket.shop.enumerators.UserRoles;
+import com.ticket.shop.enumerators.UserRole;
 import lombok.Builder;
 import lombok.Data;
 
@@ -16,7 +16,7 @@ public class PrincipalDto {
     private Long userId;
     private String name;
     private String email;
-    private List<UserRoles> roles;
+    private List<UserRole> roles;
     private Long countryId;
     private Long companyId;
 }
