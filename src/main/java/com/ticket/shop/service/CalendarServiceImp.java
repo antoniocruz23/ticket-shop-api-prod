@@ -8,6 +8,7 @@ import com.ticket.shop.converter.CalendarConverter;
 import com.ticket.shop.enumerators.TicketType;
 import com.ticket.shop.error.ErrorMessages;
 import com.ticket.shop.exception.DatabaseCommunicationException;
+import com.ticket.shop.exception.TicketShopException;
 import com.ticket.shop.exception.company.CompanyNotFoundException;
 import com.ticket.shop.exception.event.EventNotFoundException;
 import com.ticket.shop.persistence.entity.CalendarEntity;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,6 +49,9 @@ public class CalendarServiceImp implements CalendarService {
 
         getCompanyEntityById(companyId);
         EventEntity eventEntity = getEventEntityById(eventId);
+        if (!Objects.equals(eventEntity.getCompanyEntity().getCompanyId(), companyId)) {
+            throw new TicketShopException(ErrorMessages.ACCESS_DENIED);
+        }
 
         LOGGER.debug("Creating calendar - {}", createCalendarDto);
         CalendarEntity calendarEntity = CalendarConverter.fromCreateCalendarDtoToCalendarEntity(createCalendarDto, eventEntity);
@@ -70,8 +75,8 @@ public class CalendarServiceImp implements CalendarService {
         return calendarDetailsDto;
     }
 
-    private Map<TicketType, Long> createTickets(List<CreateTicketDto> createTicketDtoList, CalendarEntity calendarId) {
-        List<TicketDetailsDto> createdTickets = this.ticketService.bulkCreateTicket(createTicketDtoList, calendarId);
+    private Map<TicketType, Long> createTickets(List<CreateTicketDto> createTicketDtoList, CalendarEntity calendarEntity) {
+        List<TicketDetailsDto> createdTickets = this.ticketService.bulkCreateTicket(createTicketDtoList, calendarEntity);
         return createdTickets.stream().collect(Collectors.groupingBy(TicketDetailsDto::getType, Collectors.summingLong(t -> 1L)));
     }
 

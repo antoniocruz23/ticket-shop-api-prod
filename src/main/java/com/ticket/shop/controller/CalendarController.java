@@ -48,7 +48,7 @@ public class CalendarController {
      */
     @PostMapping("/companies/{companyId}/events/{eventId}/calendars")
     @PreAuthorize("@authorized.hasRole('ADMIN') || " +
-            "(@authorized.hasRole('COMPANY_ADMIN') || @authorized.hasRole('WORKER') && @authorized.isOnCompany(#companyId))")
+            "((@authorized.hasRole('COMPANY_ADMIN') || @authorized.hasRole('WORKER')) && @authorized.isOnCompany(#companyId))")
     @Operation(summary = "Registration", description = "Register new calendar")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful Operation",
