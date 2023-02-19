@@ -125,7 +125,7 @@ public class AuthServiceImp implements AuthService {
      */
     @Override
     public void requestResetPassword(String email) {
-        String subject = "Reset Password Link";
+        String subject = "Request to reset password";
 
         LOGGER.debug("Verifying if user with email {} exists in database", email);
         Optional<UserEntity> optionalUser = userRepository.findByEmail(email);

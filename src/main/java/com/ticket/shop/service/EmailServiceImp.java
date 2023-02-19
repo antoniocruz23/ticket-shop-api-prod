@@ -20,15 +20,18 @@ public class EmailServiceImp implements EmailService {
         this.emailGateway = emailGateway;
     }
 
+    /**
+     * @see EmailService#sendEmail(EmailDto, EmailTemplate, String)
+     */
     @Override
     public void sendEmail(EmailDto emailDto, EmailTemplate template, String subject) {
+        //TODO Value to be updated when a frontend app exists
         String baseAppUrl = "fe-base-url";
 
         String[] names = emailDto.getName().split(" ");
 
         Map<String, String> templateData = new HashMap<>();
         templateData.put("name", names[0]);
-        //TODO Value to be updated when a frontend app exists
         templateData.put("loginURL", baseAppUrl + "/login");
         templateData.put("resetPassURL", baseAppUrl + "/reset-password?t=" + emailDto.getResetPasswordToken());
         templateData.put("email", emailDto.getEmail());
