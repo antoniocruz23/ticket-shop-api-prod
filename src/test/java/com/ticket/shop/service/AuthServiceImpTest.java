@@ -50,7 +50,7 @@ public class AuthServiceImpTest {
         JwtProperties jwtProperties = new JwtProperties();
         jwtProperties.setSecretKey("default");
         jwtProperties.setExpiresInDays(100L);
-        this.authServiceImp = new AuthServiceImp(this.userRepository, this.passwordEncoder, jwtProperties);
+        this.authServiceImp = new AuthServiceImp(this.userRepository, this.passwordEncoder, jwtProperties, null);
 
         // Mocks
         when(this.passwordEncoder.encode(any())).thenReturn(ENCRYPTED_PASSWORD);
