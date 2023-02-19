@@ -2,6 +2,9 @@ package com.ticket.shop.controller;
 
 import com.ticket.shop.command.auth.CredentialsDto;
 import com.ticket.shop.command.auth.LoggedInDto;
+import com.ticket.shop.command.auth.RequestResetPasswordDto;
+import com.ticket.shop.command.auth.ResetPasswordDto;
+import com.ticket.shop.command.auth.ResetPasswordTokenDto;
 import com.ticket.shop.error.Error;
 import com.ticket.shop.error.ErrorMessages;
 import com.ticket.shop.exception.TicketShopException;
@@ -17,9 +20,12 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import static com.ticket.shop.security.CookieAuthFilter.COOKIE_NAME;
@@ -41,6 +47,7 @@ public class AuthController {
 
     /**
      * Login user with email and password
+     *
      * @param credentials user credentials
      * @return {@link LoggedInDto} with user info and jwt token
      */
@@ -50,7 +57,7 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "Successful Operation",
                     content = @Content(schema = @Schema(implementation = LoggedInDto.class))),
             @ApiResponse(responseCode = "500", description = ErrorMessages.WRONG_CREDENTIALS,
-                    content = @Content(schema = @Schema(implementation = Error.class))) })
+                    content = @Content(schema = @Schema(implementation = Error.class)))})
     public ResponseEntity<LoggedInDto> login(@RequestBody CredentialsDto credentials) {
 
         LOGGER.info("Request to login user with email {}", credentials.getEmail());
@@ -79,5 +86,42 @@ public class AuthController {
             LOGGER.error("Failed to logging user - {}", credentials, e);
             throw new TicketShopException(ErrorMessages.OPERATION_FAILED, e);
         }
+    }
+
+    @PutMapping("/reset-password")
+    @Operation(summary = "Recovery password", description = "Request to recovery password")
+    @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "No Content")})
+    public ResponseEntity<Void> requestResetPassword(@RequestBody RequestResetPasswordDto resetPassword) {
+
+        this.authService.requestResetPassword(resetPassword.getEmail());
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/reset-password/verify-token")
+    @Operation(summary = "Validate Recovery password", description = "Request to validate token of recovery password")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ok",
+                    content = @Content(schema = @Schema(implementation = ResetPasswordTokenDto.class))),
+            @ApiResponse(responseCode = "422", description = "Unprocessable Entity",
+                    content = @Content(schema = @Schema(implementation = ResetPasswordTokenDto.class)))})
+    public ResponseEntity<ResetPasswordTokenDto> validateResetPassToken(@RequestParam("token") String token) {
+
+        ResetPasswordTokenDto resetPasswordTokenDto = this.authService.validateResetPassToken(token);
+
+        return ResponseEntity.ok(resetPasswordTokenDto);
+    }
+
+    @PutMapping("/reset-password/complete")
+    @Operation(summary = "Reset password with token", description = "Request to reset password with token")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "No Content"),
+            @ApiResponse(responseCode = "422", description = "Unprocessable Entity")})
+    public ResponseEntity<Void> resetPassword(@RequestParam("token") String token,
+                                              @RequestBody ResetPasswordDto resetPasswordDto) {
+
+        this.authService.resetPassword(token, resetPasswordDto);
+
+        return ResponseEntity.noContent().build();
     }
 }

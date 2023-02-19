@@ -1,5 +1,7 @@
 package com.ticket.shop.configuration;
 
+import com.sendgrid.SendGrid;
+import com.ticket.shop.properties.SendGridProperties;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
@@ -24,8 +26,11 @@ import java.util.Arrays;
 @Configuration
 public class WebConfig {
 
+    private final SendGridProperties sendGridProperties;
+
     /**
      * CORS configuration
+     *
      * @return {@link FilterRegistrationBean}
      */
     @Bean
@@ -43,6 +48,7 @@ public class WebConfig {
     /**
      * PasswordEncoder configuration
      * Set the password encoder we want to use returned a generic {@link PasswordEncoder}
+     *
      * @return {@link PasswordEncoder}
      */
     @Bean
@@ -52,6 +58,7 @@ public class WebConfig {
 
     /**
      * Swagger
+     *
      * @return {@link OpenAPI}
      */
     @Bean
@@ -64,5 +71,15 @@ public class WebConfig {
                         .description("API documentation for Ticket Shop application"))
                 .addSecurityItem(
                         new SecurityRequirement().addList("bearer-jwt", Arrays.asList("read", "write")));
+    }
+
+    /**
+     * SendGrid
+     *
+     * @return {@link SendGrid}
+     */
+    @Bean
+    public SendGrid getSendGrid() {
+        return new SendGrid(sendGridProperties.getApiKey());
     }
 }

@@ -25,6 +25,7 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -74,6 +75,12 @@ public class UserEntity {
 
     @Column(name = "updated_at")
     private Timestamp updatedAt;
+
+    @Column(insertable = false)
+    private String resetPasswordToken;
+
+    @Column(insertable = false)
+    private Date resetPasswordExpireToken;
 
     @OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL)
     @ToString.Exclude

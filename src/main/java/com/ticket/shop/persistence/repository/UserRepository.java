@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
+import java.util.Date;
 import java.util.Optional;
 
 /**
@@ -46,4 +47,13 @@ public interface UserRepository extends CrudRepository<UserEntity, Long> {
      * @return {@link Page<UserEntity>}
      */
     Page<UserEntity> findByCompanyEntity(CompanyEntity companyEntity, Pageable pageable);
+
+    /**
+     * Get user by reset token and expire token
+     *
+     * @param token token
+     * @param date {@link Date}
+     * @return {@link Optional<UserEntity>}
+     */
+    Optional<UserEntity> findByResetPasswordTokenAndResetPasswordExpireTokenIsAfter(String token, Date date);
 }

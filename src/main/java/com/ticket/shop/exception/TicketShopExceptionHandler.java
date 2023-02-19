@@ -2,6 +2,7 @@ package com.ticket.shop.exception;
 
 import com.ticket.shop.error.Error;
 import com.ticket.shop.exception.address.AddressNotFoundException;
+import com.ticket.shop.exception.auth.InvalidResetPasswordTokenException;
 import com.ticket.shop.exception.auth.RoleInvalidException;
 import com.ticket.shop.exception.calendar.CalendarNotFoundException;
 import com.ticket.shop.exception.company.CompanyAlreadyExistsException;
@@ -10,9 +11,6 @@ import com.ticket.shop.exception.country.CountryNotFoundException;
 import com.ticket.shop.exception.event.EventNotFoundException;
 import com.ticket.shop.exception.user.UserAlreadyExistsException;
 import com.ticket.shop.exception.user.UserNotFoundException;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +22,7 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
 /**
@@ -79,7 +78,8 @@ public class TicketShopExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     /**
-     * Handle "access denied" exception
+     * Handle "access denied" exceptions
+     *
      * @param ex      exception
      * @param request http Servlet Request
      * @return {@link Error}
@@ -90,6 +90,19 @@ public class TicketShopExceptionHandler extends ResponseEntityExceptionHandler {
     })
     public ResponseEntity<Error> handlerForbiddenException(Exception ex, HttpServletRequest request) {
         return buildErrorResponse(ex, request, HttpStatus.FORBIDDEN);
+    }
+
+    /**
+     * Handle "invalid token" exception
+     *
+     * @param ex      exception
+     * @param request http Servlet Request
+     * @return {@link Error}
+     */
+    @ExceptionHandler(value = {
+            InvalidResetPasswordTokenException.class})
+    public ResponseEntity<Error> handlerUnprocessableEntityException(Exception ex, HttpServletRequest request) {
+        return buildErrorResponse(ex, request, HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     /**

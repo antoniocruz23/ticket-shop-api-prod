@@ -28,7 +28,6 @@ public class SecurityConfig {
     private final UserAuthenticationProvider userAuthenticationProvider;
     private final CompanyRepository companyRepository;
 
-
     public SecurityConfig(UserAuthenticationEntryPoint userAuthenticationEntryPoint, UserAuthenticationProvider userAuthenticationProvider, CompanyRepository companyRepository) {
         this.userAuthenticationEntryPoint = userAuthenticationEntryPoint;
         this.userAuthenticationProvider = userAuthenticationProvider;
@@ -57,7 +56,8 @@ public class SecurityConfig {
                 .antMatchers(HttpMethod.POST, "/api/auth/login", "/api/customers")
                 .permitAll()
                 .antMatchers("/api/swagger-ui.html", "/api/swagger-ui/*", "/v3/api-docs",
-                        "/v3/api-docs/*")
+                        "/v3/api-docs/*", "/api/auth/reset-password", "/api/auth/reset-password/verify-token",
+                        "/api/auth/reset-password/complete")
                 .permitAll()
                 .anyRequest().authenticated();
 
