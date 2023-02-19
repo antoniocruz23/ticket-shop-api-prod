@@ -10,7 +10,7 @@ import lombok.Data;
 @Data
 @Builder
 public class PriceDetailsDto {
-    private Long ticketPriceId;
+    private Long priceId;
     private Double price;
     private TicketType type;
 }

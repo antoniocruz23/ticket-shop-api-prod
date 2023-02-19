@@ -32,7 +32,7 @@ public class PriceEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long ticketPriceId;
+    private Long priceId;
 
     @Column(nullable = false)
     private Double price;

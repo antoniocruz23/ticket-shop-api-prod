@@ -4,6 +4,9 @@ import com.ticket.shop.command.address.AddressDetailsDto;
 import com.ticket.shop.command.address.CreateAddressDto;
 import com.ticket.shop.command.event.CreateEventDto;
 import com.ticket.shop.command.event.EventDetailsDto;
+import com.ticket.shop.command.price.CreatePriceDto;
+import com.ticket.shop.command.price.PriceDetailsDto;
+import com.ticket.shop.enumerators.TicketType;
 import com.ticket.shop.exception.DatabaseCommunicationException;
 import com.ticket.shop.exception.address.AddressNotFoundException;
 import com.ticket.shop.exception.company.CompanyNotFoundException;
@@ -12,6 +15,7 @@ import com.ticket.shop.persistence.entity.AddressEntity;
 import com.ticket.shop.persistence.entity.CompanyEntity;
 import com.ticket.shop.persistence.entity.CountryEntity;
 import com.ticket.shop.persistence.entity.EventEntity;
+import com.ticket.shop.persistence.entity.PriceEntity;
 import com.ticket.shop.persistence.repository.AddressRepository;
 import com.ticket.shop.persistence.repository.CompanyRepository;
 import com.ticket.shop.persistence.repository.CountryRepository;
@@ -22,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,15 +51,15 @@ public class EventServiceImpTest {
     private CountryRepository countryRepository;
 
     @Mock
-    private PriceRepository ticketPriceRepository;
+    private PriceRepository priceRepository;
 
     private EventServiceImp eventServiceImp;
 
     @BeforeEach
     void setUp() {
         AddressServiceImp addressServiceImp = new AddressServiceImp(this.addressRepository, this.countryRepository);
-        PriceServiceImp ticketPriceServiceImp = new PriceServiceImp(this.ticketPriceRepository);
-        this.eventServiceImp = new EventServiceImp(this.eventRepository, addressServiceImp, this.addressRepository, this.companyRepository, ticketPriceServiceImp);
+        PriceServiceImp priceServiceImp = new PriceServiceImp(this.priceRepository);
+        this.eventServiceImp = new EventServiceImp(this.eventRepository, addressServiceImp, this.addressRepository, this.companyRepository, priceServiceImp);
     }
 
     /**
@@ -68,6 +73,7 @@ public class EventServiceImpTest {
         when(this.addressRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedAddressEntity()));
         when(this.companyRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedCompanyEntity()));
         when(this.eventRepository.save(any())).thenReturn(getMockedEventEntity());
+        when(this.priceRepository.saveAll(any())).thenReturn(List.of(getMockedPriceEntity()));
 
         // Method to be tested
         EventDetailsDto event = this.eventServiceImp.createEvent(getMockedCreateEventDto(), getMockedCompanyEntity().getCompanyId());
@@ -84,7 +90,7 @@ public class EventServiceImpTest {
 
         // Assert exception
         assertThrows(CountryNotFoundException.class,
-                () -> this.eventServiceImp.createEvent(getMockedCreateEventDto(),getMockedCompanyEntity().getCompanyId()));
+                () -> this.eventServiceImp.createEvent(getMockedCreateEventDto(), getMockedCompanyEntity().getCompanyId()));
     }
 
     @Test
@@ -95,7 +101,7 @@ public class EventServiceImpTest {
 
         // Assert exception
         assertThrows(DatabaseCommunicationException.class,
-                () -> this.eventServiceImp.createEvent(getMockedCreateEventDto(),getMockedCompanyEntity().getCompanyId()));
+                () -> this.eventServiceImp.createEvent(getMockedCreateEventDto(), getMockedCompanyEntity().getCompanyId()));
     }
 
     @Test
@@ -107,7 +113,7 @@ public class EventServiceImpTest {
 
         // Assert exception
         assertThrows(AddressNotFoundException.class,
-                () -> this.eventServiceImp.createEvent(getMockedCreateEventDto(),getMockedCompanyEntity().getCompanyId()));
+                () -> this.eventServiceImp.createEvent(getMockedCreateEventDto(), getMockedCompanyEntity().getCompanyId()));
     }
 
     @Test
@@ -120,7 +126,7 @@ public class EventServiceImpTest {
 
         // Assert exception
         assertThrows(CompanyNotFoundException.class,
-                () -> this.eventServiceImp.createEvent(getMockedCreateEventDto(),getMockedCompanyEntity().getCompanyId()));
+                () -> this.eventServiceImp.createEvent(getMockedCreateEventDto(), getMockedCompanyEntity().getCompanyId()));
     }
 
     @Test
@@ -134,7 +140,22 @@ public class EventServiceImpTest {
 
         // Assert exception
         assertThrows(DatabaseCommunicationException.class,
-                () -> this.eventServiceImp.createEvent(getMockedCreateEventDto(),getMockedCompanyEntity().getCompanyId()));
+                () -> this.eventServiceImp.createEvent(getMockedCreateEventDto(), getMockedCompanyEntity().getCompanyId()));
+    }
+
+    @Test
+    public void testCreateEventFailureDueDatabaseConnectionFailureOnSavingPrices() {
+        // Mock data
+        when(this.countryRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedCountryEntity()));
+        when(this.addressRepository.save(any())).thenReturn(getMockedAddressEntity());
+        when(this.addressRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedAddressEntity()));
+        when(this.companyRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedCompanyEntity()));
+        when(this.eventRepository.save(any())).thenReturn(getMockedEventEntity());
+        when(this.priceRepository.saveAll(any())).thenThrow(RuntimeException.class);
+
+        // Assert exception
+        assertThrows(DatabaseCommunicationException.class,
+                () -> this.eventServiceImp.createEvent(getMockedCreateEventDto(), getMockedCompanyEntity().getCompanyId()));
     }
 
     private CountryEntity getMockedCountryEntity() {
@@ -191,6 +212,7 @@ public class EventServiceImpTest {
                 .name(getMockedEventEntity().getName())
                 .description(getMockedEventEntity().getDescription())
                 .address(getMockedCreateAddressDto())
+                .prices(getMockedCreatePriceDto())
                 .build();
     }
 
@@ -200,6 +222,7 @@ public class EventServiceImpTest {
                 .name(getMockedEventEntity().getName())
                 .description(getMockedEventEntity().getDescription())
                 .address(getMockedAddressDetailsDto())
+                .prices(getMockedPriceDetailsDto())
                 .build();
     }
 
@@ -211,5 +234,29 @@ public class EventServiceImpTest {
                 .city(getMockedAddressEntity().getCity())
                 .countryId(getMockedCountryEntity().getCountryId())
                 .build();
+    }
+
+    private PriceEntity getMockedPriceEntity() {
+        return PriceEntity.builder()
+                .priceId(2L)
+                .price(12.1)
+                .type(TicketType.VIP)
+                .eventEntity(getMockedEventEntity())
+                .build();
+    }
+
+    private List<CreatePriceDto> getMockedCreatePriceDto() {
+        return List.of(CreatePriceDto.builder()
+                .price(getMockedPriceEntity().getPrice())
+                .type(getMockedPriceEntity().getType())
+                .build());
+    }
+
+    private List<PriceDetailsDto> getMockedPriceDetailsDto() {
+        return List.of(PriceDetailsDto.builder()
+                .priceId(getMockedPriceEntity().getPriceId())
+                .price(getMockedPriceEntity().getPrice())
+                .type(getMockedPriceEntity().getType())
+                .build());
     }
 }

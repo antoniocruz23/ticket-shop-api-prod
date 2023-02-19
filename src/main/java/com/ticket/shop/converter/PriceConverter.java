@@ -39,7 +39,7 @@ public class PriceConverter {
     public static List<PriceDetailsDto> fromPriceEntityToPriceDetailsDtoList(List<PriceEntity> ticketPriceEntities) {
         return ticketPriceEntities.stream()
                 .map(price -> PriceDetailsDto.builder()
-                        .ticketPriceId(price.getTicketPriceId())
+                        .priceId(price.getPriceId())
                         .price(price.getPrice())
                         .type(price.getType())
                         .build()).toList();

@@ -110,7 +110,7 @@ public class TicketServiceImpTest {
 
     private List<PriceEntity> getMockedPriceEntities() {
         return List.of(PriceEntity.builder()
-                .ticketPriceId(2L)
+                .priceId(2L)
                 .type(TicketType.VIP)
                 .price(30.0)
                 .build());
