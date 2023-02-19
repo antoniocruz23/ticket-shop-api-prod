@@ -8,8 +8,8 @@ import com.ticket.shop.error.ErrorMessages;
 import com.ticket.shop.exception.DatabaseCommunicationException;
 import com.ticket.shop.persistence.entity.CalendarEntity;
 import com.ticket.shop.persistence.entity.TicketEntity;
-import com.ticket.shop.persistence.entity.TicketPriceEntity;
-import com.ticket.shop.persistence.repository.TicketPriceRepository;
+import com.ticket.shop.persistence.entity.PriceEntity;
+import com.ticket.shop.persistence.repository.PriceRepository;
 import com.ticket.shop.persistence.repository.TicketRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -25,11 +25,11 @@ public class TicketServiceImp implements TicketService {
     private static final Logger LOGGER = LogManager.getLogger(TicketService.class);
 
     private final TicketRepository ticketRepository;
-    private final TicketPriceRepository ticketPriceRepository;
+    private final PriceRepository priceRepository;
 
-    public TicketServiceImp(TicketRepository ticketRepository, TicketPriceRepository ticketPriceRepository) {
+    public TicketServiceImp(TicketRepository ticketRepository, PriceRepository priceRepository) {
         this.ticketRepository = ticketRepository;
-        this.ticketPriceRepository = ticketPriceRepository;
+        this.priceRepository = priceRepository;
     }
 
     /**
@@ -52,23 +52,23 @@ public class TicketServiceImp implements TicketService {
         }
 
         List<TicketType> ticketTypes = createTicketDto.stream().map(CreateTicketDto::getType).distinct().toList();
-        List<TicketPriceEntity> ticketPrices = getTicketPriceEntityByType(ticketTypes, calendar.getEventEntity().getEventId());
+        List<PriceEntity> prices = getTicketPriceEntityByType(ticketTypes, calendar.getEventEntity().getEventId());
 
         LOGGER.debug("Retrieving created tickets");
         List<TicketEntity> tickets = StreamSupport.stream(createdTicketsIterable.spliterator(), false).collect(Collectors.toList());
-        return TicketConverter.fromListOfTicketEntityToListOfTicketDetailsDto(tickets, ticketPrices);
+        return TicketConverter.fromListOfTicketEntityToListOfTicketDetailsDto(tickets, prices);
     }
 
 
     /**
-     * Get Ticket Price by types and event id
+     * Get Prices by types and event id
      *
      * @param ticketTypes ticket type
      * @param eventId     event id
-     * @return {@link List<TicketPriceEntity>}
+     * @return {@link List<PriceEntity>}
      */
-    private List<TicketPriceEntity> getTicketPriceEntityByType(List<TicketType> ticketTypes, Long eventId) {
-        LOGGER.debug("Getting ticket prices with types {} from database", ticketTypes);
-        return this.ticketPriceRepository.findByValuesAndEventId(ticketTypes, eventId);
+    private List<PriceEntity> getTicketPriceEntityByType(List<TicketType> ticketTypes, Long eventId) {
+        LOGGER.debug("Getting prices with types {} from database", ticketTypes);
+        return this.priceRepository.findByValuesAndEventId(ticketTypes, eventId);
     }
 }

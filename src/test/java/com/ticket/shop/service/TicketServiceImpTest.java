@@ -7,9 +7,9 @@ import com.ticket.shop.enumerators.TicketType;
 import com.ticket.shop.exception.DatabaseCommunicationException;
 import com.ticket.shop.persistence.entity.CalendarEntity;
 import com.ticket.shop.persistence.entity.EventEntity;
+import com.ticket.shop.persistence.entity.PriceEntity;
 import com.ticket.shop.persistence.entity.TicketEntity;
-import com.ticket.shop.persistence.entity.TicketPriceEntity;
-import com.ticket.shop.persistence.repository.TicketPriceRepository;
+import com.ticket.shop.persistence.repository.PriceRepository;
 import com.ticket.shop.persistence.repository.TicketRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,7 +31,7 @@ public class TicketServiceImpTest {
     private TicketRepository ticketRepository;
 
     @Mock
-    private TicketPriceRepository ticketPriceRepository;
+    private PriceRepository priceRepository;
 
     private TicketServiceImp ticketServiceImp;
 
@@ -39,7 +39,7 @@ public class TicketServiceImpTest {
 
     @BeforeEach
     void setUp() {
-        this.ticketServiceImp = new TicketServiceImp(ticketRepository, ticketPriceRepository);
+        this.ticketServiceImp = new TicketServiceImp(this.ticketRepository, this.priceRepository);
     }
 
     /**
@@ -49,7 +49,7 @@ public class TicketServiceImpTest {
     public void testCreateEventSuccessfully() {
         // Mock data
         when(this.ticketRepository.saveAll(any())).thenReturn(List.of(getMockedTicketEntity()));
-        when(this.ticketPriceRepository.findByValuesAndEventId(any(), any())).thenReturn(getMockedTicketPriceEntities());
+        when(this.priceRepository.findByValuesAndEventId(any(), any())).thenReturn(getMockedPriceEntities());
         // Method to be tested
         List<TicketDetailsDto> tickets = this.ticketServiceImp.bulkCreateTicket(getMockedCreateTicketDto(), getMockedCalendarEntity());
 
@@ -108,11 +108,11 @@ public class TicketServiceImpTest {
                 .build());
     }
 
-    private List<TicketPriceEntity> getMockedTicketPriceEntities() {
-        return List.of(TicketPriceEntity.builder()
+    private List<PriceEntity> getMockedPriceEntities() {
+        return List.of(PriceEntity.builder()
                 .ticketPriceId(2L)
                 .type(TicketType.VIP)
-                .value(30.0)
+                .price(30.0)
                 .build());
     }
 

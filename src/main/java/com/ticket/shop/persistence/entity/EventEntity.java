@@ -49,7 +49,7 @@ public class EventEntity {
     private CompanyEntity companyEntity;
 
     @OneToMany(mappedBy = "eventEntity", cascade = CascadeType.ALL)
-    private List<TicketPriceEntity> prices;
+    private List<PriceEntity> prices;
 
     @OneToMany(mappedBy = "eventEntity", cascade = CascadeType.ALL)
     private List<CalendarEntity> calendars;

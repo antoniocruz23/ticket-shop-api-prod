@@ -17,7 +17,7 @@ import com.ticket.shop.persistence.entity.TicketEntity;
 import com.ticket.shop.persistence.repository.CalendarRepository;
 import com.ticket.shop.persistence.repository.CompanyRepository;
 import com.ticket.shop.persistence.repository.EventRepository;
-import com.ticket.shop.persistence.repository.TicketPriceRepository;
+import com.ticket.shop.persistence.repository.PriceRepository;
 import com.ticket.shop.persistence.repository.TicketRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,14 +51,14 @@ public class CalendarServiceImpTest {
     private TicketRepository ticketRepository;
 
     @Mock
-    private TicketPriceRepository ticketPriceRepository;
+    private PriceRepository priceRepository;
 
     private CalendarServiceImp calendarServiceImp;
     private final LocalDateTime refDate = LocalDateTime.now();
 
     @BeforeEach
     public void setUp() {
-        TicketServiceImp ticketServiceImp = new TicketServiceImp(this.ticketRepository, this.ticketPriceRepository);
+        TicketServiceImp ticketServiceImp = new TicketServiceImp(this.ticketRepository, this.priceRepository);
         this.calendarServiceImp = new CalendarServiceImp(this.calendarRepository, this.companyRepository, this.eventRepository, ticketServiceImp);
     }
 

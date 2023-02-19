@@ -27,15 +27,15 @@ import javax.persistence.Table;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "ticketPrices")
-public class TicketPriceEntity {
+@Table(name = "prices")
+public class PriceEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long ticketPriceId;
 
     @Column(nullable = false)
-    private Double value;
+    private Double price;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)

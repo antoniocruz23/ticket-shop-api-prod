@@ -6,7 +6,7 @@ import com.ticket.shop.enumerators.TicketStatus;
 import com.ticket.shop.enumerators.TicketType;
 import com.ticket.shop.persistence.entity.CalendarEntity;
 import com.ticket.shop.persistence.entity.TicketEntity;
-import com.ticket.shop.persistence.entity.TicketPriceEntity;
+import com.ticket.shop.persistence.entity.PriceEntity;
 
 import java.util.List;
 import java.util.Map;
@@ -21,7 +21,7 @@ public class TicketConverter {
     /**
      * From {@link List<CreateTicketDto>} to {@link List<TicketEntity>}
      *
-     * @param createTicketDto {@link CreateTicketDto}
+     * @param createTicketDto {@link List<CreateTicketDto>}
      * @param calendarEntity  {@link CalendarEntity}
      * @return {@link TicketEntity}
      */
@@ -40,19 +40,20 @@ public class TicketConverter {
     /**
      * From {@link List<TicketEntity>} to {@link List<TicketDetailsDto>}
      *
-     * @param ticketEntities {@link TicketEntity}
+     * @param ticketEntities {@link List<TicketEntity>}
+     * @param prices   {@link List<PriceEntity>}
      * @return {@link List<TicketDetailsDto>}
      */
-    public static List<TicketDetailsDto> fromListOfTicketEntityToListOfTicketDetailsDto(List<TicketEntity> ticketEntities, List<TicketPriceEntity> ticketPrices) {
-        Map<TicketType, Double> ticketPriceMap = ticketPrices.stream()
-                .collect(Collectors.toMap(TicketPriceEntity::getType, TicketPriceEntity::getValue));
+    public static List<TicketDetailsDto> fromListOfTicketEntityToListOfTicketDetailsDto(List<TicketEntity> ticketEntities, List<PriceEntity> prices) {
+        Map<TicketType, Double> priceMap = prices.stream()
+                .collect(Collectors.toMap(PriceEntity::getType, PriceEntity::getPrice));
 
         return ticketEntities.stream()
                 .map(ticket -> TicketDetailsDto.builder()
                         .ticketId(ticket.getTicketId())
                         .type(ticket.getType())
                         .status(ticket.getStatus())
-                        .price(ticketPriceMap.getOrDefault(ticket.getType(), 0.0))
+                        .price(priceMap.getOrDefault(ticket.getType(), 0.0))
                         .build())
                 .toList();
     }
