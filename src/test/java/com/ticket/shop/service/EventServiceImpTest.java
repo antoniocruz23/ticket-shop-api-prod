@@ -16,6 +16,7 @@ import com.ticket.shop.persistence.repository.AddressRepository;
 import com.ticket.shop.persistence.repository.CompanyRepository;
 import com.ticket.shop.persistence.repository.CountryRepository;
 import com.ticket.shop.persistence.repository.EventRepository;
+import com.ticket.shop.persistence.repository.PriceRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -44,12 +45,16 @@ public class EventServiceImpTest {
     @Mock
     private CountryRepository countryRepository;
 
+    @Mock
+    private PriceRepository ticketPriceRepository;
+
     private EventServiceImp eventServiceImp;
 
     @BeforeEach
     void setUp() {
         AddressServiceImp addressServiceImp = new AddressServiceImp(this.addressRepository, this.countryRepository);
-        this.eventServiceImp = new EventServiceImp(this.eventRepository, addressServiceImp, this.addressRepository, this.companyRepository);
+        PriceServiceImp ticketPriceServiceImp = new PriceServiceImp(this.ticketPriceRepository);
+        this.eventServiceImp = new EventServiceImp(this.eventRepository, addressServiceImp, this.addressRepository, this.companyRepository, ticketPriceServiceImp);
     }
 
     /**

@@ -3,6 +3,7 @@ package com.ticket.shop.service;
 import com.ticket.shop.command.address.AddressDetailsDto;
 import com.ticket.shop.command.event.CreateEventDto;
 import com.ticket.shop.command.event.EventDetailsDto;
+import com.ticket.shop.command.price.PriceDetailsDto;
 import com.ticket.shop.converter.EventConverter;
 import com.ticket.shop.error.ErrorMessages;
 import com.ticket.shop.exception.DatabaseCommunicationException;
@@ -19,21 +20,25 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class EventServiceImp implements EventService {
 
     private static final Logger LOGGER = LogManager.getLogger(EventService.class);
     private final EventRepository eventRepository;
-    private final AddressServiceImp addressService;
     private final AddressRepository addressRepository;
     private final CompanyRepository companyRepository;
+    private final AddressServiceImp addressService;
+    private final PriceServiceImp priceServiceImp;
 
     public EventServiceImp(EventRepository eventRepository, AddressServiceImp addressService, AddressRepository addressRepository,
-                           CompanyRepository companyRepository) {
+                           CompanyRepository companyRepository, PriceServiceImp priceServiceImp) {
         this.eventRepository = eventRepository;
         this.addressService = addressService;
         this.addressRepository = addressRepository;
         this.companyRepository = companyRepository;
+        this.priceServiceImp = priceServiceImp;
     }
 
     /**
@@ -52,18 +57,20 @@ public class EventServiceImp implements EventService {
         eventEntity.setCompanyEntity(companyEntity);
 
         LOGGER.info("Persisting event into database");
-        EventEntity createEvent;
+        EventEntity createdEvent;
         try {
             LOGGER.info("Saving event on database");
-            createEvent = this.eventRepository.save(eventEntity);
+            createdEvent = this.eventRepository.save(eventEntity);
 
         } catch (Exception e) {
             LOGGER.error("Failed while saving event into database {}", eventEntity, e);
             throw new DatabaseCommunicationException(ErrorMessages.DATABASE_COMMUNICATION_ERROR, e);
         }
 
+        List<PriceDetailsDto> prices = this.priceServiceImp.bulkCreatePrice(createEventDto.getPrices(), createdEvent);
+
         LOGGER.debug("Retrieving created event");
-        return EventConverter.fromCompanyEntityToCompanyDetailsDto(createEvent);
+        return EventConverter.fromCompanyEntityToCompanyDetailsDto(createdEvent, prices);
     }
 
     /**
