@@ -22,6 +22,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * An {@link EventService} implementation
+ */
 @Service
 public class EventServiceImp implements EventService {
 

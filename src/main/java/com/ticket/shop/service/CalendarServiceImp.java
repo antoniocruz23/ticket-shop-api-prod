@@ -25,6 +25,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+/**
+ * An {@link CalendarService} implementation
+ */
 @Service
 public class CalendarServiceImp implements CalendarService {
 

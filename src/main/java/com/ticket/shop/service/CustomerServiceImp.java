@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * UserService Implementation
+ * An {@link CustomerService} implementation
  */
 @Service
 public class CustomerServiceImp implements CustomerService {

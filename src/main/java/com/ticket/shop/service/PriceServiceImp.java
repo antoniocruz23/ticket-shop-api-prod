@@ -16,6 +16,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+/**
+ * An {@link PriceService} implementation
+ */
 @Service
 public class PriceServiceImp implements PriceService {
 

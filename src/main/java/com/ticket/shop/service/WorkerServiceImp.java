@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * WorkerService Implementation
+ * An {@link WorkerService} implementation
  */
 @Service
 public class WorkerServiceImp implements WorkerService {
