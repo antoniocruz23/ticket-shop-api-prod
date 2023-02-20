@@ -3,13 +3,18 @@ package com.ticket.shop.service;
 import com.ticket.shop.command.auth.CredentialsDto;
 import com.ticket.shop.command.auth.LoggedInDto;
 import com.ticket.shop.command.auth.PrincipalDto;
+import com.ticket.shop.command.auth.ResetPasswordDto;
+import com.ticket.shop.command.auth.ResetPasswordTokenDto;
 import com.ticket.shop.enumerators.UserRole;
+import com.ticket.shop.exception.DatabaseCommunicationException;
+import com.ticket.shop.exception.auth.InvalidResetPasswordTokenException;
 import com.ticket.shop.exception.auth.WrongCredentialsException;
 import com.ticket.shop.exception.user.UserNotFoundException;
 import com.ticket.shop.persistence.entity.CountryEntity;
 import com.ticket.shop.persistence.entity.UserEntity;
 import com.ticket.shop.persistence.repository.UserRepository;
 import com.ticket.shop.properties.JwtProperties;
+import org.joda.time.DateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -18,6 +23,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,6 +31,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -35,6 +43,9 @@ public class AuthServiceImpTest {
 
     @MockBean
     private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private EmailServiceImp emailServiceImp;
     private AuthServiceImp authServiceImp;
 
     private final static String FIRSTNAME = "User";
@@ -44,13 +55,16 @@ public class AuthServiceImpTest {
     private final static String ENCRYPTED_PASSWORD = "321drowssaP";
     private final static Long USER_ID = 10L;
     private final static List<UserRole> USER_ROLE = Collections.singletonList(UserRole.ADMIN);
+    private final static String TOKEN = "ajdehjkahnsd";
+    private final static Date DATE_TOKEN = new DateTime().plusDays(4).toDate();
+
 
     @BeforeEach
     public void setUp() {
         JwtProperties jwtProperties = new JwtProperties();
         jwtProperties.setSecretKey("default");
         jwtProperties.setExpiresInDays(100L);
-        this.authServiceImp = new AuthServiceImp(this.userRepository, this.passwordEncoder, jwtProperties, null);
+        this.authServiceImp = new AuthServiceImp(this.userRepository, this.passwordEncoder, jwtProperties, this.emailServiceImp);
 
         // Mocks
         when(this.passwordEncoder.encode(any())).thenReturn(ENCRYPTED_PASSWORD);
@@ -126,6 +140,80 @@ public class AuthServiceImpTest {
                 () -> this.authServiceImp.validateToken(token));
     }
 
+    /**
+     * Validate Reset Password Token Test
+     */
+    @Test
+    public void testValidateResetPasswordTokenSuccessfully() {
+        // Mocks
+        when(this.userRepository.findByResetPasswordTokenAndResetPasswordExpireTokenIsAfter(any(), any())).thenReturn(Optional.of(getMockedUserEntity()));
+
+        // Call method to be tested
+        ResetPasswordTokenDto resetPasswordTokenDto = this.authServiceImp.validateResetPassToken(TOKEN);
+
+        // Assert result
+        assertNotNull(resetPasswordTokenDto);
+        assertEquals(getMockedResetPasswordTokenDto(), resetPasswordTokenDto);
+    }
+
+    /**
+     * Reset Password Tests
+     */
+    @Test
+    public void testResetPasswordSuccessfully() {
+        // Mocks
+        when(this.userRepository.findByResetPasswordTokenAndResetPasswordExpireTokenIsAfter(any(), any())).thenReturn(Optional.of(getMockedUserEntity()));
+        when(this.passwordEncoder.encode(any())).thenReturn(ENCRYPTED_PASSWORD);
+
+        this.authServiceImp.resetPassword(TOKEN, getMockedResetPasswordDto());
+
+        verify(this.userRepository).save(any());
+    }
+
+    @Test
+    public void testResetPasswordFailureDueToInvalidResetPasswordTokenException() {
+        // Mocks
+        when(this.userRepository.findByResetPasswordTokenAndResetPasswordExpireTokenIsAfter(any(), any())).thenReturn(Optional.empty());
+
+        assertThrows(InvalidResetPasswordTokenException.class,
+                () -> this.authServiceImp.resetPassword(TOKEN, getMockedResetPasswordDto()));
+    }
+
+    @Test
+    public void testResetPasswordFailureDueToDatabaseConnectionFailure() {
+        // Mocks
+        when(this.userRepository.findByResetPasswordTokenAndResetPasswordExpireTokenIsAfter(any(), any())).thenReturn(Optional.of(getMockedUserEntity()));
+        doThrow(RuntimeException.class).when(this.userRepository).save(any());
+
+        assertThrows(DatabaseCommunicationException.class,
+                () -> this.authServiceImp.resetPassword(TOKEN, getMockedResetPasswordDto()));
+    }
+
+    /**
+     * Request Reset Password tests
+     */
+    @Test
+    public void testRequestResetPasswordSuccessfully() {
+        // Mocks
+        when(this.userRepository.findByEmail(any())).thenReturn(Optional.of(getMockedUserEntity()));
+
+        // Call method to be tested
+        this.authServiceImp.requestResetPassword(EMAIL);
+
+        // Assert result
+        verify(this.userRepository).save(any());
+    }
+
+    @Test
+    public void testRequestResetPasswordFailureDueToDatabaseConnectionFailure() {
+        // Mocks
+        when(this.userRepository.findByEmail(any())).thenReturn(Optional.of(getMockedUserEntity()));
+        doThrow(RuntimeException.class).when(this.userRepository).save(any());
+
+        assertThrows(DatabaseCommunicationException.class,
+                () -> this.authServiceImp.requestResetPassword(EMAIL));
+    }
+
     private UserEntity getMockedUserEntity() {
         return UserEntity.builder()
                 .userId(USER_ID)
@@ -135,6 +223,8 @@ public class AuthServiceImpTest {
                 .encryptedPassword(ENCRYPTED_PASSWORD)
                 .roles(USER_ROLE)
                 .countryEntity(getMockedCountryEntity())
+                .resetPasswordToken(TOKEN)
+                .resetPasswordExpireToken(DATE_TOKEN)
                 .build();
     }
 
@@ -164,6 +254,20 @@ public class AuthServiceImpTest {
                 .email(EMAIL)
                 .roles(USER_ROLE)
                 .countryId(getMockedCountryEntity().getCountryId())
+                .build();
+    }
+
+    private ResetPasswordTokenDto getMockedResetPasswordTokenDto() {
+        return ResetPasswordTokenDto.builder()
+                .userId(USER_ID)
+                .name(FIRSTNAME)
+                .token(TOKEN)
+                .build();
+    }
+
+    private ResetPasswordDto getMockedResetPasswordDto() {
+        return ResetPasswordDto.builder()
+                .password(PASSWORD)
                 .build();
     }
 }
