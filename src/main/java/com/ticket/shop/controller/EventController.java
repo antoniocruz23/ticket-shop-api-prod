@@ -44,7 +44,7 @@ public class EventController {
      * Create new event
      *
      * @param createEventDto new event data
-     * @return the response entity
+     * @return {@link EventDetailsDto}
      */
     @PostMapping("/companies/{companyId}/events")
     @PreAuthorize("@authorized.hasRole('ADMIN') || " +

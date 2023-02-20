@@ -136,7 +136,7 @@ public class WorkerController {
      * @param companyId company id
      * @param page      page number
      * @param size      page size
-     * @return {@link Paginated <WorkerDetailsDto>} workers list wanted and Ok httpStatus
+     * @return {@link Paginated<WorkerDetailsDto>} workers list wanted and Ok httpStatus
      */
     @GetMapping("/companies/{companyId}/workers")
     @PreAuthorize("@authorized.hasRole('ADMIN') || (@authorized.hasRole('COMPANY_ADMIN') && @authorized.isOnCompany(#companyId))")
@@ -150,9 +150,9 @@ public class WorkerController {
                     content = @Content(schema = @Schema(implementation = Error.class))),
             @ApiResponse(responseCode = "403", description = ErrorMessages.ACCESS_DENIED,
                     content = @Content(schema = @Schema(implementation = Error.class)))})
-    public ResponseEntity<Paginated<WorkerDetailsDto>> getPatientsList(@PathVariable Long companyId,
-                                                                       @RequestParam(defaultValue = "0") int page,
-                                                                       @RequestParam(defaultValue = "10") int size) {
+    public ResponseEntity<Paginated<WorkerDetailsDto>> getWorkersList(@PathVariable Long companyId,
+                                                                      @RequestParam(defaultValue = "0") int page,
+                                                                      @RequestParam(defaultValue = "10") int size) {
 
         LOGGER.info("Request to get workers list - page: {}, size: {}", page, size);
         Paginated<WorkerDetailsDto> patientsList;
