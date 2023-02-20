@@ -49,18 +49,16 @@ public class WorkerServiceImp implements WorkerService {
     }
 
     /**
-     * @see WorkerService#createWorker(CreateWorkerDto, Long)
+     * @see WorkerService#createWorker(Long, CreateWorkerDto)
      */
     @Override
-    public WorkerDetailsDto createWorker(CreateWorkerDto createWorkerDto, Long companyId) throws UserAlreadyExistsException {
+    public WorkerDetailsDto createWorker(Long companyId, CreateWorkerDto createWorkerDto)
+            throws UserAlreadyExistsException, CompanyNotFoundException, CountryNotFoundException, RoleInvalidException {
 
         LOGGER.debug("Creating worker - {}", createWorkerDto);
         UserEntity userEntity = UserConverter.fromCreateWorkerDtoToUserEntity(createWorkerDto);
 
-        if (userEntity.getRoles().contains(UserRole.ADMIN)) {
-            LOGGER.debug("Failed while trying to create the worker role with ADMIN role");
-            throw new RoleInvalidException(ErrorMessages.ROLE_INVALID);
-        }
+        validateRoles(userEntity.getRoles());
 
         if (this.userRepository.findByEmail(userEntity.getEmail()).isPresent()) {
             LOGGER.error("Duplicated email - {}", userEntity.getEmail());
@@ -95,17 +93,17 @@ public class WorkerServiceImp implements WorkerService {
      * @see WorkerService#getWorkerById(Long, Long)
      */
     @Override
-    public WorkerDetailsDto getWorkerById(Long workerId, Long companyId) throws UserNotFoundException {
-        UserEntity userEntity = getWorkerByIdAndCompany(workerId, companyId);
+    public WorkerDetailsDto getWorkerById(Long companyId, Long workerId) throws UserNotFoundException {
+        UserEntity userEntity = getWorkerByIdAndCompany(companyId, workerId);
 
         return UserConverter.fromUserEntityToWorkerDetailsDto(userEntity);
     }
 
     /**
-     * @see WorkerService#getWorkersList(int, int, Long)
+     * @see WorkerService#getWorkersList(Long, int, int)
      */
     @Override
-    public Paginated<WorkerDetailsDto> getWorkersList(int page, int size, Long companyId) {
+    public Paginated<WorkerDetailsDto> getWorkersList(Long companyId, int page, int size) {
 
         CompanyEntity companyEntity = getCompanyEntityById(companyId);
 
@@ -137,14 +135,11 @@ public class WorkerServiceImp implements WorkerService {
      * @see WorkerService#updateWorker(Long, Long, UpdateWorkerDto)
      */
     @Override
-    public WorkerDetailsDto updateWorker(Long companyId, Long userId, UpdateWorkerDto updateUserDto) throws UserNotFoundException {
+    public WorkerDetailsDto updateWorker(Long companyId, Long userId, UpdateWorkerDto updateUserDto) throws UserNotFoundException, CountryNotFoundException {
 
-        if (updateUserDto.getRoles().contains(UserRole.ADMIN)) {
-            LOGGER.debug("Failed while trying to update the worker role to application ADMIN");
-            throw new RoleInvalidException(ErrorMessages.ROLE_INVALID);
-        }
+        validateRoles(updateUserDto.getRoles());
 
-        UserEntity userEntity = getWorkerByIdAndCompany(userId, companyId);
+        UserEntity userEntity = getWorkerByIdAndCompany(companyId, userId);
         CountryEntity countryEntity = getCountryEntityById(updateUserDto.getCountryId());
         String encryptedPassword = this.passwordEncoder.encode(updateUserDto.getPassword());
 
@@ -155,16 +150,34 @@ public class WorkerServiceImp implements WorkerService {
         userEntity.setRoles(updateUserDto.getRoles());
         userEntity.setCountryEntity(countryEntity);
 
-        LOGGER.debug("Updating customer with id {} with new data", userId);
+        LOGGER.debug("Updating worker with id {} with new data", userId);
         try {
             this.userRepository.save(userEntity);
 
         } catch (Exception e) {
-            LOGGER.error("Failed while updating customer with id {} with new data - {}", userId, userEntity, e);
+            LOGGER.error("Failed while updating worker with id {} with new data - {}", userId, userEntity, e);
             throw new DatabaseCommunicationException(ErrorMessages.DATABASE_COMMUNICATION_ERROR, e);
         }
 
         return UserConverter.fromUserEntityToWorkerDetailsDto(userEntity);
+    }
+
+    /**
+     * @see WorkerService#deleteWorker(Long, Long)
+     */
+    @Override
+    public void deleteWorker(Long companyId, Long workerId) throws UserNotFoundException {
+        LOGGER.debug("Getting worker with id {} from database", workerId);
+        UserEntity userEntity = getWorkerByIdAndCompany(companyId, workerId);
+
+        LOGGER.debug("Removing worker with id {} from database", workerId);
+        try {
+            this.userRepository.delete(userEntity);
+
+        } catch (Exception e) {
+            LOGGER.error("Failed while deleting worker with id {} from database", workerId, e);
+            throw new DatabaseCommunicationException(ErrorMessages.DATABASE_COMMUNICATION_ERROR, e);
+        }
     }
 
     /**
@@ -185,13 +198,13 @@ public class WorkerServiceImp implements WorkerService {
     /**
      * Get Worker by id and company
      *
-     * @param workerId  worker id
      * @param companyId company id
+     * @param workerId  worker id
      * @return {@link UserEntity}
      */
-    private UserEntity getWorkerByIdAndCompany(Long workerId, Long companyId) {
+    private UserEntity getWorkerByIdAndCompany(Long companyId, Long workerId) {
         LOGGER.debug("Getting worker with id {} from database", workerId);
-        return this.userRepository.findByUserIdAndCompanyId(workerId, companyId)
+        return this.userRepository.findByUserIdAndCompanyId(companyId, workerId)
                 .orElseThrow(() -> {
                     LOGGER.error("The worker with id {} does not exist in database", workerId);
                     return new UserNotFoundException(ErrorMessages.USER_NOT_FOUND);
@@ -211,5 +224,17 @@ public class WorkerServiceImp implements WorkerService {
                     LOGGER.error("The company with id {} does not exist in database", companyId);
                     return new CompanyNotFoundException(ErrorMessages.COMPANY_NOT_FOUND);
                 });
+    }
+
+    /**
+     * Valida role
+     *
+     * @param roles list of roles
+     */
+    private static void validateRoles(List<UserRole> roles) {
+        if (roles.contains(UserRole.ADMIN) || roles.contains(UserRole.CUSTOMER)) {
+            LOGGER.debug("Failed while trying to create the worker with an invalid role for workers");
+            throw new RoleInvalidException(ErrorMessages.ROLE_INVALID);
+        }
     }
 }

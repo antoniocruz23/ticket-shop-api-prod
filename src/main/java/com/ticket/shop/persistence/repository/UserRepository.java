@@ -27,8 +27,8 @@ public interface UserRepository extends CrudRepository<UserEntity, Long> {
     /**
      * Get Worker by id and company
      *
-     * @param userId    worker id
      * @param companyId company id
+     * @param userId    worker id
      * @return Optional of {@link UserEntity}
      */
     @Query(value = """
@@ -38,7 +38,7 @@ public interface UserRepository extends CrudRepository<UserEntity, Long> {
             where u.user_id = :userId
             and u.company_id = :companyId""",
             nativeQuery = true)
-    Optional<UserEntity> findByUserIdAndCompanyId(Long userId, Long companyId);
+    Optional<UserEntity> findByUserIdAndCompanyId(Long companyId, Long userId);
 
     /**
      * Get page of workers by user entity

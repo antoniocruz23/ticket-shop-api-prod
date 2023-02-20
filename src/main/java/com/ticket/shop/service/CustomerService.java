@@ -32,10 +32,18 @@ public interface CustomerService {
     /**
      * Update customer
      *
-     * @param userId        user id to be updated
+     * @param userId            user id to be updated
      * @param updateCustomerDto {@link UpdateCustomerDto}
      * @return {@link CustomerDetailsDto} the customer updated
      * @throws UserNotFoundException when the user isn't found
      */
     CustomerDetailsDto updateCustomer(Long userId, UpdateCustomerDto updateCustomerDto) throws UserNotFoundException;
+
+    /**
+     * Delete customer
+     *
+     * @param customerId customer id
+     * @throws UserNotFoundException when the user isn't found
+     */
+    void deleteCustomer(Long customerId) throws UserNotFoundException;
 }

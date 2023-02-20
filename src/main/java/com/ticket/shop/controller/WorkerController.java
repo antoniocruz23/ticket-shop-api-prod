@@ -9,7 +9,7 @@ import com.ticket.shop.error.Error;
 import com.ticket.shop.error.ErrorMessages;
 import com.ticket.shop.exception.TicketShopException;
 import com.ticket.shop.persistence.entity.UserEntity;
-import com.ticket.shop.service.WorkerService;
+import com.ticket.shop.service.WorkerServiceImp;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -21,6 +21,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -43,15 +44,16 @@ import static org.springframework.http.HttpStatus.OK;
 public class WorkerController {
 
     private static final Logger LOGGER = LogManager.getLogger(WorkerController.class);
-    private final WorkerService workerService;
+    private final WorkerServiceImp workerServiceImp;
 
-    public WorkerController(WorkerService workerService) {
-        this.workerService = workerService;
+    public WorkerController(WorkerServiceImp workerServiceImp) {
+        this.workerServiceImp = workerServiceImp;
     }
 
     /**
      * Create new worker
      *
+     * @param companyId company id
      * @param createWorkerDto new worker data
      * @return {@link WorkerDetailsDto} the response entity
      */
@@ -71,13 +73,13 @@ public class WorkerController {
                     content = @Content(schema = @Schema(implementation = Error.class))),
             @ApiResponse(responseCode = "403", description = ErrorMessages.ACCESS_DENIED,
                     content = @Content(schema = @Schema(implementation = Error.class)))})
-    public ResponseEntity<WorkerDetailsDto> workerRegistration(@Valid @RequestBody CreateWorkerDto createWorkerDto,
-                                                               @PathVariable Long companyId) {
+    public ResponseEntity<WorkerDetailsDto> workerRegistration(@PathVariable Long companyId,
+                                                               @Valid @RequestBody CreateWorkerDto createWorkerDto) {
 
         LOGGER.info("Request to create new worker - {}", createWorkerDto);
         WorkerDetailsDto workerDetailsDto;
         try {
-            workerDetailsDto = this.workerService.createWorker(createWorkerDto, companyId);
+            workerDetailsDto = this.workerServiceImp.createWorker(companyId, createWorkerDto);
 
         } catch (TicketShopException e) {
             throw e;
@@ -114,7 +116,7 @@ public class WorkerController {
         LOGGER.info("Request to get worker with id {}", workerId);
         WorkerDetailsDto workerDetailsDto;
         try {
-            workerDetailsDto = this.workerService.getWorkerById(workerId, companyId);
+            workerDetailsDto = this.workerServiceImp.getWorkerById(companyId, workerId);
 
         } catch (TicketShopException e) {
             throw e;
@@ -131,9 +133,9 @@ public class WorkerController {
     /**
      * Get workers list by company id
      *
+     * @param companyId company id
      * @param page      page number
      * @param size      page size
-     * @param companyId company id
      * @return {@link Paginated <WorkerDetailsDto>} workers list wanted and Ok httpStatus
      */
     @GetMapping("/companies/{companyId}/workers")
@@ -148,14 +150,14 @@ public class WorkerController {
                     content = @Content(schema = @Schema(implementation = Error.class))),
             @ApiResponse(responseCode = "403", description = ErrorMessages.ACCESS_DENIED,
                     content = @Content(schema = @Schema(implementation = Error.class)))})
-    public ResponseEntity<Paginated<WorkerDetailsDto>> getPatientsList(@RequestParam(defaultValue = "0") int page,
-                                                                       @RequestParam(defaultValue = "10") int size,
-                                                                       @PathVariable Long companyId) {
+    public ResponseEntity<Paginated<WorkerDetailsDto>> getPatientsList(@PathVariable Long companyId,
+                                                                       @RequestParam(defaultValue = "0") int page,
+                                                                       @RequestParam(defaultValue = "10") int size) {
 
         LOGGER.info("Request to get workers list - page: {}, size: {}", page, size);
         Paginated<WorkerDetailsDto> patientsList;
         try {
-            patientsList = this.workerService.getWorkersList(page, size, companyId);
+            patientsList = this.workerServiceImp.getWorkersList(companyId, page, size);
 
         } catch (TicketShopException e) {
             throw e;
@@ -198,7 +200,7 @@ public class WorkerController {
         LOGGER.info("Request to update worker with id {} - {}", workerId, updateWorkerDto);
         WorkerDetailsDto workerDetailsDto;
         try {
-            workerDetailsDto = this.workerService.updateWorker(companyId, workerId, updateWorkerDto);
+            workerDetailsDto = this.workerServiceImp.updateWorker(companyId, workerId, updateWorkerDto);
 
         } catch (TicketShopException e) {
             throw e;
@@ -210,5 +212,38 @@ public class WorkerController {
 
         LOGGER.info("Worker with id {} updated successfully. Retrieving updated worker", workerId);
         return new ResponseEntity<>(workerDetailsDto, HttpStatus.OK);
+    }
+
+    /**
+     * Delete Worker
+     *
+     * @param companyId company id
+     * @param workerId  worker id
+     */
+    @DeleteMapping("/companies/{companyId}/workers/{workerId}")
+    @PreAuthorize("@authorized.hasRole('ADMIN') || (@authorized.hasRole('COMPANY_ADMIN') && @authorized.isOnCompany(#companyId))")
+    @Operation(summary = "Delete Customer", description = "Delete Customer")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful Operation"),
+            @ApiResponse(responseCode = "404", description = ErrorMessages.USER_NOT_FOUND,
+                    content = @Content(schema = @Schema(implementation = Error.class))),
+            @ApiResponse(responseCode = "400", description = ErrorMessages.DATABASE_COMMUNICATION_ERROR,
+                    content = @Content(schema = @Schema(implementation = Error.class)))})
+    public ResponseEntity deleteUser(@PathVariable Long companyId,
+                                     @PathVariable Long workerId) {
+
+        try {
+            this.workerServiceImp.deleteWorker(companyId, workerId);
+
+        } catch (TicketShopException e) {
+            throw e;
+
+        } catch (Exception e) {
+            LOGGER.error("Failed to delete customer with id {}", workerId, e);
+            throw new TicketShopException(ErrorMessages.OPERATION_FAILED, e);
+        }
+
+        LOGGER.info("Customer with id {} deleted successfully", workerId);
+        return new ResponseEntity(OK);
     }
 }

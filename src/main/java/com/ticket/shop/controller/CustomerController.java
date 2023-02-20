@@ -7,7 +7,7 @@ import com.ticket.shop.error.Error;
 import com.ticket.shop.error.ErrorMessages;
 import com.ticket.shop.exception.TicketShopException;
 import com.ticket.shop.persistence.entity.UserEntity;
-import com.ticket.shop.service.CustomerService;
+import com.ticket.shop.service.CustomerServiceImp;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -19,6 +19,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,17 +42,17 @@ import static org.springframework.http.HttpStatus.OK;
 public class CustomerController {
 
     private static final Logger LOGGER = LogManager.getLogger(CustomerController.class);
-    private final CustomerService customerService;
+    private final CustomerServiceImp customerServiceImp;
 
-    public CustomerController(CustomerService customerService) {
-        this.customerService = customerService;
+    public CustomerController(CustomerServiceImp customerServiceImp) {
+        this.customerServiceImp = customerServiceImp;
     }
 
     /**
      * Create new costumer
      *
      * @param createCustomerDto new customer data
-     * @return the response entity
+     * @return {@link CustomerDetailsDto}
      */
     @PostMapping()
     @Operation(summary = "Registration", description = "Register new customer")
@@ -69,7 +70,7 @@ public class CustomerController {
         LOGGER.info("Request to create new customer - {}", createCustomerDto);
         CustomerDetailsDto customerDetailsDto;
         try {
-            customerDetailsDto = this.customerService.createCustomer(createCustomerDto);
+            customerDetailsDto = this.customerServiceImp.createCustomer(createCustomerDto);
 
         } catch (TicketShopException e) {
             throw e;
@@ -104,7 +105,7 @@ public class CustomerController {
         LOGGER.info("Request to get customer with id {}", customerId);
         CustomerDetailsDto customerDetailsDto;
         try {
-            customerDetailsDto = this.customerService.getCustomerById(customerId);
+            customerDetailsDto = this.customerServiceImp.getCustomerById(customerId);
 
         } catch (TicketShopException e) {
             throw e;
@@ -123,7 +124,7 @@ public class CustomerController {
      *
      * @param customerId        the customer id
      * @param updateCustomerDto data to update
-     * @return the response entity
+     * @return {@link CustomerDetailsDto}
      */
     @PutMapping("/{customerId}")
     @PreAuthorize("@authorized.hasRole('ADMIN') || (@authorized.hasRole('CUSTOMER') && @authorized.isUser(#customerId))")
@@ -143,7 +144,7 @@ public class CustomerController {
         LOGGER.info("Request to update customer with id {} - {}", customerId, updateCustomerDto);
         CustomerDetailsDto customerDetailsDto;
         try {
-            customerDetailsDto = this.customerService.updateCustomer(customerId, updateCustomerDto);
+            customerDetailsDto = this.customerServiceImp.updateCustomer(customerId, updateCustomerDto);
 
         } catch (TicketShopException e) {
             throw e;
@@ -155,5 +156,36 @@ public class CustomerController {
 
         LOGGER.info("Customer with id {} updated successfully. Retrieving updated customer", customerId);
         return new ResponseEntity<>(customerDetailsDto, HttpStatus.OK);
+    }
+
+    /**
+     * Delete Customer
+     *
+     * @param customerId customer id
+     */
+    @DeleteMapping("/{customerId}")
+    @PreAuthorize("@authorized.hasRole(\"ADMIN\")")
+    @Operation(summary = "Delete Customer", description = "Delete Customer")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful Operation"),
+            @ApiResponse(responseCode = "404", description = ErrorMessages.USER_NOT_FOUND,
+                    content = @Content(schema = @Schema(implementation = Error.class))),
+            @ApiResponse(responseCode = "400", description = ErrorMessages.DATABASE_COMMUNICATION_ERROR,
+                    content = @Content(schema = @Schema(implementation = Error.class)))})
+    public ResponseEntity deleteUser(@PathVariable Long customerId) {
+
+        try {
+            this.customerServiceImp.deleteCustomer(customerId);
+
+        } catch (TicketShopException e) {
+            throw e;
+
+        } catch (Exception e) {
+            LOGGER.error("Failed to delete customer with id {}", customerId, e);
+            throw new TicketShopException(ErrorMessages.OPERATION_FAILED, e);
+        }
+
+        LOGGER.info("Customer with id {} deleted successfully", customerId);
+        return new ResponseEntity(OK);
     }
 }

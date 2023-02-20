@@ -114,6 +114,24 @@ public class CustomerServiceImp implements CustomerService {
     }
 
     /**
+     * @see CustomerService#deleteCustomer(Long)
+     */
+    @Override
+    public void deleteCustomer(Long customerId) throws UserNotFoundException {
+        LOGGER.debug("Getting customer with id {} from database", customerId);
+        UserEntity userEntity = getUserEntityById(customerId);
+
+        LOGGER.debug("Removing customer with id {} from database", customerId);
+        try {
+            this.userRepository.delete(userEntity);
+
+        } catch (Exception e) {
+            LOGGER.error("Failed while deleting customer with id {} from database", customerId, e);
+            throw new DatabaseCommunicationException(ErrorMessages.DATABASE_COMMUNICATION_ERROR, e);
+        }
+    }
+
+    /**
      * Get Country by id
      *
      * @param countryId country id
