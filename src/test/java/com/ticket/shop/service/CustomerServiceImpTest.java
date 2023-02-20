@@ -27,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -41,19 +42,19 @@ public class CustomerServiceImpTest {
 
     @MockBean
     private PasswordEncoder passwordEncoder;
-    private CustomerServiceImp userServiceImp;
+    private CustomerServiceImp customerServiceImp;
 
     private final static String FIRSTNAME = "customer";
     private final static String LASTNAME = "Test";
     private final static String EMAIL = "test@service.com";
     private final static String PASSWORD = "Password123!";
     private final static String ENCRYPTED_PASSWORD = "adub1bb891b";
-    private final static Long USER_ID = 3L;
+    private final static Long CUSTOMER_ID = 3L;
     private final static List<UserRole> USER_ROLE = Collections.singletonList(UserRole.CUSTOMER);
 
     @BeforeEach
     public void setUp() {
-        this.userServiceImp = new CustomerServiceImp(this.userRepository, this.countryRepository, this.passwordEncoder);
+        this.customerServiceImp = new CustomerServiceImp(this.userRepository, this.countryRepository, this.passwordEncoder);
 
         // Mocks
         when(this.passwordEncoder.encode(any())).thenReturn(ENCRYPTED_PASSWORD);
@@ -69,7 +70,7 @@ public class CustomerServiceImpTest {
         when(this.userRepository.save(any())).thenReturn(getMockedUserEntity());
 
         // Method to be tested
-        CustomerDetailsDto customerDetails = this.userServiceImp.createCustomer(getMockedCreateCustomerDto());
+        CustomerDetailsDto customerDetails = this.customerServiceImp.createCustomer(getMockedCreateCustomerDto());
 
         // Assert result
         assertNotNull(customerDetails);
@@ -83,7 +84,7 @@ public class CustomerServiceImpTest {
 
         // Assert exception
         assertThrows(CountryNotFoundException.class,
-                () -> this.userServiceImp.createCustomer(getMockedCreateCustomerDto()));
+                () -> this.customerServiceImp.createCustomer(getMockedCreateCustomerDto()));
     }
 
     @Test
@@ -94,7 +95,7 @@ public class CustomerServiceImpTest {
 
         // Assert exception
         assertThrows(UserAlreadyExistsException.class,
-                () -> this.userServiceImp.createCustomer(getMockedCreateCustomerDto()));
+                () -> this.customerServiceImp.createCustomer(getMockedCreateCustomerDto()));
     }
 
     @Test
@@ -105,7 +106,7 @@ public class CustomerServiceImpTest {
 
         // Assert exception
         assertThrows(DatabaseCommunicationException.class,
-                () -> this.userServiceImp.createCustomer(getMockedCreateCustomerDto()));
+                () -> this.customerServiceImp.createCustomer(getMockedCreateCustomerDto()));
     }
 
     /**
@@ -117,7 +118,7 @@ public class CustomerServiceImpTest {
         when(this.userRepository.findById(any())).thenReturn(Optional.of(getMockedUserEntity()));
 
         // Method to be tested
-        CustomerDetailsDto customerDetails = this.userServiceImp.getCustomerById(USER_ID);
+        CustomerDetailsDto customerDetails = this.customerServiceImp.getCustomerById(CUSTOMER_ID);
 
         // Assert result
         assertNotNull(customerDetails);
@@ -132,7 +133,7 @@ public class CustomerServiceImpTest {
 
         // Assert exception
         assertThrows(UserNotFoundException.class,
-                () -> this.userServiceImp.getCustomerById(USER_ID));
+                () -> this.customerServiceImp.getCustomerById(CUSTOMER_ID));
     }
 
     /**
@@ -143,9 +144,9 @@ public class CustomerServiceImpTest {
         // Mocks
         when(this.userRepository.findById(any())).thenReturn(Optional.of(getMockedUserEntity()));
         when(this.countryRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedCountryEntity()));
-        CustomerDetailsDto user = CustomerDetailsDto.builder().userId(USER_ID).firstname(FIRSTNAME + 11).lastname(LASTNAME + 11).email(EMAIL).countryId(1L).build();
+        CustomerDetailsDto user = CustomerDetailsDto.builder().userId(CUSTOMER_ID).firstname(FIRSTNAME + 11).lastname(LASTNAME + 11).email(EMAIL).countryId(1L).build();
         UserEntity userEntity = UserEntity.builder()
-                .userId(USER_ID)
+                .userId(CUSTOMER_ID)
                 .firstname(FIRSTNAME + 11)
                 .lastname(LASTNAME + 11)
                 .email(EMAIL)
@@ -154,7 +155,7 @@ public class CustomerServiceImpTest {
                 .countryEntity(getMockedCountryEntity()).build();
 
         // Method to be tested
-        CustomerDetailsDto customerDetails = this.userServiceImp.updateCustomer(USER_ID, getMockedUpdateCustomerDto());
+        CustomerDetailsDto customerDetails = this.customerServiceImp.updateCustomer(CUSTOMER_ID, getMockedUpdateCustomerDto());
 
         // Assert result
         assertNotNull(customerDetails);
@@ -171,7 +172,7 @@ public class CustomerServiceImpTest {
 
         // Assert exception
         assertThrows(DatabaseCommunicationException.class,
-                () -> this.userServiceImp.updateCustomer(USER_ID, getMockedUpdateCustomerDto()));
+                () -> this.customerServiceImp.updateCustomer(CUSTOMER_ID, getMockedUpdateCustomerDto()));
     }
 
     @Test
@@ -181,7 +182,7 @@ public class CustomerServiceImpTest {
 
         // Assert exception
         assertThrows(UserNotFoundException.class,
-                () -> this.userServiceImp.updateCustomer(USER_ID, getMockedUpdateCustomerDto()));
+                () -> this.customerServiceImp.updateCustomer(CUSTOMER_ID, getMockedUpdateCustomerDto()));
     }
 
     @Test
@@ -192,12 +193,45 @@ public class CustomerServiceImpTest {
 
         // Assert exception
         assertThrows(CountryNotFoundException.class,
-                () -> this.userServiceImp.updateCustomer(USER_ID, getMockedUpdateCustomerDto()));
+                () -> this.customerServiceImp.updateCustomer(CUSTOMER_ID, getMockedUpdateCustomerDto()));
+    }
+
+    /**
+     * Delete worker tests
+     */
+    @Test
+    public void testDeleteWorkerSuccessfully() {
+        // Mocks
+        when(this.userRepository.findById(any())).thenReturn(Optional.of(getMockedUserEntity()));
+
+        // Call method to be tested
+        this.customerServiceImp.deleteCustomer(CUSTOMER_ID);
+
+        verify(this.userRepository).delete(any());
+    }
+
+    @Test
+    public void testDeleteWorkerFailureDueToUserNotFound() {
+        // Mocks
+        when(this.userRepository.findById(any())).thenReturn(Optional.empty());
+
+        assertThrows(UserNotFoundException.class,
+                () -> this.customerServiceImp.deleteCustomer(CUSTOMER_ID));
+    }
+
+    @Test
+    public void testDeleteWorkerFailureDueToDatabaseConnectionFailure() {
+        // Mocks
+        when(this.userRepository.findById(any())).thenReturn(Optional.of(getMockedUserEntity()));
+        doThrow(RuntimeException.class).when(this.userRepository).delete(any());
+
+        assertThrows(DatabaseCommunicationException.class,
+                () -> this.customerServiceImp.deleteCustomer(CUSTOMER_ID));
     }
 
     private UserEntity getMockedUserEntity() {
         return UserEntity.builder()
-                .userId(USER_ID)
+                .userId(CUSTOMER_ID)
                 .firstname(FIRSTNAME)
                 .lastname(LASTNAME)
                 .email(EMAIL)
@@ -220,7 +254,7 @@ public class CustomerServiceImpTest {
 
     private CustomerDetailsDto getMockedCustomerDetailsDto() {
         return CustomerDetailsDto.builder()
-                .userId(USER_ID)
+                .userId(CUSTOMER_ID)
                 .firstname(FIRSTNAME)
                 .lastname(LASTNAME)
                 .email(EMAIL)
