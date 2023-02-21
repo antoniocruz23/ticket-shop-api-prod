@@ -31,10 +31,17 @@ public interface CompanyService {
     /**
      * Update company
      *
-     * @param companyId company id to be updated
+     * @param companyId       company id to be updated
      * @param updateWorkerDto {@link CreateOrUpdateCompanyDto}
      * @return {@link CompanyDetailsDto} the company updated
      * @throws CompanyNotFoundException when the company isn't found
      */
     CompanyDetailsDto updateCompany(Long companyId, CreateOrUpdateCompanyDto updateWorkerDto) throws CompanyNotFoundException;
+
+    /**
+     * Delete company
+     *
+     * @param companyId company id
+     */
+    void deleteCompany(Long companyId);
 }

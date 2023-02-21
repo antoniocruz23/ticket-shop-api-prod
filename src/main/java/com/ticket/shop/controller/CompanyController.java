@@ -5,7 +5,7 @@ import com.ticket.shop.command.company.CreateOrUpdateCompanyDto;
 import com.ticket.shop.error.Error;
 import com.ticket.shop.error.ErrorMessages;
 import com.ticket.shop.exception.TicketShopException;
-import com.ticket.shop.service.CompanyService;
+import com.ticket.shop.service.CompanyServiceImp;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -17,6 +17,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,10 +39,10 @@ import static org.springframework.http.HttpStatus.OK;
 public class CompanyController {
 
     private static final Logger LOGGER = LogManager.getLogger(CompanyController.class);
-    private final CompanyService companyService;
+    private final CompanyServiceImp companyServiceImp;
 
-    public CompanyController(CompanyService companyService) {
-        this.companyService = companyService;
+    public CompanyController(CompanyServiceImp companyServiceImp) {
+        this.companyServiceImp = companyServiceImp;
     }
 
     /**
@@ -67,7 +68,7 @@ public class CompanyController {
         LOGGER.info("Request to create new company - {}", createOrUpdateCompanyDto);
         CompanyDetailsDto companyDetailsDto;
         try {
-            companyDetailsDto = this.companyService.createCompany(createOrUpdateCompanyDto);
+            companyDetailsDto = this.companyServiceImp.createCompany(createOrUpdateCompanyDto);
 
         } catch (TicketShopException e) {
             throw e;
@@ -101,7 +102,7 @@ public class CompanyController {
         LOGGER.info("Request to get company with id {}", companyId);
         CompanyDetailsDto companyDetailsDto;
         try {
-            companyDetailsDto = this.companyService.getCompanyById(companyId);
+            companyDetailsDto = this.companyServiceImp.getCompanyById(companyId);
 
         } catch (TicketShopException e) {
             throw e;
@@ -139,7 +140,7 @@ public class CompanyController {
         LOGGER.info("Request to update company with id {} - {}", companyId, updateCompanyDto);
         CompanyDetailsDto companyDetailsDto;
         try {
-            companyDetailsDto = this.companyService.updateCompany(companyId, updateCompanyDto);
+            companyDetailsDto = this.companyServiceImp.updateCompany(companyId, updateCompanyDto);
 
         } catch (TicketShopException e) {
             throw e;
@@ -151,5 +152,36 @@ public class CompanyController {
 
         LOGGER.info("Company with id {} updated successfully. Retrieving updated company", companyId);
         return new ResponseEntity<>(companyDetailsDto, HttpStatus.OK);
+    }
+
+    /**
+     * Delete Company
+     *
+     * @param companyId company id
+     */
+    @DeleteMapping("/{companyId}")
+    @PreAuthorize("@authorized.hasRole('ADMIN')")
+    @Operation(summary = "Delete Company", description = "Delete Company")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful Operation"),
+            @ApiResponse(responseCode = "404", description = ErrorMessages.COMPANY_NOT_FOUND,
+                    content = @Content(schema = @Schema(implementation = Error.class))),
+            @ApiResponse(responseCode = "400", description = ErrorMessages.DATABASE_COMMUNICATION_ERROR,
+                    content = @Content(schema = @Schema(implementation = Error.class)))})
+    public ResponseEntity deleteUser(@PathVariable Long companyId) {
+
+        try {
+            this.companyServiceImp.deleteCompany(companyId);
+
+        } catch (TicketShopException e) {
+            throw e;
+
+        } catch (Exception e) {
+            LOGGER.error("Failed to delete company with id {}", companyId, e);
+            throw new TicketShopException(ErrorMessages.OPERATION_FAILED, e);
+        }
+
+        LOGGER.info("Company with id {} deleted successfully", companyId);
+        return new ResponseEntity(OK);
     }
 }

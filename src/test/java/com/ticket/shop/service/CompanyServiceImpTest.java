@@ -27,6 +27,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -235,6 +237,39 @@ public class CompanyServiceImpTest {
         // Assert
         assertThrows(DatabaseCommunicationException.class,
                 () -> this.companyServiceImp.updateCompany(COMPANY_ID, getMockedCreateOrUpdateCompanyDto()));
+    }
+
+    /**
+     * Delete company tests
+     */
+    @Test
+    public void testDeleteCompanySuccessfully() {
+        // Mocks
+        when(this.companyRepository.findById(any())).thenReturn(Optional.of(getMockedCompanyEntity()));
+
+        // Call method to be tested
+        this.companyServiceImp.deleteCompany(COMPANY_ID);
+
+        verify(this.companyRepository).delete(any());
+    }
+
+    @Test
+    public void testDeleteCompanyFailureDueToUserNotFound() {
+        // Mocks
+        when(this.companyRepository.findById(any())).thenReturn(Optional.empty());
+
+        assertThrows(CompanyNotFoundException.class,
+                () -> this.companyServiceImp.deleteCompany(COMPANY_ID));
+    }
+
+    @Test
+    public void testDeleteCompanyFailureDueToDatabaseConnectionFailure() {
+        // Mocks
+        when(this.companyRepository.findById(any())).thenReturn(Optional.of(getMockedCompanyEntity()));
+        doThrow(RuntimeException.class).when(this.companyRepository).delete(any());
+
+        assertThrows(DatabaseCommunicationException.class,
+                () -> this.companyServiceImp.deleteCompany(COMPANY_ID));
     }
 
     private CreateOrUpdateCompanyDto getMockedCreateOrUpdateCompanyDto() {

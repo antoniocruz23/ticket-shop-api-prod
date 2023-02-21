@@ -95,6 +95,24 @@ public class CompanyServiceImp implements CompanyService {
         return CompanyConverter.fromCompanyEntityToCompanyDetailsDto(companyEntity);
     }
 
+    /**
+     * @see CompanyService#deleteCompany(Long)
+     */
+    @Override
+    public void deleteCompany(Long companyId) {
+        LOGGER.debug("Getting company with id {} from database", companyId);
+        CompanyEntity companyEntity = getCompanyEntityById(companyId);
+
+        LOGGER.debug("Removing company with id {} from database", companyId);
+        try {
+            this.companyRepository.delete(companyEntity);
+
+        } catch (Exception e) {
+            LOGGER.error("Failed while deleting company with id {} from database", companyId, e);
+            throw new DatabaseCommunicationException(ErrorMessages.DATABASE_COMMUNICATION_ERROR, e);
+        }
+    }
+
     private void validateCompany(String name, String email, String website) {
         if (this.companyRepository.findByName(name).isPresent()) {
 
