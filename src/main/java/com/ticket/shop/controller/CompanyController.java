@@ -168,8 +168,9 @@ public class CompanyController {
                     content = @Content(schema = @Schema(implementation = Error.class))),
             @ApiResponse(responseCode = "400", description = ErrorMessages.DATABASE_COMMUNICATION_ERROR,
                     content = @Content(schema = @Schema(implementation = Error.class)))})
-    public ResponseEntity deleteUser(@PathVariable Long companyId) {
+    public ResponseEntity deleteCompany(@PathVariable Long companyId) {
 
+        LOGGER.info("Request to delete company with id - {}", companyId);
         try {
             this.companyServiceImp.deleteCompany(companyId);
 

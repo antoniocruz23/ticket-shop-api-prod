@@ -229,9 +229,10 @@ public class WorkerController {
                     content = @Content(schema = @Schema(implementation = Error.class))),
             @ApiResponse(responseCode = "400", description = ErrorMessages.DATABASE_COMMUNICATION_ERROR,
                     content = @Content(schema = @Schema(implementation = Error.class)))})
-    public ResponseEntity deleteUser(@PathVariable Long companyId,
-                                     @PathVariable Long workerId) {
+    public ResponseEntity deleteWorker(@PathVariable Long companyId,
+                                       @PathVariable Long workerId) {
 
+        LOGGER.info("Request to delete worker with id - {}", workerId);
         try {
             this.workerServiceImp.deleteWorker(companyId, workerId);
 
@@ -239,11 +240,11 @@ public class WorkerController {
             throw e;
 
         } catch (Exception e) {
-            LOGGER.error("Failed to delete customer with id {}", workerId, e);
+            LOGGER.error("Failed to delete worker with id {}", workerId, e);
             throw new TicketShopException(ErrorMessages.OPERATION_FAILED, e);
         }
 
-        LOGGER.info("Customer with id {} deleted successfully", workerId);
+        LOGGER.info("Worker with id {} deleted successfully", workerId);
         return new ResponseEntity(OK);
     }
 }
