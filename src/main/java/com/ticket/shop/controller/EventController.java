@@ -5,7 +5,7 @@ import com.ticket.shop.command.event.EventDetailsDto;
 import com.ticket.shop.error.Error;
 import com.ticket.shop.error.ErrorMessages;
 import com.ticket.shop.exception.TicketShopException;
-import com.ticket.shop.service.EventService;
+import com.ticket.shop.service.EventServiceImp;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -34,10 +34,10 @@ import javax.validation.Valid;
 public class EventController {
 
     private static final Logger LOGGER = LogManager.getLogger(CompanyController.class);
-    private final EventService eventService;
+    private final EventServiceImp eventServiceImp;
 
-    public EventController(EventService eventService) {
-        this.eventService = eventService;
+    public EventController(EventServiceImp eventServiceImp) {
+        this.eventServiceImp = eventServiceImp;
     }
 
     /**
@@ -65,7 +65,7 @@ public class EventController {
         LOGGER.info("Request to create new event - {}", createEventDto);
         EventDetailsDto eventDetailsDto;
         try {
-            eventDetailsDto = this.eventService.createEvent(createEventDto, companyId);
+            eventDetailsDto = this.eventServiceImp.createEvent(createEventDto, companyId);
 
         } catch (TicketShopException e) {
             throw e;

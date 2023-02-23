@@ -105,4 +105,20 @@ public class EventServiceImp implements EventService {
                     return new CompanyNotFoundException(ErrorMessages.COMPANY_NOT_FOUND);
                 });
     }
+
+    /**
+     * Get event by company id and event id
+     *
+     * @param companyId company id
+     * @param eventId   event id
+     * @return {@link EventEntity}
+     */
+    private EventEntity getEventEntityByCompanyIdAndEventId(Long companyId, Long eventId) {
+        LOGGER.debug("Getting event with id {} from database", eventId);
+        return this.eventRepository.findByCompanyIdAndEventId(companyId, eventId)
+                .orElseThrow(() -> {
+                    LOGGER.error("The event with id {} does not exist in database", companyId);
+                    return new CompanyNotFoundException(ErrorMessages.EVENT_NOT_FOUND);
+                });
+    }
 }
