@@ -1,5 +1,6 @@
 package com.ticket.shop.persistence.repository;
 
+import com.ticket.shop.enumerators.UserRole;
 import com.ticket.shop.persistence.entity.CompanyEntity;
 import com.ticket.shop.persistence.entity.UserEntity;
 import org.springframework.data.domain.Page;
@@ -44,9 +45,19 @@ public interface UserRepository extends CrudRepository<UserEntity, Long> {
      * Get page of workers by user entity
      *
      * @param companyEntity company
+     * @param pageable      pageable
      * @return {@link Page<UserEntity>}
      */
     Page<UserEntity> findByCompanyEntity(CompanyEntity companyEntity, Pageable pageable);
+
+    /**
+     * Get user list by role
+     *
+     * @param role     role
+     * @param pageable pageable
+     * @return {@link Page<UserEntity>}
+     */
+    Page<UserEntity> findByRolesContains(UserRole role, Pageable pageable);
 
     /**
      * Get user by reset token and expire token

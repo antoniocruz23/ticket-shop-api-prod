@@ -1,5 +1,6 @@
 package com.ticket.shop.service;
 
+import com.ticket.shop.command.Paginated;
 import com.ticket.shop.command.customer.CreateCustomerDto;
 import com.ticket.shop.command.customer.CustomerDetailsDto;
 import com.ticket.shop.command.customer.UpdateCustomerDto;
@@ -17,6 +18,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Collections;
@@ -143,6 +148,31 @@ public class CustomerServiceImpTest {
     }
 
     /**
+     * Get customer list tests
+     */
+    @Test
+    public void testGetCustomerListSuccessfully() {
+        //Mocks
+        when(this.userRepository.findByRolesContains(any(), any())).thenReturn(getMockedPagedUserEntity());
+
+        //Call method
+        Paginated<CustomerDetailsDto> customerDetailsDto = this.customerServiceImp.getCustomersList(0, 1);
+
+        //Assert result
+        assertNotNull(customerDetailsDto);
+        assertEquals(getMockedPaginatedUserDetailsDto(), customerDetailsDto);
+    }
+
+    @Test
+    public void testGetCustomerListFailureDueToDatabaseConnectionFailure() {
+        //Mocks
+        when(this.userRepository.findByRolesContains(any(), any())).thenThrow(RuntimeException.class);
+
+        assertThrows(DatabaseCommunicationException.class,
+                () -> this.customerServiceImp.getCustomersList(0, 1));
+    }
+
+    /**
      * Update customer Tests
      */
     @Test
@@ -203,10 +233,10 @@ public class CustomerServiceImpTest {
     }
 
     /**
-     * Delete worker tests
+     * Delete customer tests
      */
     @Test
-    public void testDeleteWorkerSuccessfully() {
+    public void testDeleteCustomerSuccessfully() {
         // Mocks
         when(this.userRepository.findById(any())).thenReturn(Optional.of(getMockedUserEntity()));
 
@@ -217,7 +247,7 @@ public class CustomerServiceImpTest {
     }
 
     @Test
-    public void testDeleteWorkerFailureDueToUserNotFound() {
+    public void testDeleteCustomerFailureDueToUserNotFound() {
         // Mocks
         when(this.userRepository.findById(any())).thenReturn(Optional.empty());
 
@@ -226,7 +256,7 @@ public class CustomerServiceImpTest {
     }
 
     @Test
-    public void testDeleteWorkerFailureDueToDatabaseConnectionFailure() {
+    public void testDeleteCustomerFailureDueToDatabaseConnectionFailure() {
         // Mocks
         when(this.userRepository.findById(any())).thenReturn(Optional.of(getMockedUserEntity()));
         doThrow(RuntimeException.class).when(this.userRepository).delete(any());
@@ -286,5 +316,23 @@ public class CustomerServiceImpTest {
                 .password(PASSWORD + "11")
                 .countryId(1L)
                 .build();
+    }
+
+    private Page<UserEntity> getMockedPagedUserEntity() {
+        List<UserEntity> content = List.of(getMockedUserEntity());
+        Pageable pageable = PageRequest.of(0, 1);
+
+        return new PageImpl<>(content, pageable, 1);
+    }
+
+    private Paginated<CustomerDetailsDto> getMockedPaginatedUserDetailsDto() {
+        List<CustomerDetailsDto> workerDetailsDtos = List.of(getMockedCustomerDetailsDto());
+
+        return new Paginated<>(
+                workerDetailsDtos,
+                0,
+                workerDetailsDtos.size(),
+                1,
+                1);
     }
 }

@@ -1,5 +1,6 @@
 package com.ticket.shop.service;
 
+import com.ticket.shop.command.Paginated;
 import com.ticket.shop.command.customer.CreateCustomerDto;
 import com.ticket.shop.command.customer.UpdateCustomerDto;
 import com.ticket.shop.command.customer.CustomerDetailsDto;
@@ -28,6 +29,15 @@ public interface CustomerService {
      * @throws UserNotFoundException when the user isn't found
      */
     CustomerDetailsDto getCustomerById(Long userId) throws UserNotFoundException;
+
+    /**
+     * Get customers list with pagination
+     *
+     * @param page page number
+     * @param size size of page
+     * @return {@link Paginated<CustomerDetailsDto>}
+     */
+    Paginated<CustomerDetailsDto> getCustomersList(int page, int size);
 
     /**
      * Update customer

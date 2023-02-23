@@ -262,14 +262,14 @@ public class WorkerServiceImpTest {
     public void testGetWorkersListSuccessfully() {
         //Mocks
         when(this.companyRepository.findById(any())).thenReturn(Optional.of(getMockedCompanyEntity()));
-        when(this.userRepository.findByCompanyEntity(any(), any())).thenReturn(getMockedPagedUserEntity(0, 1));
+        when(this.userRepository.findByCompanyEntity(any(), any())).thenReturn(getMockedPagedUserEntity());
 
         //Call method
         Paginated<WorkerDetailsDto> workerDetailsDto = this.workerServiceImp.getWorkersList(COMPANY_ID, 0, 1);
 
         //Assert result
         assertNotNull(workerDetailsDto);
-        assertEquals(getMockedPaginatedUserDetailsDto(0), workerDetailsDto);
+        assertEquals(getMockedPaginatedUserDetailsDto(), workerDetailsDto);
     }
 
     @Test
@@ -402,20 +402,20 @@ public class WorkerServiceImpTest {
                 .build();
     }
 
-    private Page<UserEntity> getMockedPagedUserEntity(int pageNum, int size) {
+    private Page<UserEntity> getMockedPagedUserEntity() {
         List<UserEntity> content = List.of(getMockedUserEntity());
-        Pageable pageable = PageRequest.of(pageNum, size);
+        Pageable pageable = PageRequest.of(0, 1);
 
         return new PageImpl<>(content, pageable, 1);
     }
 
-    private Paginated<WorkerDetailsDto> getMockedPaginatedUserDetailsDto(int page) {
-        List<WorkerDetailsDto> patientDetailsDtos = List.of(getMockedWorkerDetailsDto());
+    private Paginated<WorkerDetailsDto> getMockedPaginatedUserDetailsDto() {
+        List<WorkerDetailsDto> workerDetailsDtos = List.of(getMockedWorkerDetailsDto());
 
         return new Paginated<>(
-                patientDetailsDtos,
-                page,
-                patientDetailsDtos.size(),
+                workerDetailsDtos,
+                0,
+                workerDetailsDtos.size(),
                 1,
                 1);
     }

@@ -155,9 +155,9 @@ public class WorkerController {
                                                                       @RequestParam(defaultValue = "10") int size) {
 
         LOGGER.info("Request to get workers list - page: {}, size: {}", page, size);
-        Paginated<WorkerDetailsDto> patientsList;
+        Paginated<WorkerDetailsDto> workersList;
         try {
-            patientsList = this.workerServiceImp.getWorkersList(companyId, page, size);
+            workersList = this.workerServiceImp.getWorkersList(companyId, page, size);
 
         } catch (TicketShopException e) {
             throw e;
@@ -168,7 +168,7 @@ public class WorkerController {
         }
 
         LOGGER.info("Retrieving workers list");
-        return new ResponseEntity<>(patientsList, HttpStatus.OK);
+        return new ResponseEntity<>(workersList, HttpStatus.OK);
     }
 
     /**

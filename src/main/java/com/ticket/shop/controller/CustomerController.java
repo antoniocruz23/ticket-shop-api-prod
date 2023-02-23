@@ -1,5 +1,6 @@
 package com.ticket.shop.controller;
 
+import com.ticket.shop.command.Paginated;
 import com.ticket.shop.command.customer.CreateCustomerDto;
 import com.ticket.shop.command.customer.CustomerDetailsDto;
 import com.ticket.shop.command.customer.UpdateCustomerDto;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -117,6 +119,43 @@ public class CustomerController {
 
         LOGGER.info("Retrieved customer with id {}", customerId);
         return new ResponseEntity<>(customerDetailsDto, OK);
+    }
+
+    /**
+     * Get customers list
+     *
+     * @param page page number
+     * @param size page size
+     * @return {@link Paginated<CustomerDetailsDto>} customers list wanted and Ok httpStatus
+     */
+    @GetMapping()
+    @PreAuthorize("@authorized.hasRole('ADMIN')")
+    @Operation(summary = "Get customers by pagination", description = "Get customers by pagination")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful Operation",
+                    content = @Content(schema = @Schema(implementation = Paginated.class))),
+            @ApiResponse(responseCode = "400", description = ErrorMessages.DATABASE_COMMUNICATION_ERROR,
+                    content = @Content(schema = @Schema(implementation = Error.class))),
+            @ApiResponse(responseCode = "403", description = ErrorMessages.ACCESS_DENIED,
+                    content = @Content(schema = @Schema(implementation = Error.class)))})
+    public ResponseEntity<Paginated<CustomerDetailsDto>> getCustomersList(@RequestParam(defaultValue = "0") int page,
+                                                                          @RequestParam(defaultValue = "10") int size) {
+
+        LOGGER.info("Request to get customers list - page: {}, size: {}", page, size);
+        Paginated<CustomerDetailsDto> customersList;
+        try {
+            customersList = this.customerServiceImp.getCustomersList(page, size);
+
+        } catch (TicketShopException e) {
+            throw e;
+
+        } catch (Exception e) {
+            LOGGER.error("Failed to get customers list - ", e);
+            throw new TicketShopException(ErrorMessages.OPERATION_FAILED, e);
+        }
+
+        LOGGER.info("Retrieving customers list");
+        return new ResponseEntity<>(customersList, HttpStatus.OK);
     }
 
     /**

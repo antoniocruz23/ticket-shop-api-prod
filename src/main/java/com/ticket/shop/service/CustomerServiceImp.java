@@ -1,6 +1,7 @@
 package com.ticket.shop.service;
 
 
+import com.ticket.shop.command.Paginated;
 import com.ticket.shop.command.customer.CreateCustomerDto;
 import com.ticket.shop.command.customer.CustomerDetailsDto;
 import com.ticket.shop.command.customer.UpdateCustomerDto;
@@ -18,10 +19,13 @@ import com.ticket.shop.persistence.repository.UserRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -110,6 +114,35 @@ public class CustomerServiceImp implements CustomerService {
     @Override
     public CustomerDetailsDto getCustomerById(Long userId) throws UserNotFoundException {
         return UserConverter.fromUserEntityToCustomerDetailsDto(getUserEntityById(userId));
+    }
+
+    /**
+     * @see CustomerService#getCustomersList(int, int)
+     */
+    @Override
+    public Paginated<CustomerDetailsDto> getCustomersList(int page, int size) {
+        LOGGER.debug("Getting all customers from database");
+        Page<UserEntity> customersList;
+        try {
+            customersList = this.userRepository.findByRolesContains(UserRole.CUSTOMER, PageRequest.of(page, size));
+
+        } catch (Exception e) {
+            LOGGER.error("Failed at getting customers page from database", e);
+            throw new DatabaseCommunicationException(ErrorMessages.DATABASE_COMMUNICATION_ERROR, e);
+        }
+
+        LOGGER.debug("Converting customers list to CustomerDetailsDto");
+        List<CustomerDetailsDto> customerListResponse = new ArrayList<>();
+        for (UserEntity customer : customersList) {
+            customerListResponse.add(UserConverter.fromUserEntityToCustomerDetailsDto(customer));
+        }
+
+        return new Paginated<>(
+                customerListResponse,
+                page,
+                customerListResponse.size(),
+                customersList.getTotalPages(),
+                customersList.getTotalElements());
     }
 
     /**

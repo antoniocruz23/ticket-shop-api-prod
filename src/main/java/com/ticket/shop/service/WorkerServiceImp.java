@@ -137,7 +137,7 @@ public class WorkerServiceImp implements WorkerService {
 
         CompanyEntity companyEntity = getCompanyEntityById(companyId);
 
-        LOGGER.debug("Getting all patients from database");
+        LOGGER.debug("Getting all workers from database");
         Page<UserEntity> workersList;
         try {
             workersList = this.userRepository.findByCompanyEntity(companyEntity, PageRequest.of(page, size));
@@ -148,15 +148,15 @@ public class WorkerServiceImp implements WorkerService {
         }
 
         LOGGER.debug("Converting workers list to WorkerDetailsDto");
-        List<WorkerDetailsDto> patientListResponse = new ArrayList<>();
+        List<WorkerDetailsDto> workerListResponse = new ArrayList<>();
         for (UserEntity worker : workersList) {
-            patientListResponse.add(UserConverter.fromUserEntityToWorkerDetailsDto(worker));
+            workerListResponse.add(UserConverter.fromUserEntityToWorkerDetailsDto(worker));
         }
 
         return new Paginated<>(
-                patientListResponse,
+                workerListResponse,
                 page,
-                patientListResponse.size(),
+                workerListResponse.size(),
                 workersList.getTotalPages(),
                 workersList.getTotalElements());
     }
