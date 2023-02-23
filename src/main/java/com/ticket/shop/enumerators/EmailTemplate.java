@@ -5,7 +5,8 @@ package com.ticket.shop.enumerators;
  */
 public enum EmailTemplate {
     CHANGE_PASSWORD("password-changed-email"),
-    RESET_PASSWORD("reset-password-email");
+    RESET_PASSWORD("reset-password-email"),
+    CONFIRM_EMAIL_ADDRESS("confirm-email");
 
     private final String name;
 

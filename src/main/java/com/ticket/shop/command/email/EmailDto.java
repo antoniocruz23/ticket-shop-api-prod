@@ -13,5 +13,7 @@ public class EmailDto {
     private String email;
     private String password;
     private String resetPasswordToken;
-    private String expireTimeToken;
+    private String expireTimePasswordToken;
+    private String confirmEmailToken;
+    private String expireTimeEmailToken;
 }

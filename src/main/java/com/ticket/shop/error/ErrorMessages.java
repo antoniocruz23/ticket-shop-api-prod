@@ -27,5 +27,5 @@ public class ErrorMessages {
     public static final String OPERATION_FAILED = "Failed to process the requested operation";
     public static final String ACCESS_DENIED = "Access is denied";
     public static final String ROLE_INVALID = "The given role is invalid";
-    public static final String INVALID_RESET_PASS_TOKEN = "The token doesn't exist or it's expired";
+    public static final String INVALID_TOKEN = "The token doesn't exist or it's expired";
 }

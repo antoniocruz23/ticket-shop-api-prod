@@ -82,6 +82,15 @@ public class UserEntity {
     @Column(insertable = false)
     private Date resetPasswordExpireToken;
 
+    @Column()
+    private String confirmEmailToken;
+
+    @Column()
+    private Date confirmEmailExpireToken;
+
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean isEmailConfirmed;
+
     @OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL)
     @ToString.Exclude
     private List<AddressEntity> addresses;

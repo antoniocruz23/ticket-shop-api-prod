@@ -21,12 +21,15 @@ import com.ticket.shop.persistence.repository.CountryRepository;
 import com.ticket.shop.persistence.repository.UserRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -40,12 +43,19 @@ public class WorkerServiceImp implements WorkerService {
     private final CountryRepository countryRepository;
     private final CompanyRepository companyRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthServiceImp authServiceImp;
+    private final EmailServiceImp emailServiceImp;
 
-    public WorkerServiceImp(UserRepository userRepository, CountryRepository countryRepository, PasswordEncoder passwordEncoder, CompanyRepository companyRepository) {
+    @Value("${ticket-shop.resetPassToken.expiresInHours}")
+    private long expiresInHours;
+
+    public WorkerServiceImp(UserRepository userRepository, CountryRepository countryRepository, PasswordEncoder passwordEncoder, CompanyRepository companyRepository, AuthServiceImp authServiceImp, EmailServiceImp emailServiceImp) {
         this.userRepository = userRepository;
         this.countryRepository = countryRepository;
         this.passwordEncoder = passwordEncoder;
         this.companyRepository = companyRepository;
+        this.authServiceImp = authServiceImp;
+        this.emailServiceImp = emailServiceImp;
     }
 
     /**
@@ -55,24 +65,12 @@ public class WorkerServiceImp implements WorkerService {
     public WorkerDetailsDto createWorker(Long companyId, CreateWorkerDto createWorkerDto)
             throws UserAlreadyExistsException, CompanyNotFoundException, CountryNotFoundException, RoleInvalidException {
 
-        LOGGER.debug("Creating worker - {}", createWorkerDto);
-        UserEntity userEntity = UserConverter.fromCreateWorkerDtoToUserEntity(createWorkerDto);
-
-        validateRoles(userEntity.getRoles());
-
-        if (this.userRepository.findByEmail(userEntity.getEmail()).isPresent()) {
-            LOGGER.error("Duplicated email - {}", userEntity.getEmail());
+        if (this.userRepository.findByEmail(createWorkerDto.getEmail()).isPresent()) {
+            LOGGER.error("Duplicated email - {}", createWorkerDto.getEmail());
             throw new UserAlreadyExistsException(ErrorMessages.EMAIL_ALREADY_EXISTS);
         }
 
-        CompanyEntity companyEntity = getCompanyEntityById(companyId);
-        userEntity.setCompanyEntity(companyEntity);
-
-        CountryEntity countryEntity = getCountryEntityById(createWorkerDto.getCountryId());
-        userEntity.setCountryEntity(countryEntity);
-
-        String encryptedPassword = this.passwordEncoder.encode(createWorkerDto.getPassword());
-        userEntity.setEncryptedPassword(encryptedPassword);
+        UserEntity userEntity = buildUserEntity(companyId, createWorkerDto);
 
         LOGGER.info("Persisting worker into database");
         UserEntity createdWorker;
@@ -85,8 +83,40 @@ public class WorkerServiceImp implements WorkerService {
             throw new DatabaseCommunicationException(ErrorMessages.DATABASE_COMMUNICATION_ERROR, e);
         }
 
+        this.emailServiceImp.sendEmailToConfirmEmailAddress(
+                createdWorker.getFirstname(),
+                createdWorker.getEmail(),
+                createdWorker.getConfirmEmailToken(),
+                this.expiresInHours
+        );
+
         LOGGER.debug("Retrieving created worker");
         return UserConverter.fromUserEntityToWorkerDetailsDto(createdWorker);
+    }
+
+    private UserEntity buildUserEntity(Long companyId, CreateWorkerDto createWorkerDto) {
+        LOGGER.debug("Creating worker - {}", createWorkerDto);
+        UserEntity userEntity = UserConverter.fromCreateWorkerDtoToUserEntity(createWorkerDto);
+
+        validateRoles(userEntity.getRoles());
+
+        CompanyEntity companyEntity = getCompanyEntityById(companyId);
+        userEntity.setCompanyEntity(companyEntity);
+
+        CountryEntity countryEntity = getCountryEntityById(createWorkerDto.getCountryId());
+        userEntity.setCountryEntity(countryEntity);
+
+        String encryptedPassword = this.passwordEncoder.encode(createWorkerDto.getPassword());
+        userEntity.setEncryptedPassword(encryptedPassword);
+
+        // Insert data about email validation
+        String emailToken = this.authServiceImp.generateTokenForValidations();
+        Date expiresAt = new Date(new Date().getTime() + Duration.ofHours(2).toMillis());
+        userEntity.setConfirmEmailToken(emailToken);
+        userEntity.setConfirmEmailExpireToken(expiresAt);
+        userEntity.setEmailConfirmed(false);
+
+        return userEntity;
     }
 
     /**

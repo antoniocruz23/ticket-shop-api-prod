@@ -2,7 +2,7 @@ package com.ticket.shop.exception;
 
 import com.ticket.shop.error.Error;
 import com.ticket.shop.exception.address.AddressNotFoundException;
-import com.ticket.shop.exception.auth.InvalidResetPasswordTokenException;
+import com.ticket.shop.exception.auth.InvalidTokenException;
 import com.ticket.shop.exception.auth.RoleInvalidException;
 import com.ticket.shop.exception.calendar.CalendarNotFoundException;
 import com.ticket.shop.exception.company.CompanyAlreadyExistsException;
@@ -100,7 +100,7 @@ public class TicketShopExceptionHandler extends ResponseEntityExceptionHandler {
      * @return {@link Error}
      */
     @ExceptionHandler(value = {
-            InvalidResetPasswordTokenException.class})
+            InvalidTokenException.class})
     public ResponseEntity<Error> handlerUnprocessableEntityException(Exception ex, HttpServletRequest request) {
         return buildErrorResponse(ex, request, HttpStatus.UNPROCESSABLE_ENTITY);
     }

@@ -52,8 +52,17 @@ public interface UserRepository extends CrudRepository<UserEntity, Long> {
      * Get user by reset token and expire token
      *
      * @param token token
-     * @param date {@link Date}
+     * @param date  {@link Date}
      * @return {@link Optional<UserEntity>}
      */
     Optional<UserEntity> findByResetPasswordTokenAndResetPasswordExpireTokenIsAfter(String token, Date date);
+
+    /**
+     * Get user by confirm email token and expire token
+     *
+     * @param token token
+     * @param date  {@link Date}
+     * @return {@link Optional<UserEntity>}
+     */
+    Optional<UserEntity> findByConfirmEmailTokenAndConfirmEmailExpireTokenIsAfter(String token, Date date);
 }

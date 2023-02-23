@@ -124,4 +124,16 @@ public class AuthController {
 
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/confirm-email")
+    @Operation(summary = "Confirm email", description = "Confirm email with token")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "No Content"),
+            @ApiResponse(responseCode = "422", description = "Unprocessable Entity")})
+    public ResponseEntity<Void> confirmEmail(@RequestParam("token") String token) {
+
+        this.authService.confirmEmail(token);
+
+        return ResponseEntity.noContent().build();
+    }
 }

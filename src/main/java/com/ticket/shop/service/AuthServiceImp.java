@@ -10,7 +10,7 @@ import com.ticket.shop.converter.UserConverter;
 import com.ticket.shop.enumerators.EmailTemplate;
 import com.ticket.shop.error.ErrorMessages;
 import com.ticket.shop.exception.DatabaseCommunicationException;
-import com.ticket.shop.exception.auth.InvalidResetPasswordTokenException;
+import com.ticket.shop.exception.auth.InvalidTokenException;
 import com.ticket.shop.exception.auth.WrongCredentialsException;
 import com.ticket.shop.exception.user.UserNotFoundException;
 import com.ticket.shop.persistence.entity.UserEntity;
@@ -21,9 +21,9 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +34,6 @@ import java.security.Key;
 import java.time.Duration;
 import java.util.Base64;
 import java.util.Date;
-import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -126,19 +125,9 @@ public class AuthServiceImp implements AuthService {
     @Override
     public void requestResetPassword(String email) {
         String subject = "Request to reset password";
-
-        LOGGER.debug("Verifying if user with email {} exists in database", email);
-        Optional<UserEntity> optionalUser = userRepository.findByEmail(email);
-
-        if (optionalUser.isEmpty()) {
-            LOGGER.error("The user with email {} does not exist in database", email);
-            return;
-        }
-
-        UserEntity user = optionalUser.get();
-        String token = generateResetPasswordToken();
-        Date issuedAt = new Date();
-        Date expiresAt = new Date(issuedAt.getTime() +
+        UserEntity user = getUserByEmail(email);
+        String token = generateTokenForValidations();
+        Date expiresAt = new Date(new Date().getTime() +
                 Duration.ofHours(this.expiresInHours).toMillis());
 
         user.setResetPasswordToken(token);
@@ -146,7 +135,7 @@ public class AuthServiceImp implements AuthService {
 
         LOGGER.debug("Persisting reset password token on database");
         try {
-            userRepository.save(user);
+            this.userRepository.save(user);
 
         } catch (Exception e) {
             LOGGER.error("Failed while saving token into database", e);
@@ -158,7 +147,7 @@ public class AuthServiceImp implements AuthService {
                         .name(user.getFirstname())
                         .email(user.getEmail())
                         .resetPasswordToken(token)
-                        .expireTimeToken(expiresAt.toString())
+                        .expireTimePasswordToken(String.valueOf(this.expiresInHours))
                         .build(),
                 EmailTemplate.RESET_PASSWORD,
                 subject
@@ -170,7 +159,7 @@ public class AuthServiceImp implements AuthService {
      */
     @Override
     public ResetPasswordTokenDto validateResetPassToken(String token) {
-        UserEntity userEntity = getUserFromResetPassToken(token);
+        UserEntity userEntity = getUserFromResetPasswordToken(token);
 
         return ResetPasswordTokenDto.builder()
                 .token(token)
@@ -184,19 +173,18 @@ public class AuthServiceImp implements AuthService {
      */
     @Override
     public void resetPassword(String token, ResetPasswordDto resetPasswordDto) {
-
         String subject = "Confirm of Password Reset";
-        UserEntity userEntity = getUserFromResetPassToken(token);
+        UserEntity userEntity = getUserFromResetPasswordToken(token);
 
         String encryptedPassword = passwordEncoder.encode(resetPasswordDto.getPassword());
         userEntity.setEncryptedPassword(encryptedPassword);
-
         userEntity.setResetPasswordToken(null);
         userEntity.setResetPasswordExpireToken(new Date());
 
         LOGGER.debug("Persisting reset password token as null on database");
         try {
-            userRepository.save(userEntity);
+            this.userRepository.save(userEntity);
+
         } catch (Exception e) {
             LOGGER.error("Failed while saving token as null into database", e);
             throw new DatabaseCommunicationException(ErrorMessages.DATABASE_COMMUNICATION_ERROR, e);
@@ -210,6 +198,26 @@ public class AuthServiceImp implements AuthService {
                 EmailTemplate.CHANGE_PASSWORD,
                 subject
         );
+    }
+
+    /**
+     * @see AuthService#confirmEmail(String)
+     */
+    @Override
+    public void confirmEmail(String token) {
+        UserEntity userEntity = getUserFromConfirmEmailToken(token);
+        userEntity.setConfirmEmailToken(null);
+        userEntity.setConfirmEmailExpireToken(new Date());
+        userEntity.setEmailConfirmed(true);
+
+        LOGGER.debug("Persisting email confirmation on database");
+        try {
+            this.userRepository.save(userEntity);
+
+        } catch (Exception e) {
+            LOGGER.error("Failed while saving email confirmation into database", e);
+            throw new DatabaseCommunicationException(ErrorMessages.DATABASE_COMMUNICATION_ERROR, e);
+        }
     }
 
     /**
@@ -233,18 +241,61 @@ public class AuthServiceImp implements AuthService {
                 .compact();
     }
 
-    private String generateResetPasswordToken() {
+    /**
+     * Generate token for password reset and email confirmation
+     *
+     * @return token
+     */
+    protected String generateTokenForValidations() {
         String token = UUID.randomUUID().toString().toLowerCase();
         token = token.replaceAll("-", "");
         return token;
     }
 
-    private UserEntity getUserFromResetPassToken(String token) {
+    /**
+     * Get user by reset password token if the token is after the actual date
+     *
+     * @param token token
+     * @return {@link UserEntity}
+     */
+    private UserEntity getUserFromResetPasswordToken(String token) {
+        LOGGER.debug("Verifying if the token {} exists or is expired", token);
         return this.userRepository.findByResetPasswordTokenAndResetPasswordExpireTokenIsAfter(
                 token, new Date()
         ).orElseThrow(() -> {
             LOGGER.error("The token is invalid or it expired already");
-            return new InvalidResetPasswordTokenException(ErrorMessages.INVALID_RESET_PASS_TOKEN);
+            return new InvalidTokenException(ErrorMessages.INVALID_TOKEN);
         });
+    }
+
+    /**
+     * Get user by confirm email token if the token is after the actual date
+     *
+     * @param token token
+     * @return {@link UserEntity}
+     */
+    private UserEntity getUserFromConfirmEmailToken(String token) {
+        LOGGER.debug("Verifying if the token {} exists or is expired", token);
+        return this.userRepository.findByConfirmEmailTokenAndConfirmEmailExpireTokenIsAfter(
+                token, new Date()
+        ).orElseThrow(() -> {
+            LOGGER.error("The token is invalid or it expired already");
+            return new InvalidTokenException(ErrorMessages.INVALID_TOKEN);
+        });
+    }
+
+    /**
+     * Get User by email
+     *
+     * @param email email
+     * @return {@link UserEntity}
+     */
+    private UserEntity getUserByEmail(String email) {
+        LOGGER.debug("Verifying if user with email {} exists in database", email);
+        return this.userRepository.findByEmail(email)
+                .orElseThrow(() -> {
+                    LOGGER.error("The user with email {} does not exist in database", email);
+                    return new UserNotFoundException(ErrorMessages.USER_NOT_FOUND);
+                });
     }
 }

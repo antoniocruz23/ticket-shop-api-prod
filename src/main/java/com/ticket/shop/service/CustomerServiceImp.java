@@ -2,8 +2,8 @@ package com.ticket.shop.service;
 
 
 import com.ticket.shop.command.customer.CreateCustomerDto;
-import com.ticket.shop.command.customer.UpdateCustomerDto;
 import com.ticket.shop.command.customer.CustomerDetailsDto;
+import com.ticket.shop.command.customer.UpdateCustomerDto;
 import com.ticket.shop.converter.UserConverter;
 import com.ticket.shop.enumerators.UserRole;
 import com.ticket.shop.error.ErrorMessages;
@@ -17,9 +17,12 @@ import com.ticket.shop.persistence.repository.CountryRepository;
 import com.ticket.shop.persistence.repository.UserRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -32,11 +35,18 @@ public class CustomerServiceImp implements CustomerService {
     private final UserRepository userRepository;
     private final CountryRepository countryRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthServiceImp authServiceImp;
+    private final EmailServiceImp emailServiceImp;
 
-    public CustomerServiceImp(UserRepository userRepository, CountryRepository countryRepository, PasswordEncoder passwordEncoder) {
+    @Value("${ticket-shop.resetPassToken.expiresInHours}")
+    private long expiresInHours;
+
+    public CustomerServiceImp(UserRepository userRepository, CountryRepository countryRepository, PasswordEncoder passwordEncoder, AuthServiceImp authServiceImp, EmailServiceImp emailServiceImp) {
         this.userRepository = userRepository;
         this.countryRepository = countryRepository;
         this.passwordEncoder = passwordEncoder;
+        this.authServiceImp = authServiceImp;
+        this.emailServiceImp = emailServiceImp;
     }
 
     /**
@@ -44,23 +54,12 @@ public class CustomerServiceImp implements CustomerService {
      */
     @Override
     public CustomerDetailsDto createCustomer(CreateCustomerDto createUserDto) throws UserAlreadyExistsException {
-
-        LOGGER.debug("Creating customer - {}", createUserDto);
-        UserEntity userEntity = UserConverter.fromCreateCustomerDtoToUserEntity(createUserDto);
-
-        userEntity.setRoles(List.of(UserRole.CUSTOMER));
-
-        CountryEntity countryEntity = getCountryEntityById(createUserDto.getCountryId());
-        userEntity.setCountryEntity(countryEntity);
-
-        String encryptedPassword = this.passwordEncoder.encode(createUserDto.getPassword());
-        userEntity.setEncryptedPassword(encryptedPassword);
-
-        if (this.userRepository.findByEmail(userEntity.getEmail()).isPresent()) {
-
-            LOGGER.error("Duplicated email - {}", userEntity.getEmail());
+        if (this.userRepository.findByEmail(createUserDto.getEmail()).isPresent()) {
+            LOGGER.error("Duplicated email - {}", createUserDto.getEmail());
             throw new UserAlreadyExistsException(ErrorMessages.EMAIL_ALREADY_EXISTS);
         }
+
+        UserEntity userEntity = buildUserEntity(createUserDto);
 
         LOGGER.info("Persisting customer into database");
         UserEntity createdCustomer;
@@ -73,8 +72,36 @@ public class CustomerServiceImp implements CustomerService {
             throw new DatabaseCommunicationException(ErrorMessages.DATABASE_COMMUNICATION_ERROR, e);
         }
 
+        this.emailServiceImp.sendEmailToConfirmEmailAddress(
+                createdCustomer.getFirstname(),
+                createdCustomer.getEmail(),
+                createdCustomer.getConfirmEmailToken(),
+                this.expiresInHours
+        );
+
         LOGGER.debug("Retrieving created customer");
         return UserConverter.fromUserEntityToCustomerDetailsDto(createdCustomer);
+    }
+
+    private UserEntity buildUserEntity(CreateCustomerDto createCustomerDto) {
+        LOGGER.debug("Creating customer - {}", createCustomerDto);
+        UserEntity userEntity = UserConverter.fromCreateCustomerDtoToUserEntity(createCustomerDto);
+        userEntity.setRoles(List.of(UserRole.CUSTOMER));
+
+        CountryEntity countryEntity = getCountryEntityById(createCustomerDto.getCountryId());
+        userEntity.setCountryEntity(countryEntity);
+
+        String encryptedPassword = this.passwordEncoder.encode(createCustomerDto.getPassword());
+        userEntity.setEncryptedPassword(encryptedPassword);
+
+        // Insert data about email validation
+        String emailToken = this.authServiceImp.generateTokenForValidations();
+        Date expiresAt = new Date(new Date().getTime() + Duration.ofHours(2).toMillis());
+        userEntity.setConfirmEmailToken(emailToken);
+        userEntity.setConfirmEmailExpireToken(expiresAt);
+        userEntity.setEmailConfirmed(false);
+
+        return userEntity;
     }
 
     /**

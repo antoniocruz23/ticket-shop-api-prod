@@ -49,4 +49,11 @@ public interface AuthService {
      * @return {@link ResetPasswordTokenDto}
      */
     ResetPasswordTokenDto validateResetPassToken(String token);
+
+    /**
+     * Confirm email with token
+     *
+     * @param token token
+     */
+    void confirmEmail(String token);
 }

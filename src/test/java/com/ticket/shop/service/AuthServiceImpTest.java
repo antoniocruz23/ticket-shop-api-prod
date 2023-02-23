@@ -7,7 +7,7 @@ import com.ticket.shop.command.auth.ResetPasswordDto;
 import com.ticket.shop.command.auth.ResetPasswordTokenDto;
 import com.ticket.shop.enumerators.UserRole;
 import com.ticket.shop.exception.DatabaseCommunicationException;
-import com.ticket.shop.exception.auth.InvalidResetPasswordTokenException;
+import com.ticket.shop.exception.auth.InvalidTokenException;
 import com.ticket.shop.exception.auth.WrongCredentialsException;
 import com.ticket.shop.exception.user.UserNotFoundException;
 import com.ticket.shop.persistence.entity.CountryEntity;
@@ -175,7 +175,7 @@ public class AuthServiceImpTest {
         // Mocks
         when(this.userRepository.findByResetPasswordTokenAndResetPasswordExpireTokenIsAfter(any(), any())).thenReturn(Optional.empty());
 
-        assertThrows(InvalidResetPasswordTokenException.class,
+        assertThrows(InvalidTokenException.class,
                 () -> this.authServiceImp.resetPassword(TOKEN, getMockedResetPasswordDto()));
     }
 
@@ -212,6 +212,31 @@ public class AuthServiceImpTest {
 
         assertThrows(DatabaseCommunicationException.class,
                 () -> this.authServiceImp.requestResetPassword(EMAIL));
+    }
+
+    /**
+     * Confirm email tests
+     */
+    @Test
+    public void testConfirmEmailSuccessfully() {
+        // Mocks
+        when(this.userRepository.findByConfirmEmailTokenAndConfirmEmailExpireTokenIsAfter(any(), any())).thenReturn(Optional.of(getMockedUserEntity()));
+
+        // Call method to be tested
+        this.authServiceImp.confirmEmail(EMAIL);
+
+        // Assert result
+        verify(this.userRepository).save(any());
+    }
+
+    @Test
+    public void testConfirmEmailFailureDueToDatabaseConnectionFailure() {
+        // Mocks
+        when(this.userRepository.findByConfirmEmailTokenAndConfirmEmailExpireTokenIsAfter(any(), any())).thenReturn(Optional.of(getMockedUserEntity()));
+        doThrow(RuntimeException.class).when(this.userRepository).save(any());
+
+        assertThrows(DatabaseCommunicationException.class,
+                () -> this.authServiceImp.confirmEmail(EMAIL));
     }
 
     private UserEntity getMockedUserEntity() {

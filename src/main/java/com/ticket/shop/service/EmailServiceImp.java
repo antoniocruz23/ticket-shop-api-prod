@@ -32,10 +32,11 @@ public class EmailServiceImp implements EmailService {
 
         Map<String, String> templateData = new HashMap<>();
         templateData.put("name", names[0]);
-        templateData.put("loginURL", baseAppUrl + "/login");
-        templateData.put("resetPassURL", baseAppUrl + "/reset-password?t=" + emailDto.getResetPasswordToken());
+        templateData.put("resetPasswordUrl", baseAppUrl + "/reset-password?t=" + emailDto.getResetPasswordToken());
+        templateData.put("confirmEmailUrl", baseAppUrl + "/confirm-email?t=" + emailDto.getConfirmEmailToken());
         templateData.put("email", emailDto.getEmail());
-        templateData.put("expireTimeToken", emailDto.getExpireTimeToken());
+        templateData.put("expireTimePasswordToken", emailDto.getExpireTimePasswordToken());
+        templateData.put("expireTimeEmailToken", emailDto.getExpireTimeEmailToken());
 
         this.emailGateway.sendEmail(
                 emailDto.getEmail(),
@@ -44,4 +45,22 @@ public class EmailServiceImp implements EmailService {
                 subject
         );
     }
+
+    /**
+     * @see EmailService#sendEmailToConfirmEmailAddress(String, String, String, Long)
+     */
+    @Override
+    public void sendEmailToConfirmEmailAddress(String firstName, String email, String token, Long expiresInHours) {
+        sendEmail(
+                EmailDto.builder()
+                        .name(firstName)
+                        .email(email)
+                        .confirmEmailToken(token)
+                        .expireTimeEmailToken(String.valueOf(expiresInHours))
+                        .build(),
+                EmailTemplate.CONFIRM_EMAIL_ADDRESS,
+                "Confirm Your Email"
+        );
+    }
+
 }

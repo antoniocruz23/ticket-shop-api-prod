@@ -44,6 +44,12 @@ public class CustomerServiceImpTest {
     private PasswordEncoder passwordEncoder;
     private CustomerServiceImp customerServiceImp;
 
+    @Mock
+    private AuthServiceImp authServiceImp;
+
+    @Mock
+    private EmailServiceImp emailServiceImp;
+
     private final static String FIRSTNAME = "customer";
     private final static String LASTNAME = "Test";
     private final static String EMAIL = "test@service.com";
@@ -54,7 +60,7 @@ public class CustomerServiceImpTest {
 
     @BeforeEach
     public void setUp() {
-        this.customerServiceImp = new CustomerServiceImp(this.userRepository, this.countryRepository, this.passwordEncoder);
+        this.customerServiceImp = new CustomerServiceImp(this.userRepository, this.countryRepository, this.passwordEncoder, this.authServiceImp, this.emailServiceImp);
 
         // Mocks
         when(this.passwordEncoder.encode(any())).thenReturn(ENCRYPTED_PASSWORD);
