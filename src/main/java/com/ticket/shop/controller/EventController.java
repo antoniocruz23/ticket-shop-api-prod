@@ -33,7 +33,7 @@ import javax.validation.Valid;
 @Tag(name = "Events", description = "Event endpoints")
 public class EventController {
 
-    private static final Logger LOGGER = LogManager.getLogger(CompanyController.class);
+    private static final Logger LOGGER = LogManager.getLogger(EventController.class);
     private final EventServiceImp eventServiceImp;
 
     public EventController(EventServiceImp eventServiceImp) {
