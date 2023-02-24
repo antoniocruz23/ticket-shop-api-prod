@@ -9,6 +9,8 @@ import com.ticket.shop.exception.company.CompanyAlreadyExistsException;
 import com.ticket.shop.exception.company.CompanyNotFoundException;
 import com.ticket.shop.exception.country.CountryNotFoundException;
 import com.ticket.shop.exception.event.EventNotFoundException;
+import com.ticket.shop.exception.order.OrderCaptureException;
+import com.ticket.shop.exception.order.PayPalOrderException;
 import com.ticket.shop.exception.user.UserAlreadyExistsException;
 import com.ticket.shop.exception.user.UserNotFoundException;
 import org.springframework.http.HttpHeaders;
@@ -72,7 +74,11 @@ public class TicketShopExceptionHandler extends ResponseEntityExceptionHandler {
      * @param request http Servlet Request
      * @return {@link Error}
      */
-    @ExceptionHandler(value = {DatabaseCommunicationException.class})
+    @ExceptionHandler(value = {
+            DatabaseCommunicationException.class,
+            OrderCaptureException.class,
+            PayPalOrderException.class
+    })
     public ResponseEntity<Error> handlerBadRequestException(Exception ex, HttpServletRequest request) {
         return buildErrorResponse(ex, request, HttpStatus.BAD_REQUEST);
     }
@@ -100,7 +106,8 @@ public class TicketShopExceptionHandler extends ResponseEntityExceptionHandler {
      * @return {@link Error}
      */
     @ExceptionHandler(value = {
-            InvalidTokenException.class})
+            InvalidTokenException.class
+    })
     public ResponseEntity<Error> handlerUnprocessableEntityException(Exception ex, HttpServletRequest request) {
         return buildErrorResponse(ex, request, HttpStatus.UNPROCESSABLE_ENTITY);
     }

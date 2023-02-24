@@ -49,4 +49,7 @@ public class TicketEntity {
     @ManyToOne()
     @JoinColumn(name = "user_id")
     private UserEntity userEntity;
+
+    @Column
+    private String paypalOrderId;
 }
