@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Dto to reset password
+ * Reset password dto
  */
 @Data
 @Builder
@@ -17,4 +17,15 @@ public class ResetPasswordDto {
 
     @Schema(example = "new.password")
     private String password;
+
+    /**
+     * Override to String to avoid show the password
+     * in the logs if printing the entire object
+     */
+    @Override
+    public String toString() {
+        return "ResetPasswordDto{" +
+                "password=***'" +  '\'' +
+                '}';
+    }
 }

@@ -120,10 +120,10 @@ public class AuthServiceImp implements AuthService {
     }
 
     /**
-     * @see AuthService#requestResetPassword(String)
+     * @see AuthService#requestRecoverPassword(String)
      */
     @Override
-    public void requestResetPassword(String email) {
+    public void requestRecoverPassword(String email) {
         String subject = "Request to reset password";
         UserEntity user = getUserByEmail(email);
         String token = generateTokenForValidations();
@@ -133,7 +133,7 @@ public class AuthServiceImp implements AuthService {
         user.setResetPasswordToken(token);
         user.setResetPasswordExpireToken(expiresAt);
 
-        LOGGER.debug("Persisting reset password token on database");
+        LOGGER.debug("Persisting recover password token on database");
         try {
             this.userRepository.save(user);
 
@@ -155,10 +155,10 @@ public class AuthServiceImp implements AuthService {
     }
 
     /**
-     * @see AuthService#validateResetPassToken(String)
+     * @see AuthService#validateResetPasswordToken(String)
      */
     @Override
-    public ResetPasswordTokenDto validateResetPassToken(String token) {
+    public ResetPasswordTokenDto validateResetPasswordToken(String token) {
         UserEntity userEntity = getUserFromResetPasswordToken(token);
 
         return ResetPasswordTokenDto.builder()

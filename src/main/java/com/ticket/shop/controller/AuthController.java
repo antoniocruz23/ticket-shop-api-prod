@@ -2,7 +2,7 @@ package com.ticket.shop.controller;
 
 import com.ticket.shop.command.auth.CredentialsDto;
 import com.ticket.shop.command.auth.LoggedInDto;
-import com.ticket.shop.command.auth.RequestResetPasswordDto;
+import com.ticket.shop.command.auth.RecoverPasswordDto;
 import com.ticket.shop.command.auth.ResetPasswordDto;
 import com.ticket.shop.command.auth.ResetPasswordTokenDto;
 import com.ticket.shop.error.Error;
@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -88,52 +89,108 @@ public class AuthController {
         }
     }
 
+    /**
+     * Recover Password
+     * An email will be sent with the link to make the reset
+     *
+     * @param recoverPassword {@link RecoverPasswordDto}
+     */
     @PutMapping("/reset-password")
-    @Operation(summary = "Recovery password", description = "Request to recovery password")
+    @Operation(summary = "Recover password", description = "Request to recover password")
     @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "No Content")})
-    public ResponseEntity<Void> requestResetPassword(@RequestBody RequestResetPasswordDto resetPassword) {
+    public ResponseEntity<Void> recoverPassword(@RequestBody RecoverPasswordDto recoverPassword) {
 
-        this.authService.requestResetPassword(resetPassword.getEmail());
+        try {
+            this.authService.requestRecoverPassword(recoverPassword.getEmail());
 
+        } catch (TicketShopException e) {
+            throw e;
+
+        } catch (Exception e) {
+            LOGGER.error("Failed while creating the request to recover password of email - {}", recoverPassword, e);
+            throw new TicketShopException(ErrorMessages.OPERATION_FAILED, e);
+        }
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Verify if the token is still valid
+     * to make the password reset
+     *
+     * @param token token
+     * @return {@link ResetPasswordTokenDto}
+     */
     @GetMapping("/reset-password/verify-token")
-    @Operation(summary = "Validate Recovery password", description = "Request to validate token of recovery password")
+    @Operation(summary = "Validate token to reset password", description = "Request to validate token to reset password")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Ok",
                     content = @Content(schema = @Schema(implementation = ResetPasswordTokenDto.class))),
             @ApiResponse(responseCode = "422", description = "Unprocessable Entity",
                     content = @Content(schema = @Schema(implementation = ResetPasswordTokenDto.class)))})
-    public ResponseEntity<ResetPasswordTokenDto> validateResetPassToken(@RequestParam("token") String token) {
+    public ResponseEntity<ResetPasswordTokenDto> validateResetPasswordToken(@RequestParam String token) {
 
-        ResetPasswordTokenDto resetPasswordTokenDto = this.authService.validateResetPassToken(token);
+        ResetPasswordTokenDto resetPasswordTokenDto;
+        try {
+            resetPasswordTokenDto = this.authService.validateResetPasswordToken(token);
 
-        return ResponseEntity.ok(resetPasswordTokenDto);
+        } catch (TicketShopException e) {
+            throw e;
+
+        } catch (Exception e) {
+            LOGGER.error("Failed while verifying reset password token - {}", token, e);
+            throw new TicketShopException(ErrorMessages.OPERATION_FAILED, e);
+        }
+        return new ResponseEntity<>(resetPasswordTokenDto, HttpStatus.OK);
     }
 
+    /**
+     * Reset Password with given token
+     *
+     * @param token            token
+     * @param resetPasswordDto {@link ResetPasswordDto}
+     */
     @PutMapping("/reset-password/complete")
     @Operation(summary = "Reset password with token", description = "Request to reset password with token")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "No Content"),
             @ApiResponse(responseCode = "422", description = "Unprocessable Entity")})
-    public ResponseEntity<Void> resetPassword(@RequestParam("token") String token,
+    public ResponseEntity<Void> resetPassword(@RequestParam String token,
                                               @RequestBody ResetPasswordDto resetPasswordDto) {
+        try {
+            this.authService.resetPassword(token, resetPasswordDto);
 
-        this.authService.resetPassword(token, resetPasswordDto);
+        } catch (TicketShopException e) {
+            throw e;
 
+        } catch (Exception e) {
+            LOGGER.error("Failed while saving new user password with token - {}", token, e);
+            throw new TicketShopException(ErrorMessages.OPERATION_FAILED, e);
+        }
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Confirm email address with token
+     *
+     * @param token token
+     */
     @PutMapping("/confirm-email")
     @Operation(summary = "Confirm email", description = "Confirm email with token")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "No Content"),
             @ApiResponse(responseCode = "422", description = "Unprocessable Entity")})
-    public ResponseEntity<Void> confirmEmail(@RequestParam("token") String token) {
+    public ResponseEntity<Void> confirmEmail(@RequestParam String token) {
 
-        this.authService.confirmEmail(token);
+        try {
+            this.authService.confirmEmail(token);
 
+        } catch (TicketShopException e) {
+            throw e;
+
+        } catch (Exception e) {
+            LOGGER.error("Failed while confirming email with token - {}", token, e);
+            throw new TicketShopException(ErrorMessages.OPERATION_FAILED, e);
+        }
         return ResponseEntity.noContent().build();
     }
 }

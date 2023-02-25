@@ -28,11 +28,11 @@ public interface AuthService {
     PrincipalDto validateToken(String token);
 
     /**
-     * Request to reset password
+     * Request to recover password
      *
      * @param email email
      */
-    void requestResetPassword(String email);
+    void requestRecoverPassword(String email);
 
     /**
      * Reset password with token
@@ -43,12 +43,12 @@ public interface AuthService {
     void resetPassword(String token, ResetPasswordDto resetPasswordDto);
 
     /**
-     * Validate Reset password token
+     * Validate reset password token
      *
      * @param token token
      * @return {@link ResetPasswordTokenDto}
      */
-    ResetPasswordTokenDto validateResetPassToken(String token);
+    ResetPasswordTokenDto validateResetPasswordToken(String token);
 
     /**
      * Confirm email with token

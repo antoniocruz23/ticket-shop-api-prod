@@ -7,13 +7,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Dto to request reset password
+ * Recover password dto
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RequestResetPasswordDto {
+public class RecoverPasswordDto {
 
     @Schema(example = "user.test@gmail.com")
     private String email;

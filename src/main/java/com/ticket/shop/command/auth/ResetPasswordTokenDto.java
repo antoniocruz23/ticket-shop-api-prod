@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Dto for reset password token
+ * Reset password token dto
  */
 @Data
 @Builder

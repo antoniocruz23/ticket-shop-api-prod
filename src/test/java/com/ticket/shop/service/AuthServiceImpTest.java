@@ -149,7 +149,7 @@ public class AuthServiceImpTest {
         when(this.userRepository.findByResetPasswordTokenAndResetPasswordExpireTokenIsAfter(any(), any())).thenReturn(Optional.of(getMockedUserEntity()));
 
         // Call method to be tested
-        ResetPasswordTokenDto resetPasswordTokenDto = this.authServiceImp.validateResetPassToken(TOKEN);
+        ResetPasswordTokenDto resetPasswordTokenDto = this.authServiceImp.validateResetPasswordToken(TOKEN);
 
         // Assert result
         assertNotNull(resetPasswordTokenDto);
@@ -198,7 +198,7 @@ public class AuthServiceImpTest {
         when(this.userRepository.findByEmail(any())).thenReturn(Optional.of(getMockedUserEntity()));
 
         // Call method to be tested
-        this.authServiceImp.requestResetPassword(EMAIL);
+        this.authServiceImp.requestRecoverPassword(EMAIL);
 
         // Assert result
         verify(this.userRepository).save(any());
@@ -211,7 +211,7 @@ public class AuthServiceImpTest {
         doThrow(RuntimeException.class).when(this.userRepository).save(any());
 
         assertThrows(DatabaseCommunicationException.class,
-                () -> this.authServiceImp.requestResetPassword(EMAIL));
+                () -> this.authServiceImp.requestRecoverPassword(EMAIL));
     }
 
     /**
