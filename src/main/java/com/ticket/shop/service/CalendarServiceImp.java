@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 @Service
 public class CalendarServiceImp implements CalendarService {
 
-    private static final Logger LOGGER = LogManager.getLogger(CustomerService.class);
+    private static final Logger LOGGER = LogManager.getLogger(CalendarService.class);
     private final CalendarRepository calendarRepository;
     private final CompanyRepository companyRepository;
     private final EventRepository eventRepository;
