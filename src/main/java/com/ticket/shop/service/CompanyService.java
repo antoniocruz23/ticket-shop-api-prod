@@ -17,7 +17,7 @@ public interface CompanyService {
      * @return {@link CompanyDetailsDto}
      * @throws CompanyAlreadyExistsException when the company already exists
      */
-    CompanyDetailsDto createCompany(CreateOrUpdateCompanyDto createOrUpdateCompanyDto) throws CompanyAlreadyExistsException;
+    CompanyDetailsDto createCompany(CreateOrUpdateCompanyDto createOrUpdateCompanyDto);
 
     /**
      * Get company by id
@@ -26,7 +26,7 @@ public interface CompanyService {
      * @return {@link CreateOrUpdateCompanyDto}
      * @throws CompanyNotFoundException when the company is not found
      */
-    CompanyDetailsDto getCompanyById(Long companyId) throws CompanyNotFoundException;
+    CompanyDetailsDto getCompanyById(Long companyId);
 
     /**
      * Update company
@@ -36,7 +36,7 @@ public interface CompanyService {
      * @return {@link CompanyDetailsDto} the company updated
      * @throws CompanyNotFoundException when the company isn't found
      */
-    CompanyDetailsDto updateCompany(Long companyId, CreateOrUpdateCompanyDto updateWorkerDto) throws CompanyNotFoundException;
+    CompanyDetailsDto updateCompany(Long companyId, CreateOrUpdateCompanyDto updateWorkerDto);
 
     /**
      * Delete company

@@ -44,7 +44,7 @@ public class CompanyServiceImp implements CompanyService {
      * @see CompanyService#createCompany(CreateOrUpdateCompanyDto)
      */
     @Override
-    public CompanyDetailsDto createCompany(CreateOrUpdateCompanyDto createOrUpdateCompanyDto) throws CompanyAlreadyExistsException {
+    public CompanyDetailsDto createCompany(CreateOrUpdateCompanyDto createOrUpdateCompanyDto) {
 
         CompanyEntity companyEntity = CompanyConverter.fromCreateCompanyDtoToCompanyEntity(createOrUpdateCompanyDto);
         validateCompany(companyEntity.getName(), companyEntity.getEmail(), companyEntity.getWebsite());
@@ -81,7 +81,7 @@ public class CompanyServiceImp implements CompanyService {
      * @see CompanyService#updateCompany(Long, CreateOrUpdateCompanyDto)
      */
     @Override
-    public CompanyDetailsDto updateCompany(Long companyId, CreateOrUpdateCompanyDto updateWorkerDto) throws CompanyNotFoundException {
+    public CompanyDetailsDto updateCompany(Long companyId, CreateOrUpdateCompanyDto updateWorkerDto) {
         CompanyEntity companyEntity = getCompanyEntityById(companyId);
         companyEntity.setName(updateWorkerDto.getName());
         companyEntity.setEmail(updateWorkerDto.getEmail());

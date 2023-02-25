@@ -26,8 +26,7 @@ public interface WorkerService {
      * @throws CountryNotFoundException   when the country isn't found
      * @throws RoleInvalidException       when the role provided is an invalid role for workers
      */
-    WorkerDetailsDto createWorker(Long companyId, CreateWorkerDto createUserDto)
-            throws UserAlreadyExistsException, CompanyNotFoundException, CountryNotFoundException, RoleInvalidException;
+    WorkerDetailsDto createWorker(Long companyId, CreateWorkerDto createUserDto);
 
     /**
      * Get worker by id
@@ -38,7 +37,7 @@ public interface WorkerService {
      * @return {@link WorkerDetailsDto} the worker obtained
      * @throws UserNotFoundException when the user isn't found
      */
-    WorkerDetailsDto getWorkerById(Long companyId, Long workerId) throws UserNotFoundException;
+    WorkerDetailsDto getWorkerById(Long companyId, Long workerId);
 
     /**
      * Get workers list by pagination
@@ -58,8 +57,9 @@ public interface WorkerService {
      * @param updateWorkerDto {@link UpdateWorkerDto}
      * @return {@link WorkerDetailsDto} the worker updated
      * @throws UserNotFoundException when the user isn't found
+     * @throws CountryNotFoundException when the country isn't found
      */
-    WorkerDetailsDto updateWorker(Long companyId, Long workerId, UpdateWorkerDto updateWorkerDto) throws UserNotFoundException, CountryNotFoundException;
+    WorkerDetailsDto updateWorker(Long companyId, Long workerId, UpdateWorkerDto updateWorkerDto);
 
     /**
      * Delete worker
@@ -68,5 +68,5 @@ public interface WorkerService {
      * @param workerId  worker id to be deleted
      * @throws UserNotFoundException when the user isn't found
      */
-    void deleteWorker(Long companyId, Long workerId) throws UserNotFoundException;
+    void deleteWorker(Long companyId, Long workerId);
 }

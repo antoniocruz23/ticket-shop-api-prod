@@ -2,8 +2,8 @@ package com.ticket.shop.service;
 
 import com.ticket.shop.command.Paginated;
 import com.ticket.shop.command.customer.CreateCustomerDto;
-import com.ticket.shop.command.customer.UpdateCustomerDto;
 import com.ticket.shop.command.customer.CustomerDetailsDto;
+import com.ticket.shop.command.customer.UpdateCustomerDto;
 import com.ticket.shop.exception.company.CompanyNotFoundException;
 import com.ticket.shop.exception.user.UserAlreadyExistsException;
 import com.ticket.shop.exception.user.UserNotFoundException;
@@ -20,7 +20,7 @@ public interface CustomerService {
      * @return {@link CustomerDetailsDto} the customer created
      * @throws UserAlreadyExistsException when the user already exists
      */
-    CustomerDetailsDto createCustomer(CreateCustomerDto createCustomerDto) throws UserAlreadyExistsException;
+    CustomerDetailsDto createCustomer(CreateCustomerDto createCustomerDto);
 
     /**
      * Get customer by id
@@ -29,7 +29,7 @@ public interface CustomerService {
      * @return {@link CustomerDetailsDto} the customer obtained
      * @throws UserNotFoundException when the user isn't found
      */
-    CustomerDetailsDto getCustomerById(Long userId) throws UserNotFoundException;
+    CustomerDetailsDto getCustomerById(Long userId);
 
     /**
      * Get customers list with pagination
@@ -46,9 +46,10 @@ public interface CustomerService {
      * @param userId            user id to be updated
      * @param updateCustomerDto {@link UpdateCustomerDto}
      * @return {@link CustomerDetailsDto} the customer updated
-     * @throws UserNotFoundException when the user isn't found
+     * @throws UserNotFoundException    when the user isn't found
+     * @throws CompanyNotFoundException when the company isn't found
      */
-    CustomerDetailsDto updateCustomer(Long userId, UpdateCustomerDto updateCustomerDto) throws UserNotFoundException, CompanyNotFoundException;
+    CustomerDetailsDto updateCustomer(Long userId, UpdateCustomerDto updateCustomerDto);
 
     /**
      * Delete customer
@@ -56,5 +57,5 @@ public interface CustomerService {
      * @param customerId customer id
      * @throws UserNotFoundException when the user isn't found
      */
-    void deleteCustomer(Long customerId) throws UserNotFoundException;
+    void deleteCustomer(Long customerId);
 }

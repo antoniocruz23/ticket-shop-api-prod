@@ -51,7 +51,7 @@ public class EventController {
             "((@authorized.hasRole('COMPANY_ADMIN') || @authorized.hasRole('WORKER')) && @authorized.isOnCompany(#companyId))")
     @Operation(summary = "Registration", description = "Register new event")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful Operation",
+            @ApiResponse(responseCode = "201", description = "Successful Operation",
                     content = @Content(schema = @Schema(implementation = EventDetailsDto.class))),
             @ApiResponse(responseCode = "403", description = ErrorMessages.ACCESS_DENIED,
                     content = @Content(schema = @Schema(implementation = Error.class))),

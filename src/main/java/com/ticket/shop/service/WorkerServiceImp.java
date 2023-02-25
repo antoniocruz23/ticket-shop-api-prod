@@ -62,8 +62,7 @@ public class WorkerServiceImp implements WorkerService {
      * @see WorkerService#createWorker(Long, CreateWorkerDto)
      */
     @Override
-    public WorkerDetailsDto createWorker(Long companyId, CreateWorkerDto createWorkerDto)
-            throws UserAlreadyExistsException, CompanyNotFoundException, CountryNotFoundException, RoleInvalidException {
+    public WorkerDetailsDto createWorker(Long companyId, CreateWorkerDto createWorkerDto) {
 
         if (this.userRepository.findByEmail(createWorkerDto.getEmail()).isPresent()) {
             LOGGER.error("Duplicated email - {}", createWorkerDto.getEmail());
@@ -123,7 +122,7 @@ public class WorkerServiceImp implements WorkerService {
      * @see WorkerService#getWorkerById(Long, Long)
      */
     @Override
-    public WorkerDetailsDto getWorkerById(Long companyId, Long workerId) throws UserNotFoundException {
+    public WorkerDetailsDto getWorkerById(Long companyId, Long workerId) {
         UserEntity userEntity = getWorkerByIdAndCompany(companyId, workerId);
 
         return UserConverter.fromUserEntityToWorkerDetailsDto(userEntity);
@@ -165,7 +164,7 @@ public class WorkerServiceImp implements WorkerService {
      * @see WorkerService#updateWorker(Long, Long, UpdateWorkerDto)
      */
     @Override
-    public WorkerDetailsDto updateWorker(Long companyId, Long userId, UpdateWorkerDto updateUserDto) throws UserNotFoundException, CountryNotFoundException {
+    public WorkerDetailsDto updateWorker(Long companyId, Long userId, UpdateWorkerDto updateUserDto) {
 
         validateRoles(updateUserDto.getRoles());
 
@@ -196,7 +195,7 @@ public class WorkerServiceImp implements WorkerService {
      * @see WorkerService#deleteWorker(Long, Long)
      */
     @Override
-    public void deleteWorker(Long companyId, Long workerId) throws UserNotFoundException {
+    public void deleteWorker(Long companyId, Long workerId) {
         LOGGER.debug("Getting worker with id {} from database", workerId);
         UserEntity userEntity = getWorkerByIdAndCompany(companyId, workerId);
 

@@ -9,7 +9,6 @@ import com.ticket.shop.converter.UserConverter;
 import com.ticket.shop.enumerators.UserRole;
 import com.ticket.shop.error.ErrorMessages;
 import com.ticket.shop.exception.DatabaseCommunicationException;
-import com.ticket.shop.exception.company.CompanyNotFoundException;
 import com.ticket.shop.exception.country.CountryNotFoundException;
 import com.ticket.shop.exception.user.UserAlreadyExistsException;
 import com.ticket.shop.exception.user.UserNotFoundException;
@@ -46,7 +45,8 @@ public class CustomerServiceImp implements CustomerService {
     @Value("${ticket-shop.resetPassToken.expiresInHours}")
     private long expiresInHours;
 
-    public CustomerServiceImp(UserRepository userRepository, CountryRepository countryRepository, PasswordEncoder passwordEncoder, AuthServiceImp authServiceImp, EmailServiceImp emailServiceImp) {
+    public CustomerServiceImp(UserRepository userRepository, CountryRepository countryRepository,
+                              PasswordEncoder passwordEncoder, AuthServiceImp authServiceImp, EmailServiceImp emailServiceImp) {
         this.userRepository = userRepository;
         this.countryRepository = countryRepository;
         this.passwordEncoder = passwordEncoder;
@@ -58,7 +58,7 @@ public class CustomerServiceImp implements CustomerService {
      * @see CustomerService#createCustomer(CreateCustomerDto)
      */
     @Override
-    public CustomerDetailsDto createCustomer(CreateCustomerDto createUserDto) throws UserAlreadyExistsException {
+    public CustomerDetailsDto createCustomer(CreateCustomerDto createUserDto) {
         if (this.userRepository.findByEmail(createUserDto.getEmail()).isPresent()) {
             LOGGER.error("Duplicated email - {}", createUserDto.getEmail());
             throw new UserAlreadyExistsException(ErrorMessages.EMAIL_ALREADY_EXISTS);
@@ -113,7 +113,7 @@ public class CustomerServiceImp implements CustomerService {
      * @see CustomerService#getCustomerById(Long)
      */
     @Override
-    public CustomerDetailsDto getCustomerById(Long userId) throws UserNotFoundException {
+    public CustomerDetailsDto getCustomerById(Long userId) {
         return UserConverter.fromUserEntityToCustomerDetailsDto(getUserEntityById(userId));
     }
 
@@ -150,7 +150,7 @@ public class CustomerServiceImp implements CustomerService {
      * @see CustomerService#updateCustomer(Long, UpdateCustomerDto)
      */
     @Override
-    public CustomerDetailsDto updateCustomer(Long userId, UpdateCustomerDto updateCustomerDto) throws UserNotFoundException, CompanyNotFoundException {
+    public CustomerDetailsDto updateCustomer(Long userId, UpdateCustomerDto updateCustomerDto) {
 
         UserEntity userEntity = getUserEntityById(userId);
         CountryEntity countryEntity = getCountryEntityById(updateCustomerDto.getCountryId());
@@ -178,7 +178,7 @@ public class CustomerServiceImp implements CustomerService {
      * @see CustomerService#deleteCustomer(Long)
      */
     @Override
-    public void deleteCustomer(Long customerId) throws UserNotFoundException {
+    public void deleteCustomer(Long customerId) {
         LOGGER.debug("Getting customer with id {} from database", customerId);
         UserEntity userEntity = getUserEntityById(customerId);
 
