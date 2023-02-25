@@ -53,7 +53,7 @@ public class CompanyServiceImpTest {
     @BeforeEach
     public void setUp() {
         AddressServiceImp addressService = new AddressServiceImp(this.addressRepository, this.countryRepository);
-        this.companyServiceImp = new CompanyServiceImp(this.companyRepository, this.addressRepository, addressService);
+        this.companyServiceImp = new CompanyServiceImp(this.companyRepository, this.addressRepository, addressService, this.countryRepository);
     }
 
     /**
@@ -208,6 +208,7 @@ public class CompanyServiceImpTest {
     public void testUpdateCompanySuccessfully() {
         // Mock data
         when(this.companyRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedCompanyEntity()));
+        when(this.countryRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedCountryEntity()));
         when(this.companyRepository.save(any())).thenReturn(getMockedCompanyEntity());
 
         // Method to be tested
@@ -229,9 +230,21 @@ public class CompanyServiceImpTest {
     }
 
     @Test
+    public void testUpdateCompanyFailureDueToCountryNotFound() {
+        // Mock data
+        when(this.companyRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedCompanyEntity()));
+        when(this.countryRepository.findById(any())).thenReturn(Optional.empty());
+
+        // Assert
+        assertThrows(CountryNotFoundException.class,
+                () -> this.companyServiceImp.updateCompany(COMPANY_ID, getMockedCreateOrUpdateCompanyDto()));
+    }
+
+    @Test
     public void testUpdateCompanyFailureDueToDatabaseCommunication() {
         // Mock data
         when(this.companyRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedCompanyEntity()));
+        when(this.countryRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedCountryEntity()));
         when(this.companyRepository.save(any())).thenThrow(RuntimeException.class);
 
         // Assert
