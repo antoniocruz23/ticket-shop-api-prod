@@ -163,12 +163,12 @@ public class CompanyController {
     @PreAuthorize("@authorized.hasRole('ADMIN')")
     @Operation(summary = "Delete Company", description = "Delete Company")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful Operation"),
+            @ApiResponse(responseCode = "204", description = "Successful Operation"),
             @ApiResponse(responseCode = "404", description = ErrorMessages.COMPANY_NOT_FOUND,
                     content = @Content(schema = @Schema(implementation = Error.class))),
             @ApiResponse(responseCode = "400", description = ErrorMessages.DATABASE_COMMUNICATION_ERROR,
                     content = @Content(schema = @Schema(implementation = Error.class)))})
-    public ResponseEntity deleteCompany(@PathVariable Long companyId) {
+    public ResponseEntity<Void> deleteCompany(@PathVariable Long companyId) {
 
         LOGGER.info("Request to delete company with id - {}", companyId);
         try {
@@ -183,6 +183,6 @@ public class CompanyController {
         }
 
         LOGGER.info("Company with id {} deleted successfully", companyId);
-        return new ResponseEntity(OK);
+        return ResponseEntity.noContent().build();
     }
 }

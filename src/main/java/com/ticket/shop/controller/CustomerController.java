@@ -206,12 +206,12 @@ public class CustomerController {
     @PreAuthorize("@authorized.hasRole(\"ADMIN\")")
     @Operation(summary = "Delete Customer", description = "Delete Customer")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful Operation"),
+            @ApiResponse(responseCode = "204", description = "Successful Operation"),
             @ApiResponse(responseCode = "404", description = ErrorMessages.USER_NOT_FOUND,
                     content = @Content(schema = @Schema(implementation = Error.class))),
             @ApiResponse(responseCode = "400", description = ErrorMessages.DATABASE_COMMUNICATION_ERROR,
                     content = @Content(schema = @Schema(implementation = Error.class)))})
-    public ResponseEntity deleteCustomer(@PathVariable Long customerId) {
+    public ResponseEntity<Void> deleteCustomer(@PathVariable Long customerId) {
 
         LOGGER.info("Request to delete customer with id - {}", customerId);
         try {
@@ -226,6 +226,6 @@ public class CustomerController {
         }
 
         LOGGER.info("Customer with id {} deleted successfully", customerId);
-        return new ResponseEntity(OK);
+        return ResponseEntity.noContent().build();
     }
 }

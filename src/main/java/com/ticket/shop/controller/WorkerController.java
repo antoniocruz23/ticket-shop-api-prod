@@ -224,12 +224,12 @@ public class WorkerController {
     @PreAuthorize("@authorized.hasRole('ADMIN') || (@authorized.hasRole('COMPANY_ADMIN') && @authorized.isOnCompany(#companyId))")
     @Operation(summary = "Delete Customer", description = "Delete Customer")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful Operation"),
+            @ApiResponse(responseCode = "204", description = "Successful Operation"),
             @ApiResponse(responseCode = "404", description = ErrorMessages.USER_NOT_FOUND,
                     content = @Content(schema = @Schema(implementation = Error.class))),
             @ApiResponse(responseCode = "400", description = ErrorMessages.DATABASE_COMMUNICATION_ERROR,
                     content = @Content(schema = @Schema(implementation = Error.class)))})
-    public ResponseEntity deleteWorker(@PathVariable Long companyId,
+    public ResponseEntity<Void> deleteWorker(@PathVariable Long companyId,
                                        @PathVariable Long workerId) {
 
         LOGGER.info("Request to delete worker with id - {}", workerId);
@@ -245,6 +245,6 @@ public class WorkerController {
         }
 
         LOGGER.info("Worker with id {} deleted successfully", workerId);
-        return new ResponseEntity(OK);
+        return ResponseEntity.noContent().build();
     }
 }
