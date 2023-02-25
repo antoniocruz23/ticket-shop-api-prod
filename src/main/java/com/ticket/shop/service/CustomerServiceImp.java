@@ -9,6 +9,7 @@ import com.ticket.shop.converter.UserConverter;
 import com.ticket.shop.enumerators.UserRole;
 import com.ticket.shop.error.ErrorMessages;
 import com.ticket.shop.exception.DatabaseCommunicationException;
+import com.ticket.shop.exception.company.CompanyNotFoundException;
 import com.ticket.shop.exception.country.CountryNotFoundException;
 import com.ticket.shop.exception.user.UserAlreadyExistsException;
 import com.ticket.shop.exception.user.UserNotFoundException;
@@ -149,7 +150,7 @@ public class CustomerServiceImp implements CustomerService {
      * @see CustomerService#updateCustomer(Long, UpdateCustomerDto)
      */
     @Override
-    public CustomerDetailsDto updateCustomer(Long userId, UpdateCustomerDto updateCustomerDto) throws UserNotFoundException {
+    public CustomerDetailsDto updateCustomer(Long userId, UpdateCustomerDto updateCustomerDto) throws UserNotFoundException, CompanyNotFoundException {
 
         UserEntity userEntity = getUserEntityById(userId);
         CountryEntity countryEntity = getCountryEntityById(updateCustomerDto.getCountryId());

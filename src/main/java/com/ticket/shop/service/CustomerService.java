@@ -4,6 +4,7 @@ import com.ticket.shop.command.Paginated;
 import com.ticket.shop.command.customer.CreateCustomerDto;
 import com.ticket.shop.command.customer.UpdateCustomerDto;
 import com.ticket.shop.command.customer.CustomerDetailsDto;
+import com.ticket.shop.exception.company.CompanyNotFoundException;
 import com.ticket.shop.exception.user.UserAlreadyExistsException;
 import com.ticket.shop.exception.user.UserNotFoundException;
 
@@ -47,7 +48,7 @@ public interface CustomerService {
      * @return {@link CustomerDetailsDto} the customer updated
      * @throws UserNotFoundException when the user isn't found
      */
-    CustomerDetailsDto updateCustomer(Long userId, UpdateCustomerDto updateCustomerDto) throws UserNotFoundException;
+    CustomerDetailsDto updateCustomer(Long userId, UpdateCustomerDto updateCustomerDto) throws UserNotFoundException, CompanyNotFoundException;
 
     /**
      * Delete customer
