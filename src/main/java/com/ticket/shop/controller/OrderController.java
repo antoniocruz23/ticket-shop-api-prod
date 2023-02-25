@@ -73,7 +73,7 @@ public class OrderController {
     @GetMapping("/capture")
     @Operation(summary = "Capture Order", description = "Capture Order")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Successfully Captured"),
+            @ApiResponse(responseCode = "200", description = "Successfully Captured"),
             @ApiResponse(responseCode = "400", description = ErrorMessages.DATABASE_COMMUNICATION_ERROR + " || " + "Capture Error",
                     content = @Content(schema = @Schema(implementation = Error.class)))})
     public ResponseEntity<String> captureOrder(@RequestParam String token) {
