@@ -1,5 +1,6 @@
 package com.ticket.shop.service;
 
+import com.ticket.shop.command.Paginated;
 import com.ticket.shop.command.calendar.CalendarDetailsDto;
 import com.ticket.shop.command.calendar.CalendarDetailsWithTicketsDto;
 import com.ticket.shop.command.calendar.CreateCalendarDto;
@@ -17,8 +18,11 @@ import com.ticket.shop.persistence.repository.CalendarRepository;
 import com.ticket.shop.persistence.repository.EventRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -41,12 +45,12 @@ public class CalendarServiceImp implements CalendarService {
     }
 
     /**
-     * @see CalendarService#createCalendar(CreateCalendarDto)
+     * @see CalendarService#createCalendar(CreateCalendarDto, Long)
      */
     @Override
-    public CalendarDetailsWithTicketsDto createCalendar(CreateCalendarDto createCalendarDto) {
+    public CalendarDetailsWithTicketsDto createCalendar(CreateCalendarDto createCalendarDto, Long eventId) {
 
-        EventEntity eventEntity = getEventEntityByCompanyIdAndEventId(createCalendarDto.getCompanyId(), createCalendarDto.getEventId());
+        EventEntity eventEntity = getEventEntityByCompanyIdAndEventId(createCalendarDto.getCompanyId(), eventId);
 
         LOGGER.debug("Creating calendar - {}", createCalendarDto);
         CalendarEntity calendarEntity = CalendarConverter.fromCreateCalendarDtoToCalendarEntity(createCalendarDto, eventEntity);
@@ -77,6 +81,37 @@ public class CalendarServiceImp implements CalendarService {
     public CalendarDetailsDto getCalendarById(Long calendarId) {
         CalendarEntity calendarEntity = getCalendarEntityById(calendarId);
         return CalendarConverter.fromCalendarEntityToCalendarDetailsDto(calendarEntity);
+    }
+
+    /**
+     * @see CalendarService#getCalendarListByEventId(Long, int, int)
+     */
+    @Override
+    public Paginated<CalendarDetailsDto> getCalendarListByEventId(Long eventId, int page, int size) {
+        EventEntity eventEntity = getEventEntityById(eventId);
+
+        LOGGER.debug("Getting all calendars from event id {} from database", eventId);
+        Page<CalendarEntity> calendarList;
+        try {
+            calendarList = this.calendarRepository.findByEventEntity(eventEntity, PageRequest.of(page, size));
+
+        } catch (Exception e) {
+            LOGGER.error("Failed at getting calendars page from database", e);
+            throw new DatabaseCommunicationException(ErrorMessages.DATABASE_COMMUNICATION_ERROR, e);
+        }
+
+        LOGGER.debug("Converting calendars list to CalendarDetailsDto");
+        List<CalendarDetailsDto> workerListResponse = new ArrayList<>();
+        for (CalendarEntity calendar : calendarList) {
+            workerListResponse.add(CalendarConverter.fromCalendarEntityToCalendarDetailsDto(calendar));
+        }
+
+        return new Paginated<>(
+                workerListResponse,
+                page,
+                workerListResponse.size(),
+                calendarList.getTotalPages(),
+                calendarList.getTotalElements());
     }
 
     private Map<TicketType, Long> createTickets(List<CreateTicketDto> createTicketDtoList, CalendarEntity calendarEntity) {
@@ -111,6 +146,20 @@ public class CalendarServiceImp implements CalendarService {
         return this.calendarRepository.findById(calendarId).orElseThrow(() -> {
             LOGGER.error("The calendar with id {} does not exist in database", calendarId);
             return new CalendarNotFoundException(ErrorMessages.CALENDAR_NOT_FOUND);
+        });
+    }
+
+    /**
+     * Get event id
+     *
+     * @param eventId event id
+     * @return {@link EventEntity}
+     */
+    private EventEntity getEventEntityById(Long eventId) {
+        LOGGER.debug("Getting event with id {} from database", eventId);
+        return this.eventRepository.findById(eventId).orElseThrow(() -> {
+            LOGGER.error("The event with id {} does not exist in database", eventId);
+            return new EventNotFoundException(ErrorMessages.EVENT_NOT_FOUND);
         });
     }
 }

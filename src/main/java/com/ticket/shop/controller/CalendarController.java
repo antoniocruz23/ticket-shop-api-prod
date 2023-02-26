@@ -1,5 +1,6 @@
 package com.ticket.shop.controller;
 
+import com.ticket.shop.command.Paginated;
 import com.ticket.shop.command.calendar.CalendarDetailsDto;
 import com.ticket.shop.command.calendar.CalendarDetailsWithTicketsDto;
 import com.ticket.shop.command.calendar.CreateCalendarDto;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -50,7 +52,7 @@ public class CalendarController {
      * @param createCalendarDto new calendar data
      * @return the response entity
      */
-    @PostMapping("/calendars")
+    @PostMapping("/events/{eventId}/calendars")
     @PreAuthorize("@authorized.hasRole('ADMIN') || " +
             "((@authorized.hasRole('COMPANY_ADMIN') || @authorized.hasRole('WORKER')) && @authorized.isOnCompany(#createCalendarDto.companyId))")
     @Operation(summary = "Registration", description = "Register new calendar")
@@ -63,12 +65,13 @@ public class CalendarController {
                     content = @Content(schema = @Schema(implementation = Error.class))),
             @ApiResponse(responseCode = "400", description = ErrorMessages.DATABASE_COMMUNICATION_ERROR,
                     content = @Content(schema = @Schema(implementation = Error.class)))})
-    public ResponseEntity<CalendarDetailsWithTicketsDto> createCalendar(@Valid @RequestBody CreateCalendarDto createCalendarDto) {
+    public ResponseEntity<CalendarDetailsWithTicketsDto> createCalendar(@Valid @RequestBody CreateCalendarDto createCalendarDto,
+                                                                        @PathVariable Long eventId) {
 
         LOGGER.info("Request to create new calendar - {}", createCalendarDto);
         CalendarDetailsWithTicketsDto calendarDetailsDto;
         try {
-            calendarDetailsDto = this.calendarServiceImp.createCalendar(createCalendarDto);
+            calendarDetailsDto = this.calendarServiceImp.createCalendar(createCalendarDto, eventId);
 
         } catch (TicketShopException e) {
             throw e;
@@ -85,9 +88,9 @@ public class CalendarController {
      * Get calendar by id
      *
      * @param calendarId calendar id
-     * @return {@link CalendarDetailsWithTicketsDto} the calendar wanted and Ok httpStatus
+     * @return {@link CalendarDetailsDto} the calendar wanted and Ok httpStatus
      */
-    @GetMapping("/calendars/{calendarId}")
+    @GetMapping("/events/calendars/{calendarId}")
     @Operation(summary = "Get calendar by id", description = "Get calendar by id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful Operation",
@@ -113,5 +116,41 @@ public class CalendarController {
 
         LOGGER.info("Retrieved calendar with id {}", calendarId);
         return new ResponseEntity<>(calendarDetailsDto, OK);
+    }
+
+    /**
+     * Get calendar list by event id
+     *
+     * @param eventId event id
+     * @return {@link Paginated<CalendarDetailsDto>} calendar list and Ok httpStatus
+     */
+    @GetMapping("/events/{eventId}/calendars")
+    @Operation(summary = "Get calendars by event id with pagination", description = "Get calendars by event id with pagination")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful Operation",
+                    content = @Content(schema = @Schema(implementation = CalendarDetailsDto.class))),
+            @ApiResponse(responseCode = "404", description = ErrorMessages.EVENT_NOT_FOUND,
+                    content = @Content(schema = @Schema(implementation = Error.class))),
+            @ApiResponse(responseCode = "500", description = ErrorMessages.ACCESS_DENIED,
+                    content = @Content(schema = @Schema(implementation = Error.class)))})
+    public ResponseEntity<Paginated<CalendarDetailsDto>> getCalendarByEventId(@PathVariable Long eventId,
+                                                                              @RequestParam(defaultValue = "0") int page,
+                                                                              @RequestParam(defaultValue = "10") int size) {
+
+        LOGGER.info("Request to get calendar list with event id {}", eventId);
+        Paginated<CalendarDetailsDto> calendarList;
+        try {
+            calendarList = this.calendarServiceImp.getCalendarListByEventId(eventId, page, size);
+
+        } catch (TicketShopException e) {
+            throw e;
+
+        } catch (Exception e) {
+            LOGGER.error("Failed to get calendar list with event id {}", eventId, e);
+            throw new TicketShopException(ErrorMessages.OPERATION_FAILED, e);
+        }
+
+        LOGGER.info("Retrieved calendar list");
+        return new ResponseEntity<>(calendarList, OK);
     }
 }

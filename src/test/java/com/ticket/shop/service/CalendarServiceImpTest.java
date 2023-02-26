@@ -1,5 +1,6 @@
 package com.ticket.shop.service;
 
+import com.ticket.shop.command.Paginated;
 import com.ticket.shop.command.calendar.CalendarDetailsDto;
 import com.ticket.shop.command.calendar.CalendarDetailsWithTicketsDto;
 import com.ticket.shop.command.calendar.CreateCalendarDto;
@@ -21,6 +22,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -68,7 +73,7 @@ public class CalendarServiceImpTest {
         when(this.ticketRepository.saveAll(any())).thenReturn(List.of(getMockedTicketEntity()));
 
         // Method to be tested
-        CalendarDetailsWithTicketsDto calendar = this.calendarServiceImp.createCalendar(getMockedCreateCalendarDto());
+        CalendarDetailsWithTicketsDto calendar = this.calendarServiceImp.createCalendar(getMockedCreateCalendarDto(), 2L);
 
         // Assert
         assertNotNull(calendar);
@@ -82,7 +87,7 @@ public class CalendarServiceImpTest {
 
         // assert
         assertThrows(EventNotFoundException.class,
-                () -> this.calendarServiceImp.createCalendar(getMockedCreateCalendarDto()));
+                () -> this.calendarServiceImp.createCalendar(getMockedCreateCalendarDto(), 2L));
     }
 
     @Test
@@ -93,7 +98,7 @@ public class CalendarServiceImpTest {
 
         // assert
         assertThrows(DatabaseCommunicationException.class,
-                () -> this.calendarServiceImp.createCalendar(getMockedCreateCalendarDto()));
+                () -> this.calendarServiceImp.createCalendar(getMockedCreateCalendarDto(), 2L));
     }
 
     /**
@@ -120,6 +125,42 @@ public class CalendarServiceImpTest {
         // assert
         assertThrows(CalendarNotFoundException.class,
                 () -> this.calendarServiceImp.getCalendarById(getMockedCalendarEntity().getCalendarId()));
+    }
+
+    /**
+     * Get calendar list tests
+     */
+    @Test
+    public void testGetCalendarListSuccessfully() {
+        //Mocks
+        when(this.eventRepository.findById(any())).thenReturn(Optional.of(getMockedEventEntity()));
+        when(this.calendarRepository.findByEventEntity(any(), any())).thenReturn(getMockedPagedCalendarEntity());
+
+        //Call method
+        Paginated<CalendarDetailsDto> calendarList = this.calendarServiceImp.getCalendarListByEventId(getMockedEventEntity().getEventId(), 0, 1);
+
+        //Assert result
+        assertNotNull(calendarList);
+        assertEquals(getMockedPaginatedCalendarDetailsDto(), calendarList);
+    }
+
+    @Test
+    public void testGetCalendarListFailureDueToEventNotFoundException() {
+        //Mocks
+        when(this.eventRepository.findById(any())).thenReturn(Optional.empty());
+
+        assertThrows(EventNotFoundException.class,
+                () -> this.calendarServiceImp.getCalendarListByEventId(getMockedEventEntity().getEventId(), 0, 1));
+    }
+
+    @Test
+    public void testGetCalendarListFailureDueToDatabaseConnectionFailure() {
+        //Mocks
+        when(this.eventRepository.findById(any())).thenReturn(Optional.of(getMockedEventEntity()));
+        when(this.calendarRepository.findByEventEntity(any(), any())).thenThrow(RuntimeException.class);
+
+        assertThrows(DatabaseCommunicationException.class,
+                () -> this.calendarServiceImp.getCalendarListByEventId(getMockedEventEntity().getEventId(), 0, 1));
     }
 
     private CompanyEntity getMockedCompanyEntity() {
@@ -152,7 +193,6 @@ public class CalendarServiceImpTest {
     private CreateCalendarDto getMockedCreateCalendarDto() {
         return CreateCalendarDto.builder()
                 .companyId(getMockedCompanyEntity().getCompanyId())
-                .eventId(getMockedEventEntity().getEventId())
                 .startDate(refDate)
                 .endDate(refDate.plusDays(1))
                 .tickets(List.of(getMockedCreateTicketDto()))
@@ -192,5 +232,23 @@ public class CalendarServiceImpTest {
                 .type(TicketType.VIP)
                 .total(1L)
                 .build();
+    }
+
+    private Page<CalendarEntity> getMockedPagedCalendarEntity() {
+        List<CalendarEntity> content = List.of(getMockedCalendarEntity());
+        Pageable pageable = PageRequest.of(0, 1);
+
+        return new PageImpl<>(content, pageable, 1);
+    }
+
+    private Paginated<CalendarDetailsDto> getMockedPaginatedCalendarDetailsDto() {
+        List<CalendarDetailsDto> calendarDetailsDtoList = List.of(getMockedCalendarDetailsDto());
+
+        return new Paginated<>(
+                calendarDetailsDtoList,
+                0,
+                calendarDetailsDtoList.size(),
+                1,
+                1);
     }
 }

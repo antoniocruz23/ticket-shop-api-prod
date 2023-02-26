@@ -21,10 +21,6 @@ public class CreateCalendarDto {
     @NotNull(message = "Must have a company id")
     private Long companyId;
 
-    @Schema(example = "1")
-    @NotNull(message = "Must have a event id")
-    private Long eventId;
-
     @Schema(example = "2020-10-04T10:00")
     @NotNull(message = "Must have a start date")
     private LocalDateTime startDate;
