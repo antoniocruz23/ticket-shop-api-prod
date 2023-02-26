@@ -15,6 +15,14 @@ import java.util.List;
  */
 public interface TicketRepository extends CrudRepository<TicketEntity, Long> {
 
+    /**
+     * Get Available Tickets by calendar and type
+     *
+     * @param calendarId   calendar id
+     * @param type         type
+     * @param totalTickets total of tickets wanted
+     * @return list of ticket ids
+     */
     @Query(value = """
             select t.ticket_id
             from tickets t
@@ -27,6 +35,13 @@ public interface TicketRepository extends CrudRepository<TicketEntity, Long> {
     List<Long> findAvailableByCalendarAndType(Long calendarId, String type, Long totalTickets);
 
 
+    /**
+     * Update ticket with userEntity, WAITING_PAYMENT status and orderId
+     *
+     * @param userEntity user entity
+     * @param ticketIds  ticket ids to be updated
+     * @param orderId    order id
+     */
     @Transactional
     @Modifying
     @Query(value = """
@@ -37,6 +52,11 @@ public interface TicketRepository extends CrudRepository<TicketEntity, Long> {
             where t.ticketId in :ticketIds""")
     void updateUserEntityAndStatusByCalendarEntityAndType(UserEntity userEntity, List<Long> ticketIds, String orderId);
 
+    /**
+     * Update Ticket to SOLD status by order id
+     *
+     * @param paypalOrderId order id
+     */
     @Transactional
     @Modifying
     @Query("update TicketEntity t set t.status = 'SOLD' where t.paypalOrderId = :paypalOrderId")

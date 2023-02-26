@@ -1,6 +1,7 @@
 package com.ticket.shop.service;
 
 import com.ticket.shop.command.calendar.CalendarDetailsDto;
+import com.ticket.shop.command.calendar.CalendarDetailsWithTicketsDto;
 import com.ticket.shop.command.calendar.CreateCalendarDto;
 
 /**
@@ -12,8 +13,16 @@ public interface CalendarService {
      * Create new calendar
      *
      * @param createCalendarDto {@link CreateCalendarDto}
+     * @return {@link CalendarDetailsWithTicketsDto}
+     */
+    CalendarDetailsWithTicketsDto createCalendar(CreateCalendarDto createCalendarDto);
+
+    /**
+     * Get calendar by id
+     *
+     * @param calendarId calendar id
      * @return {@link CalendarDetailsDto}
      */
-    CalendarDetailsDto createCalendar(CreateCalendarDto createCalendarDto, Long companyId, Long eventId);
+    CalendarDetailsDto getCalendarById(Long calendarId);
 
 }

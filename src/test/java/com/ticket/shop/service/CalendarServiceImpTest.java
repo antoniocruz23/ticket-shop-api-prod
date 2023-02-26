@@ -1,21 +1,19 @@
 package com.ticket.shop.service;
 
 import com.ticket.shop.command.calendar.CalendarDetailsDto;
+import com.ticket.shop.command.calendar.CalendarDetailsWithTicketsDto;
 import com.ticket.shop.command.calendar.CreateCalendarDto;
 import com.ticket.shop.command.ticket.CreateTicketDto;
 import com.ticket.shop.enumerators.TicketStatus;
 import com.ticket.shop.enumerators.TicketType;
 import com.ticket.shop.exception.DatabaseCommunicationException;
-import com.ticket.shop.exception.company.CompanyNotFoundException;
+import com.ticket.shop.exception.calendar.CalendarNotFoundException;
 import com.ticket.shop.exception.event.EventNotFoundException;
-import com.ticket.shop.persistence.entity.AddressEntity;
 import com.ticket.shop.persistence.entity.CalendarEntity;
 import com.ticket.shop.persistence.entity.CompanyEntity;
-import com.ticket.shop.persistence.entity.CountryEntity;
 import com.ticket.shop.persistence.entity.EventEntity;
 import com.ticket.shop.persistence.entity.TicketEntity;
 import com.ticket.shop.persistence.repository.CalendarRepository;
-import com.ticket.shop.persistence.repository.CompanyRepository;
 import com.ticket.shop.persistence.repository.EventRepository;
 import com.ticket.shop.persistence.repository.PriceRepository;
 import com.ticket.shop.persistence.repository.TicketRepository;
@@ -42,9 +40,6 @@ public class CalendarServiceImpTest {
     private CalendarRepository calendarRepository;
 
     @Mock
-    private CompanyRepository companyRepository;
-
-    @Mock
     private EventRepository eventRepository;
 
     @Mock
@@ -59,7 +54,7 @@ public class CalendarServiceImpTest {
     @BeforeEach
     public void setUp() {
         TicketServiceImp ticketServiceImp = new TicketServiceImp(this.ticketRepository, this.priceRepository);
-        this.calendarServiceImp = new CalendarServiceImp(this.calendarRepository, this.companyRepository, this.eventRepository, ticketServiceImp);
+        this.calendarServiceImp = new CalendarServiceImp(this.calendarRepository, this.eventRepository, ticketServiceImp);
     }
 
     /**
@@ -68,13 +63,49 @@ public class CalendarServiceImpTest {
     @Test
     public void testCreateCalendarSuccessfully() {
         // Mock data
-        when(this.companyRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedCompanyEntity()));
-        when(this.eventRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedEventEntity()));
+        when(this.eventRepository.findByCompanyIdAndEventId(any(), any())).thenReturn(Optional.ofNullable(getMockedEventEntity()));
         when(this.calendarRepository.save(any())).thenReturn(getMockedCalendarEntity());
-        when(this.ticketRepository.saveAll(any())).thenReturn(getMockedTicketEntities());
+        when(this.ticketRepository.saveAll(any())).thenReturn(List.of(getMockedTicketEntity()));
 
         // Method to be tested
-        CalendarDetailsDto calendar = this.calendarServiceImp.createCalendar(getMockedCreateCalendarDto(), 1L, 2L);
+        CalendarDetailsWithTicketsDto calendar = this.calendarServiceImp.createCalendar(getMockedCreateCalendarDto());
+
+        // Assert
+        assertNotNull(calendar);
+        assertEquals(getMockedCalendarDetailsWithTicketsDto(), calendar);
+    }
+
+    @Test
+    public void testCreateCalendarFailureDueToEventNotFound() {
+        // Mock data
+        when(this.eventRepository.findByCompanyIdAndEventId(any(), any())).thenReturn(Optional.empty());
+
+        // assert
+        assertThrows(EventNotFoundException.class,
+                () -> this.calendarServiceImp.createCalendar(getMockedCreateCalendarDto()));
+    }
+
+    @Test
+    public void testCreateCalendarFailureDueToDatabaseCommunicationException() {
+        // Mock data
+        when(this.eventRepository.findByCompanyIdAndEventId(any(), any())).thenReturn(Optional.ofNullable(getMockedEventEntity()));
+        when(this.calendarRepository.save(any())).thenThrow(RuntimeException.class);
+
+        // assert
+        assertThrows(DatabaseCommunicationException.class,
+                () -> this.calendarServiceImp.createCalendar(getMockedCreateCalendarDto()));
+    }
+
+    /**
+     * Get calendar by id tests
+     */
+    @Test
+    public void testGetCalendarByIdSuccessfully() {
+        // Mock data
+        when(this.calendarRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedCalendarEntity()));
+
+        // Method to be tested
+        CalendarDetailsDto calendar = this.calendarServiceImp.getCalendarById(getMockedCalendarEntity().getCalendarId());
 
         // Assert
         assertNotNull(calendar);
@@ -82,36 +113,13 @@ public class CalendarServiceImpTest {
     }
 
     @Test
-    public void testCreateCalendarFailureDueToCompanyNotFound() {
+    public void testGetCalendarByIdFailureDueToEventNotFound() {
         // Mock data
-        when(this.companyRepository.findById(any())).thenReturn(Optional.empty());
-
-        // assert
-        assertThrows(CompanyNotFoundException.class,
-                () -> this.calendarServiceImp.createCalendar(getMockedCreateCalendarDto(), 1L, 2L));
-    }
-
-    @Test
-    public void testCreateCalendarFailureDueToEventNotFound() {
-        // Mock data
-        when(this.companyRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedCompanyEntity()));
         when(this.eventRepository.findById(any())).thenReturn(Optional.empty());
 
         // assert
-        assertThrows(EventNotFoundException.class,
-                () -> this.calendarServiceImp.createCalendar(getMockedCreateCalendarDto(), 1L, 2L));
-    }
-
-    @Test
-    public void testCreateCalendarFailureDueToDatabaseCommunicationException() {
-        // Mock data
-        when(this.companyRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedCompanyEntity()));
-        when(this.eventRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedEventEntity()));
-        when(this.calendarRepository.save(any())).thenThrow(RuntimeException.class);
-
-        // assert
-        assertThrows(DatabaseCommunicationException.class,
-                () -> this.calendarServiceImp.createCalendar(getMockedCreateCalendarDto(), 1L, 2L));
+        assertThrows(CalendarNotFoundException.class,
+                () -> this.calendarServiceImp.getCalendarById(getMockedCalendarEntity().getCalendarId()));
     }
 
     private CompanyEntity getMockedCompanyEntity() {
@@ -128,29 +136,7 @@ public class CalendarServiceImpTest {
                 .eventId(2L)
                 .name("Test")
                 .description("aa")
-                .addressEntity(getMockedAddressEntity())
                 .companyEntity(getMockedCompanyEntity())
-                .build();
-    }
-
-    private AddressEntity getMockedAddressEntity() {
-        return AddressEntity.builder()
-                .addressId(1L)
-                .line1("line1")
-                .postCode("code")
-                .city("city")
-                .countryEntity(getMockedCountryEntity())
-                .build();
-    }
-
-    private CountryEntity getMockedCountryEntity() {
-        return CountryEntity.builder()
-                .countryId(1L)
-                .name("Portugal")
-                .isoCode2("PT")
-                .isoCode3("PRT")
-                .currency("EUR")
-                .language("PT")
                 .build();
     }
 
@@ -165,9 +151,21 @@ public class CalendarServiceImpTest {
 
     private CreateCalendarDto getMockedCreateCalendarDto() {
         return CreateCalendarDto.builder()
+                .companyId(getMockedCompanyEntity().getCompanyId())
+                .eventId(getMockedEventEntity().getEventId())
                 .startDate(refDate)
                 .endDate(refDate.plusDays(1))
-                .tickets(getMockedCreateTicketDto())
+                .tickets(List.of(getMockedCreateTicketDto()))
+                .build();
+    }
+
+    private CalendarDetailsWithTicketsDto getMockedCalendarDetailsWithTicketsDto() {
+        return CalendarDetailsWithTicketsDto.builder()
+                .calendarId(4L)
+                .startDate(refDate)
+                .endDate(refDate.plusDays(1))
+                .tickets(Map.of(TicketType.VIP, 1L))
+                .eventId(getMockedEventEntity().getEventId())
                 .build();
     }
 
@@ -176,27 +174,23 @@ public class CalendarServiceImpTest {
                 .calendarId(4L)
                 .startDate(refDate)
                 .endDate(refDate.plusDays(1))
-                .tickets(Map.of(TicketType.VIP, 1L))
+                .eventId(getMockedEventEntity().getEventId())
                 .build();
     }
 
-    private Iterable<TicketEntity> getMockedTicketEntities() {
-        return List.of(
-                TicketEntity.builder()
-                        .ticketId(2L)
-                        .type(TicketType.VIP)
-                        .status(TicketStatus.AVAILABLE)
-                        .calendarEntity(getMockedCalendarEntity())
-                        .build()
-        );
+    private TicketEntity getMockedTicketEntity() {
+        return TicketEntity.builder()
+                .ticketId(2L)
+                .type(TicketType.VIP)
+                .status(TicketStatus.AVAILABLE)
+                .calendarEntity(getMockedCalendarEntity())
+                .build();
     }
 
-    private List<CreateTicketDto> getMockedCreateTicketDto() {
-        return List.of(
-                CreateTicketDto.builder()
-                        .type(TicketType.VIP)
-                        .total(1L)
-                        .build()
-        );
+    private CreateTicketDto getMockedCreateTicketDto() {
+        return CreateTicketDto.builder()
+                .type(TicketType.VIP)
+                .total(1L)
+                .build();
     }
 }
