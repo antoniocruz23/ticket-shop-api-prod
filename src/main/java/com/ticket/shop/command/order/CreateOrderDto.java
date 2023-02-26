@@ -28,10 +28,10 @@ public class CreateOrderDto {
     private TicketType ticketType;
 
     @Schema(example = "1")
-    @Min(value = 1, message = "The given number for numberOfTickets must be greater than or equal to 1")
-    private Long numberOfTickets;
+    @Min(value = 1, message = "The given number for amountOfTickets must be greater than or equal to 1")
+    private Long amountOfTickets;
 
     @Schema(example = "1")
-    @Min(value = 1, message = "The given number for totalAmount must be greater than or equal to 1")
-    private Double totalAmount;
+    @Min(value = 1, message = "The given number for totalPrice must be greater than or equal to 1")
+    private Double totalPrice;
 }

@@ -20,6 +20,7 @@ import com.ticket.shop.exception.order.OrderCaptureException;
 import com.ticket.shop.exception.calendar.CalendarNotFoundException;
 import com.ticket.shop.exception.event.EventNotFoundException;
 import com.ticket.shop.exception.order.PayPalOrderException;
+import com.ticket.shop.exception.ticket.TicketUnavailableException;
 import com.ticket.shop.exception.user.UserNotFoundException;
 import com.ticket.shop.persistence.entity.CalendarEntity;
 import com.ticket.shop.persistence.entity.EventEntity;
@@ -75,10 +76,10 @@ public class OrderServiceImp implements OrderService {
         URI returnUri = buildReturnUrl(requestUrl);
 
         // Create PayPal order
-        PayPalData payPalOrder = createPayPalOrder(createOrderDto.getTotalAmount(), userEntity.getCountryEntity().getCurrency(), returnUri);
+        PayPalData payPalOrder = createPayPalOrder(createOrderDto.getTotalPrice(), userEntity.getCountryEntity().getCurrency(), returnUri);
 
         // Finding tickets available for the event and calendar
-        List<Long> availableTicketIds = getAvailableTicketIdsToBuy(calendarEntity.getCalendarId(), createOrderDto.getTicketType(), createOrderDto.getNumberOfTickets());
+        List<Long> availableTicketIds = getAvailableTicketIdsToBuy(calendarEntity.getCalendarId(), createOrderDto.getTicketType(), createOrderDto.getAmountOfTickets());
 
         // Update the tickets found
         updateTicketWithUserAndStatus(userEntity, availableTicketIds, payPalOrder.orderId());
@@ -143,7 +144,8 @@ public class OrderServiceImp implements OrderService {
      */
     private URI buildReturnUrl(String requestUrl) {
         LOGGER.info("Build return url - {}", requestUrl);
-        //NOTE -> This return url could be use for redirect a FE page
+        //NOTE -> This return url should be use for redirect a FE page
+        // after the payment is done on the PayPal website
         try {
             URI requestUri = URI.create(requestUrl);
             return new URI(requestUri.getScheme(),
@@ -340,6 +342,12 @@ public class OrderServiceImp implements OrderService {
      */
     private List<Long> getAvailableTicketIdsToBuy(Long calendarId, TicketType type, Long totalTickets) {
         LOGGER.debug("Getting available tickets from database");
-        return this.ticketRepository.findAvailableByCalendarAndType(calendarId, type.name(), totalTickets);
+        List<Long> availableByCalendarAndType = this.ticketRepository.findAvailableByCalendarAndType(calendarId, type.name(), totalTickets);
+
+        if (availableByCalendarAndType.isEmpty()) {
+            LOGGER.error("Don't exist tickets available for calendar id {}", calendarId);
+            throw new TicketUnavailableException(ErrorMessages.TICKET_UNAVAILABLE);
+        }
+        return availableByCalendarAndType;
     }
 }

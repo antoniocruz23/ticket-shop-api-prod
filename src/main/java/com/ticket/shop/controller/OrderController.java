@@ -47,7 +47,8 @@ public class OrderController {
                     content = @Content(schema = @Schema(implementation = OrderDetailsDto.class))),
             @ApiResponse(responseCode = "422", description = "The given number for numberOfTickets and totalPrice must be greater than or equal to 1",
                     content = @Content(schema = @Schema(implementation = Error.class))),
-            @ApiResponse(responseCode = "404", description = ErrorMessages.EVENT_NOT_FOUND + " || " + ErrorMessages.CALENDAR_NOT_FOUND + " || " + ErrorMessages.USER_NOT_FOUND,
+            @ApiResponse(responseCode = "404", description = ErrorMessages.EVENT_NOT_FOUND + " || " + ErrorMessages.CALENDAR_NOT_FOUND + " || "
+                    + ErrorMessages.USER_NOT_FOUND + " || " + ErrorMessages.TICKET_UNAVAILABLE,
                     content = @Content(schema = @Schema(implementation = Error.class))),
             @ApiResponse(responseCode = "400", description = ErrorMessages.DATABASE_COMMUNICATION_ERROR + " || " + "PayPal Order Error",
                     content = @Content(schema = @Schema(implementation = Error.class)))})
