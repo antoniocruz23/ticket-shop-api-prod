@@ -161,7 +161,7 @@ public class CompanyController {
      */
     @DeleteMapping("/{companyId}")
     @PreAuthorize("@authorized.hasRole('ADMIN')")
-    @Operation(summary = "Delete Company", description = "Delete Company")
+    @Operation(summary = "Delete Company", description = "Delete Company and everything related to it")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Successful Operation"),
             @ApiResponse(responseCode = "404", description = ErrorMessages.COMPANY_NOT_FOUND,

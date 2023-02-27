@@ -267,7 +267,7 @@ public class CompanyServiceImpTest {
     }
 
     @Test
-    public void testDeleteCompanyFailureDueToUserNotFound() {
+    public void testDeleteCompanyFailureDueToCompanyNotFound() {
         // Mocks
         when(this.companyRepository.findById(any())).thenReturn(Optional.empty());
 

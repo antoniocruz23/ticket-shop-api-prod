@@ -40,6 +40,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -225,6 +227,55 @@ public class CalendarServiceImpTest {
 
         assertThrows(DatabaseCommunicationException.class,
                 () -> this.calendarServiceImp.getCalendarListByEventId(getMockedEventEntity().getEventId(), 0, 1));
+    }
+
+    /**
+     * Delete calendar tests
+     */
+    @Test
+    public void testDeleteCalendarSuccessfully() {
+        // Mocks
+        when(this.eventRepository.findById(any())).thenReturn(Optional.of(getMockedEventEntity()));
+        when(this.calendarRepository.findByCalendarIdAndEventEntityAndCompanyEntityCompanyId(any(), any(), any())).thenReturn(Optional.of(getMockedCalendarEntity()));
+
+        // Call method to be tested
+        this.calendarServiceImp.deleteCalendar(
+                getMockedCompanyEntity().getCompanyId(), getMockedEventEntity().getEventId(), getMockedCalendarEntity().getCalendarId());
+
+        verify(this.calendarRepository).delete(any());
+    }
+
+    @Test
+    public void testDeleteCalendarFailureDueToEventNotFound() {
+        // Mocks
+        when(this.eventRepository.findById(any())).thenReturn(Optional.empty());
+
+        assertThrows(EventNotFoundException.class,
+                () -> this.calendarServiceImp.deleteCalendar(
+                        getMockedCompanyEntity().getCompanyId(), getMockedEventEntity().getEventId(), getMockedCalendarEntity().getCalendarId()));
+    }
+
+    @Test
+    public void testDeleteCalendarFailureDueToCalendarNotFound() {
+        // Mocks
+        when(this.eventRepository.findById(any())).thenReturn(Optional.of(getMockedEventEntity()));
+        when(this.calendarRepository.findByCalendarIdAndEventEntityAndCompanyEntityCompanyId(any(), any(), any())).thenReturn(Optional.empty());
+
+        assertThrows(CalendarNotFoundException.class,
+                () -> this.calendarServiceImp.deleteCalendar(
+                        getMockedCompanyEntity().getCompanyId(), getMockedEventEntity().getEventId(), getMockedCalendarEntity().getCalendarId()));
+    }
+
+    @Test
+    public void testDeleteCalendarFailureDueToDatabaseConnectionFailure() {
+        // Mocks
+        when(this.eventRepository.findById(any())).thenReturn(Optional.of(getMockedEventEntity()));
+        when(this.calendarRepository.findByCalendarIdAndEventEntityAndCompanyEntityCompanyId(any(), any(), any())).thenReturn(Optional.of(getMockedCalendarEntity()));
+        doThrow(RuntimeException.class).when(this.calendarRepository).delete(any());
+
+        assertThrows(DatabaseCommunicationException.class,
+                () -> this.calendarServiceImp.deleteCalendar(
+                        getMockedCompanyEntity().getCompanyId(), getMockedEventEntity().getEventId(), getMockedCalendarEntity().getCalendarId()));
     }
 
     private CompanyEntity getMockedCompanyEntity() {

@@ -24,5 +24,22 @@ public interface CalendarRepository extends CrudRepository<CalendarEntity, Long>
      */
     Page<CalendarEntity> findByEventEntity(EventEntity eventEntity, Pageable pageable);
 
+    /**
+     * Get Calendar by id and company Entity
+     *
+     * @param calendarId    calendar id
+     * @param companyEntity company entity
+     * @return {@link Optional<CalendarEntity>}
+     */
     Optional<CalendarEntity> findByCalendarIdAndCompanyEntity(Long calendarId, CompanyEntity companyEntity);
+
+    /**
+     * Get Calendar by calendar id and event entity and company id
+     *
+     * @param calendarId  calendar id
+     * @param eventEntity event entity
+     * @param companyId   company id
+     * @return {@link Optional<CalendarEntity>}
+     */
+    Optional<CalendarEntity> findByCalendarIdAndEventEntityAndCompanyEntityCompanyId(Long calendarId, EventEntity eventEntity, Long companyId);
 }

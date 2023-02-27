@@ -36,4 +36,12 @@ public interface CalendarService {
      */
     Paginated<CalendarDetailsDto> getCalendarListByEventId(Long eventId, int page, int size);
 
+    /**
+     * Delete Calendar by id
+     *
+     * @param companyId  company id
+     * @param eventId    event id
+     * @param calendarId calendar id
+     */
+    void deleteCalendar(Long companyId, Long eventId, Long calendarId);
 }

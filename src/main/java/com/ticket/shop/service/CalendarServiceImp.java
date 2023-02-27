@@ -113,6 +113,25 @@ public class CalendarServiceImp implements CalendarService {
     }
 
     /**
+     * @see CalendarService#deleteCalendar(Long, Long, Long)
+     */
+    @Override
+    public void deleteCalendar(Long companyId, Long eventId, Long calendarId) {
+        LOGGER.debug("Getting calendar with id {} from database", calendarId);
+        EventEntity eventEntity = getEventEntityById(eventId);
+        CalendarEntity calendarEntity = getCalendarEntityByIdAndEventEntityAndCompanyId(calendarId, eventEntity, companyId);
+
+        LOGGER.debug("Deleting calendar with id {} from database", calendarId);
+        try {
+            this.calendarRepository.delete(calendarEntity);
+
+        } catch (Exception e) {
+            LOGGER.error("Failed while deleting calendar with id {} from database", calendarId, e);
+            throw new DatabaseCommunicationException(ErrorMessages.DATABASE_COMMUNICATION_ERROR, e);
+        }
+    }
+
+    /**
      * Get Event by company id and event id
      *
      * @param companyId company id
@@ -136,10 +155,28 @@ public class CalendarServiceImp implements CalendarService {
      */
     private CalendarEntity getCalendarEntityById(Long calendarId) {
         LOGGER.debug("Getting calendar with id {} from database", calendarId);
-        return this.calendarRepository.findById(calendarId).orElseThrow(() -> {
-            LOGGER.error("The calendar with id {} does not exist in database", calendarId);
-            return new CalendarNotFoundException(ErrorMessages.CALENDAR_NOT_FOUND);
-        });
+        return this.calendarRepository.findById(calendarId)
+                .orElseThrow(() -> {
+                    LOGGER.error("The calendar with id {} does not exist in database", calendarId);
+                    return new CalendarNotFoundException(ErrorMessages.CALENDAR_NOT_FOUND);
+                });
+    }
+
+    /**
+     * Get calendar by id and event entity
+     *
+     * @param calendarId  calendar id
+     * @param eventEntity event entity
+     * @param companyId   company id
+     * @return {@link CalendarEntity}
+     */
+    private CalendarEntity getCalendarEntityByIdAndEventEntityAndCompanyId(Long calendarId, EventEntity eventEntity, Long companyId) {
+        LOGGER.debug("Getting calendar with id {} from database", calendarId);
+        return this.calendarRepository.findByCalendarIdAndEventEntityAndCompanyEntityCompanyId(calendarId, eventEntity, companyId)
+                .orElseThrow(() -> {
+                    LOGGER.error("The calendar with id {} does not exist in database", calendarId);
+                    return new CalendarNotFoundException(ErrorMessages.CALENDAR_NOT_FOUND);
+                });
     }
 
     /**
@@ -150,9 +187,10 @@ public class CalendarServiceImp implements CalendarService {
      */
     private EventEntity getEventEntityById(Long eventId) {
         LOGGER.debug("Getting event with id {} from database", eventId);
-        return this.eventRepository.findById(eventId).orElseThrow(() -> {
-            LOGGER.error("The event with id {} does not exist in database", eventId);
-            return new EventNotFoundException(ErrorMessages.EVENT_NOT_FOUND);
-        });
+        return this.eventRepository.findById(eventId)
+                .orElseThrow(() -> {
+                    LOGGER.error("The event with id {} does not exist in database", eventId);
+                    return new EventNotFoundException(ErrorMessages.EVENT_NOT_FOUND);
+                });
     }
 }

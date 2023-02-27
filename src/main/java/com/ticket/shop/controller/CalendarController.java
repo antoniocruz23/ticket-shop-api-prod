@@ -19,6 +19,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -63,7 +64,7 @@ public class CalendarController {
                     content = @Content(schema = @Schema(implementation = CalendarDetailsWithTicketsDto.class))),
             @ApiResponse(responseCode = "403", description = ErrorMessages.ACCESS_DENIED,
                     content = @Content(schema = @Schema(implementation = Error.class))),
-            @ApiResponse(responseCode = "404", description = ErrorMessages.EVENT_NOT_FOUND + " || " +ErrorMessages.COMPANY_NOT_FOUND + " || " +
+            @ApiResponse(responseCode = "404", description = ErrorMessages.EVENT_NOT_FOUND + " || " + ErrorMessages.COMPANY_NOT_FOUND + " || " +
                     ErrorMessages.CALENDAR_NOT_FOUND,
                     content = @Content(schema = @Schema(implementation = Error.class))),
             @ApiResponse(responseCode = "422", description = ErrorMessages.INVALID_TICKET_TYPE,
@@ -158,5 +159,42 @@ public class CalendarController {
 
         LOGGER.info("Retrieved calendar list");
         return new ResponseEntity<>(calendarList, OK);
+    }
+
+    /**
+     * Delete Calendar and tickets associated with itself
+     *
+     * @param companyId  company id
+     * @param eventId    event id
+     * @param calendarId calendar id
+     */
+    @DeleteMapping("/companies/{companyId}/events/{eventId}/calendars/{calendarId}")
+    @PreAuthorize("@authorized.hasRole('ADMIN') || " +
+            "((@authorized.hasRole('COMPANY_ADMIN') || @authorized.hasRole('WORKER')) && @authorized.isOnCompany(#companyId))")
+    @Operation(summary = "Delete Calendar", description = "Delete Calendar and associated tickets")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Successful Operation"),
+            @ApiResponse(responseCode = "404", description = ErrorMessages.EVENT_NOT_FOUND + " || " + ErrorMessages.CALENDAR_NOT_FOUND,
+                    content = @Content(schema = @Schema(implementation = Error.class))),
+            @ApiResponse(responseCode = "400", description = ErrorMessages.DATABASE_COMMUNICATION_ERROR,
+                    content = @Content(schema = @Schema(implementation = Error.class)))})
+    public ResponseEntity<Void> deleteCalendar(@PathVariable Long companyId,
+                                               @PathVariable Long eventId,
+                                               @PathVariable Long calendarId) {
+
+        LOGGER.info("Request to delete calendar with id - {}", companyId);
+        try {
+            this.calendarServiceImp.deleteCalendar(companyId, eventId, calendarId);
+
+        } catch (TicketShopException e) {
+            throw e;
+
+        } catch (Exception e) {
+            LOGGER.error("Failed to delete calendar with id {}", calendarId, e);
+            throw new TicketShopException(ErrorMessages.OPERATION_FAILED, e);
+        }
+
+        LOGGER.info("Calendar with id {} deleted successfully", calendarId);
+        return ResponseEntity.noContent().build();
     }
 }
