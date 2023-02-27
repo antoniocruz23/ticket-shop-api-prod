@@ -40,14 +40,14 @@ public class CalendarEntity {
     @Column(nullable = false)
     private LocalDateTime endDate;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "event_id", nullable = false)
     private EventEntity eventEntity;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id", nullable = false)
     private CompanyEntity companyEntity;
 
-    @OneToMany(mappedBy = "calendarEntity")
+    @OneToMany(mappedBy = "calendarEntity", cascade = CascadeType.ALL)
     private List<TicketEntity> tickets;
 }

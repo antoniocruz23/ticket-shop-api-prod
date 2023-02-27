@@ -14,7 +14,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
-import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
 /**
@@ -61,10 +60,8 @@ public class AddressEntity {
     private UserEntity userEntity;
 
     @OneToOne(mappedBy = "addressEntity")
-    @PrimaryKeyJoinColumn
     private CompanyEntity companyEntity;
 
     @OneToOne(mappedBy = "addressEntity")
-    @PrimaryKeyJoinColumn
     private EventEntity eventEntity;
 }

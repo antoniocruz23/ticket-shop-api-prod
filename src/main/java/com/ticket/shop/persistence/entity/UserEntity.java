@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -88,10 +87,10 @@ public class UserEntity {
     @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean isEmailConfirmed;
 
-    @OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "userEntity")
     private List<AddressEntity> addresses;
 
-    @OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "userEntity")
     private List<TicketEntity> tickets;
 
     @PrePersist

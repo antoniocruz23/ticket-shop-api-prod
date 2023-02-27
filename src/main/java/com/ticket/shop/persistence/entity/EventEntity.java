@@ -40,7 +40,7 @@ public class EventEntity {
     @Column(nullable = false)
     private String description;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne()
     @JoinColumn(name = "address_id", nullable = false)
     private AddressEntity addressEntity;
 
@@ -51,6 +51,6 @@ public class EventEntity {
     @OneToMany(mappedBy = "eventEntity", cascade = CascadeType.ALL)
     private List<PriceEntity> prices;
 
-    @OneToMany(mappedBy = "eventEntity", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "eventEntity")
     private List<CalendarEntity> calendars;
 }

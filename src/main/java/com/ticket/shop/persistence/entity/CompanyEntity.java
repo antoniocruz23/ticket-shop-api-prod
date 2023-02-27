@@ -54,16 +54,16 @@ public class CompanyEntity {
     @Column(name = "updated_at")
     private Timestamp updatedAt;
 
-    @OneToMany(mappedBy = "companyEntity")
+    @OneToMany(mappedBy = "companyEntity", cascade = CascadeType.ALL)
     private List<UserEntity> users;
 
-    @OneToMany(mappedBy = "companyEntity")
+    @OneToMany(mappedBy = "companyEntity", cascade = CascadeType.ALL)
     private List<EventEntity> events;
 
     @OneToMany(mappedBy = "companyEntity", cascade = CascadeType.ALL)
     private List<CalendarEntity> calendars;
 
-    @OneToMany(mappedBy = "companyEntity")
+    @OneToMany(mappedBy = "companyEntity", cascade = CascadeType.ALL)
     private List<TicketEntity> tickets;
 
     @OneToMany(mappedBy = "companyEntity")
