@@ -40,7 +40,7 @@ public class EventEntity {
     @Column(nullable = false)
     private String description;
 
-    @OneToOne()
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "address_id", nullable = false)
     private AddressEntity addressEntity;
 
