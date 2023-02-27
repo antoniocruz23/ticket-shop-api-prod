@@ -69,7 +69,7 @@ public class WorkerController {
                     content = @Content(schema = @Schema(implementation = Error.class))),
             @ApiResponse(responseCode = "400", description = ErrorMessages.DATABASE_COMMUNICATION_ERROR,
                     content = @Content(schema = @Schema(implementation = Error.class))),
-            @ApiResponse(responseCode = "500", description = ErrorMessages.ROLE_INVALID,
+            @ApiResponse(responseCode = "500", description = ErrorMessages.INVALID_ROLE,
                     content = @Content(schema = @Schema(implementation = Error.class))),
             @ApiResponse(responseCode = "403", description = ErrorMessages.ACCESS_DENIED,
                     content = @Content(schema = @Schema(implementation = Error.class)))})
@@ -189,7 +189,7 @@ public class WorkerController {
                     content = @Content(schema = @Schema(implementation = Error.class))),
             @ApiResponse(responseCode = "400", description = ErrorMessages.DATABASE_COMMUNICATION_ERROR,
                     content = @Content(schema = @Schema(implementation = Error.class))),
-            @ApiResponse(responseCode = "500", description = ErrorMessages.ROLE_INVALID,
+            @ApiResponse(responseCode = "500", description = ErrorMessages.INVALID_ROLE,
                     content = @Content(schema = @Schema(implementation = Error.class))),
             @ApiResponse(responseCode = "403", description = ErrorMessages.ACCESS_DENIED,
                     content = @Content(schema = @Schema(implementation = Error.class)))})

@@ -19,6 +19,6 @@ public class CreateTicketDto {
     private TicketType type;
 
     @Schema(example = "10")
-    @NotNull(message = "Must have total number of tickets")
-    private Long total;
+    @NotNull(message = "Must have the amount of tickets")
+    private Long amount;
 }

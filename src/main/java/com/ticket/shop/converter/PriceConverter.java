@@ -26,6 +26,7 @@ public class PriceConverter {
                         .price(t.getPrice())
                         .type(t.getType())
                         .eventEntity(eventEntity)
+                        .companyEntity(eventEntity.getCompanyEntity())
                         .build())
                 .toList();
     }

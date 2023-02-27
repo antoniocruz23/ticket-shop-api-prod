@@ -3,7 +3,7 @@ package com.ticket.shop.exception;
 import com.ticket.shop.error.Error;
 import com.ticket.shop.exception.address.AddressNotFoundException;
 import com.ticket.shop.exception.auth.InvalidTokenException;
-import com.ticket.shop.exception.auth.RoleInvalidException;
+import com.ticket.shop.exception.auth.InvalidRoleException;
 import com.ticket.shop.exception.calendar.CalendarNotFoundException;
 import com.ticket.shop.exception.company.CompanyAlreadyExistsException;
 import com.ticket.shop.exception.company.CompanyNotFoundException;
@@ -11,6 +11,8 @@ import com.ticket.shop.exception.country.CountryNotFoundException;
 import com.ticket.shop.exception.event.EventNotFoundException;
 import com.ticket.shop.exception.order.OrderCaptureException;
 import com.ticket.shop.exception.order.PayPalOrderException;
+import com.ticket.shop.exception.ticket.InvalidTicketTypeException;
+import com.ticket.shop.exception.ticket.TicketCantBeDeletedException;
 import com.ticket.shop.exception.user.UserAlreadyExistsException;
 import com.ticket.shop.exception.user.UserNotFoundException;
 import org.springframework.http.HttpHeaders;
@@ -42,7 +44,8 @@ public class TicketShopExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler(value = {
             UserAlreadyExistsException.class,
-            CompanyAlreadyExistsException.class
+            CompanyAlreadyExistsException.class,
+            TicketCantBeDeletedException.class
     })
     public ResponseEntity<Error> handlerConflictException(Exception ex, HttpServletRequest request) {
         return buildErrorResponse(ex, request, HttpStatus.CONFLICT);
@@ -92,7 +95,7 @@ public class TicketShopExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler(value = {
             AccessDeniedException.class,
-            RoleInvalidException.class
+            InvalidRoleException.class
     })
     public ResponseEntity<Error> handlerForbiddenException(Exception ex, HttpServletRequest request) {
         return buildErrorResponse(ex, request, HttpStatus.FORBIDDEN);
@@ -106,7 +109,8 @@ public class TicketShopExceptionHandler extends ResponseEntityExceptionHandler {
      * @return {@link Error}
      */
     @ExceptionHandler(value = {
-            InvalidTokenException.class
+            InvalidTokenException.class,
+            InvalidTicketTypeException.class
     })
     public ResponseEntity<Error> handlerUnprocessableEntityException(Exception ex, HttpServletRequest request) {
         return buildErrorResponse(ex, request, HttpStatus.UNPROCESSABLE_ENTITY);

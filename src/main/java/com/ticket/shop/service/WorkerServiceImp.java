@@ -8,7 +8,7 @@ import com.ticket.shop.converter.UserConverter;
 import com.ticket.shop.enumerators.UserRole;
 import com.ticket.shop.error.ErrorMessages;
 import com.ticket.shop.exception.DatabaseCommunicationException;
-import com.ticket.shop.exception.auth.RoleInvalidException;
+import com.ticket.shop.exception.auth.InvalidRoleException;
 import com.ticket.shop.exception.company.CompanyNotFoundException;
 import com.ticket.shop.exception.country.CountryNotFoundException;
 import com.ticket.shop.exception.user.UserAlreadyExistsException;
@@ -263,7 +263,7 @@ public class WorkerServiceImp implements WorkerService {
     private static void validateRoles(List<UserRole> roles) {
         if (roles.contains(UserRole.ADMIN) || roles.contains(UserRole.CUSTOMER)) {
             LOGGER.debug("Failed while trying to create the worker with an invalid role for workers");
-            throw new RoleInvalidException(ErrorMessages.ROLE_INVALID);
+            throw new InvalidRoleException(ErrorMessages.INVALID_ROLE);
         }
     }
 }

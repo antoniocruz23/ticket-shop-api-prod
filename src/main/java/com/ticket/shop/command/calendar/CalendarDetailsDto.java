@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 public class CalendarDetailsDto {
     private Long calendarId;
     private Long eventId;
+    private Long companyId;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
 }

@@ -46,6 +46,10 @@ public class TicketEntity {
     @JoinColumn(name = "calendar_id", nullable = false)
     private CalendarEntity calendarEntity;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id", nullable = false)
+    private CompanyEntity companyEntity;
+
     @ManyToOne()
     @JoinColumn(name = "user_id")
     private UserEntity userEntity;

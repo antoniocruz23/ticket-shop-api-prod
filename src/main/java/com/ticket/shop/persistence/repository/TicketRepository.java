@@ -1,5 +1,7 @@
 package com.ticket.shop.persistence.repository;
 
+import com.ticket.shop.persistence.entity.CalendarEntity;
+import com.ticket.shop.persistence.entity.CompanyEntity;
 import com.ticket.shop.persistence.entity.TicketEntity;
 import com.ticket.shop.persistence.entity.UserEntity;
 import org.springframework.data.jpa.repository.Modifying;
@@ -61,4 +63,20 @@ public interface TicketRepository extends CrudRepository<TicketEntity, Long> {
     @Modifying
     @Query("update TicketEntity t set t.status = 'SOLD' where t.paypalOrderId = :paypalOrderId")
     void updateStatusByPaypalOrderId(String paypalOrderId);
+
+    /**
+     * Delete Tickets by calendar entity
+     *
+     * @param calendarEntity calendar entity
+     * @param companyEntity  company entity
+     */
+    void deleteByCalendarEntityAndCompanyEntity(CalendarEntity calendarEntity, CompanyEntity companyEntity);
+
+    /**
+     * Verify if exists any ticket with the calendar id that is already associated with a customer
+     *
+     * @param calendarEntity calendar entity
+     * @return true if it doesn't have a customer associated and false if it has
+     */
+    boolean existsByCalendarEntityAndUserEntityNull(CalendarEntity calendarEntity);
 }

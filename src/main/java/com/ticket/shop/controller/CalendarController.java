@@ -50,28 +50,34 @@ public class CalendarController {
      * Create new calendar
      *
      * @param createCalendarDto new calendar data
+     * @param companyId         company id
+     * @param eventId           event id
      * @return the response entity
      */
-    @PostMapping("/events/{eventId}/calendars")
+    @PostMapping("/companies/{companyId}/events/{eventId}/calendars")
     @PreAuthorize("@authorized.hasRole('ADMIN') || " +
-            "((@authorized.hasRole('COMPANY_ADMIN') || @authorized.hasRole('WORKER')) && @authorized.isOnCompany(#createCalendarDto.companyId))")
-    @Operation(summary = "Registration", description = "Register new calendar")
+            "((@authorized.hasRole('COMPANY_ADMIN') || @authorized.hasRole('WORKER')) && @authorized.isOnCompany(#companyId))")
+    @Operation(summary = "Create new calendar", description = "Create new calendar")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Successful Operation",
                     content = @Content(schema = @Schema(implementation = CalendarDetailsWithTicketsDto.class))),
             @ApiResponse(responseCode = "403", description = ErrorMessages.ACCESS_DENIED,
                     content = @Content(schema = @Schema(implementation = Error.class))),
-            @ApiResponse(responseCode = "404", description = ErrorMessages.EVENT_NOT_FOUND,
+            @ApiResponse(responseCode = "404", description = ErrorMessages.EVENT_NOT_FOUND + " || " +ErrorMessages.COMPANY_NOT_FOUND + " || " +
+                    ErrorMessages.CALENDAR_NOT_FOUND,
+                    content = @Content(schema = @Schema(implementation = Error.class))),
+            @ApiResponse(responseCode = "422", description = ErrorMessages.INVALID_TICKET_TYPE,
                     content = @Content(schema = @Schema(implementation = Error.class))),
             @ApiResponse(responseCode = "400", description = ErrorMessages.DATABASE_COMMUNICATION_ERROR,
                     content = @Content(schema = @Schema(implementation = Error.class)))})
     public ResponseEntity<CalendarDetailsWithTicketsDto> createCalendar(@Valid @RequestBody CreateCalendarDto createCalendarDto,
+                                                                        @PathVariable Long companyId,
                                                                         @PathVariable Long eventId) {
 
         LOGGER.info("Request to create new calendar - {}", createCalendarDto);
         CalendarDetailsWithTicketsDto calendarDetailsDto;
         try {
-            calendarDetailsDto = this.calendarServiceImp.createCalendar(createCalendarDto, eventId);
+            calendarDetailsDto = this.calendarServiceImp.createCalendar(createCalendarDto, companyId, eventId);
 
         } catch (TicketShopException e) {
             throw e;

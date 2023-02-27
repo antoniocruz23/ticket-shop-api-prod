@@ -60,6 +60,15 @@ public class CompanyEntity {
     @OneToMany(mappedBy = "companyEntity")
     private List<EventEntity> events;
 
+    @OneToMany(mappedBy = "companyEntity", cascade = CascadeType.ALL)
+    private List<CalendarEntity> calendars;
+
+    @OneToMany(mappedBy = "companyEntity")
+    private List<TicketEntity> tickets;
+
+    @OneToMany(mappedBy = "companyEntity")
+    private List<PriceEntity> prices;
+
     @PrePersist
     protected void onCreate() {
         createdAt = new Timestamp(System.currentTimeMillis());

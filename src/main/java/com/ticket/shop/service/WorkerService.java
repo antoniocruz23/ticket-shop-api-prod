@@ -4,7 +4,7 @@ import com.ticket.shop.command.Paginated;
 import com.ticket.shop.command.worker.CreateWorkerDto;
 import com.ticket.shop.command.worker.UpdateWorkerDto;
 import com.ticket.shop.command.worker.WorkerDetailsDto;
-import com.ticket.shop.exception.auth.RoleInvalidException;
+import com.ticket.shop.exception.auth.InvalidRoleException;
 import com.ticket.shop.exception.company.CompanyNotFoundException;
 import com.ticket.shop.exception.country.CountryNotFoundException;
 import com.ticket.shop.exception.user.UserAlreadyExistsException;
@@ -24,7 +24,7 @@ public interface WorkerService {
      * @throws UserAlreadyExistsException when the user already exists
      * @throws CompanyNotFoundException   when the company isn't found
      * @throws CountryNotFoundException   when the country isn't found
-     * @throws RoleInvalidException       when the role provided is an invalid role for workers
+     * @throws InvalidRoleException       when the role provided is an invalid role for workers
      */
     WorkerDetailsDto createWorker(Long companyId, CreateWorkerDto createUserDto);
 

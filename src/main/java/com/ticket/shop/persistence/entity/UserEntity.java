@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
@@ -62,12 +61,10 @@ public class UserEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "country_id", nullable = false)
-    @ToString.Exclude
     private CountryEntity countryEntity;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id")
-    @ToString.Exclude
     private CompanyEntity companyEntity;
 
     @Column(name = "created_at")
@@ -92,11 +89,9 @@ public class UserEntity {
     private boolean isEmailConfirmed;
 
     @OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL)
-    @ToString.Exclude
     private List<AddressEntity> addresses;
 
     @OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL)
-    @ToString.Exclude
     private List<TicketEntity> tickets;
 
     @PrePersist

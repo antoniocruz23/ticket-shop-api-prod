@@ -14,10 +14,11 @@ public interface CalendarService {
      * Create new calendar
      *
      * @param createCalendarDto {@link CreateCalendarDto}
+     * @param companyId         company id
      * @param eventId           event id
      * @return {@link CalendarDetailsWithTicketsDto}
      */
-    CalendarDetailsWithTicketsDto createCalendar(CreateCalendarDto createCalendarDto, Long eventId);
+    CalendarDetailsWithTicketsDto createCalendar(CreateCalendarDto createCalendarDto, Long companyId, Long eventId);
 
     /**
      * Get calendar by id

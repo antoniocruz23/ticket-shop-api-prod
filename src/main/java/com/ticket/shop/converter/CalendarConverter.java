@@ -23,6 +23,7 @@ public class CalendarConverter {
                 .startDate(createCalendarDto.getStartDate())
                 .endDate(createCalendarDto.getEndDate())
                 .eventEntity(eventEntity)
+                .companyEntity(eventEntity.getCompanyEntity())
                 .build();
     }
 
@@ -35,7 +36,6 @@ public class CalendarConverter {
     public static CalendarDetailsWithTicketsDto fromCalendarEntityToCalendarDetailsWithTicketsDto(CalendarEntity calendarEntity) {
         return CalendarDetailsWithTicketsDto.builder()
                 .calendarId(calendarEntity.getCalendarId())
-                .eventId(calendarEntity.getEventEntity().getEventId())
                 .startDate(calendarEntity.getStartDate())
                 .endDate(calendarEntity.getEndDate())
                 .build();
@@ -51,6 +51,7 @@ public class CalendarConverter {
         return CalendarDetailsDto.builder()
                 .calendarId(calendarEntity.getCalendarId())
                 .eventId(calendarEntity.getEventEntity().getEventId())
+                .companyId(calendarEntity.getCompanyEntity().getCompanyId())
                 .startDate(calendarEntity.getStartDate())
                 .endDate(calendarEntity.getEndDate())
                 .build();

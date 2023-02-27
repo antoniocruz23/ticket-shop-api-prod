@@ -6,7 +6,7 @@ import com.ticket.shop.command.worker.UpdateWorkerDto;
 import com.ticket.shop.command.worker.WorkerDetailsDto;
 import com.ticket.shop.enumerators.UserRole;
 import com.ticket.shop.exception.DatabaseCommunicationException;
-import com.ticket.shop.exception.auth.RoleInvalidException;
+import com.ticket.shop.exception.auth.InvalidRoleException;
 import com.ticket.shop.exception.company.CompanyNotFoundException;
 import com.ticket.shop.exception.country.CountryNotFoundException;
 import com.ticket.shop.exception.user.UserAlreadyExistsException;
@@ -228,7 +228,7 @@ public class WorkerServiceImpTest {
     public void testUpdateUserFailureDueToRoleInvalidException() {
 
         // Assert exception
-        assertThrows(RoleInvalidException.class,
+        assertThrows(InvalidRoleException.class,
                 () -> this.workerServiceImp.updateWorker(COMPANY_ID, WORKER_ID, getMockedUpdateCustomerDtoWithADMIN()));
     }
 

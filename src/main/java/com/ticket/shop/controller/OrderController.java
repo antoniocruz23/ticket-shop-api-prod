@@ -27,6 +27,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+/**
+ * REST controller responsible for PayPal sdk operations
+ */
 @Controller
 @RequestMapping("/api/paypal/orders")
 @Tag(name = "PayPal", description = "PayPal requests to make a order and payment")

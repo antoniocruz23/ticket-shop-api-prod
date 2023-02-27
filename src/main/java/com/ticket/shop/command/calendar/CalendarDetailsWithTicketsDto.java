@@ -1,12 +1,11 @@
 package com.ticket.shop.command.calendar;
 
-import com.ticket.shop.enumerators.TicketType;
-import io.swagger.v3.oas.annotations.media.Schema;
+import com.ticket.shop.command.ticket.TicketDetailsWhenCreatedDto;
 import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.Map;
+import java.util.List;
 
 /**
  * CalendarDetailsDto used to respond with calendar details and ticket type and amount
@@ -15,10 +14,7 @@ import java.util.Map;
 @Builder
 public class CalendarDetailsWithTicketsDto {
     private Long calendarId;
-    private Long eventId;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
-
-    @Schema(example = "{\n\"VIP\":\n 10\n}")
-    private Map<TicketType, Long> tickets;
+    private List<TicketDetailsWhenCreatedDto> tickets;
 }

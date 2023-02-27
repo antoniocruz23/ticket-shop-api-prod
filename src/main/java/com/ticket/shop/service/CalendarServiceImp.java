@@ -4,10 +4,8 @@ import com.ticket.shop.command.Paginated;
 import com.ticket.shop.command.calendar.CalendarDetailsDto;
 import com.ticket.shop.command.calendar.CalendarDetailsWithTicketsDto;
 import com.ticket.shop.command.calendar.CreateCalendarDto;
-import com.ticket.shop.command.ticket.CreateTicketDto;
-import com.ticket.shop.command.ticket.TicketDetailsDto;
+import com.ticket.shop.command.ticket.TicketDetailsWhenCreatedDto;
 import com.ticket.shop.converter.CalendarConverter;
-import com.ticket.shop.enumerators.TicketType;
 import com.ticket.shop.error.ErrorMessages;
 import com.ticket.shop.exception.DatabaseCommunicationException;
 import com.ticket.shop.exception.calendar.CalendarNotFoundException;
@@ -21,11 +19,10 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * An {@link CalendarService} implementation
@@ -45,12 +42,13 @@ public class CalendarServiceImp implements CalendarService {
     }
 
     /**
-     * @see CalendarService#createCalendar(CreateCalendarDto, Long)
+     * @see CalendarService#createCalendar(CreateCalendarDto, Long, Long)
      */
+    @Transactional
     @Override
-    public CalendarDetailsWithTicketsDto createCalendar(CreateCalendarDto createCalendarDto, Long eventId) {
+    public CalendarDetailsWithTicketsDto createCalendar(CreateCalendarDto createCalendarDto, Long companyId, Long eventId) {
 
-        EventEntity eventEntity = getEventEntityByCompanyIdAndEventId(createCalendarDto.getCompanyId(), eventId);
+        EventEntity eventEntity = getEventEntityByCompanyIdAndEventId(companyId, eventId);
 
         LOGGER.debug("Creating calendar - {}", createCalendarDto);
         CalendarEntity calendarEntity = CalendarConverter.fromCreateCalendarDtoToCalendarEntity(createCalendarDto, eventEntity);
@@ -66,7 +64,7 @@ public class CalendarServiceImp implements CalendarService {
             throw new DatabaseCommunicationException(ErrorMessages.DATABASE_COMMUNICATION_ERROR, e);
         }
 
-        Map<TicketType, Long> createdTickets = createTickets(createCalendarDto.getTickets(), createdCalendar);
+        List<TicketDetailsWhenCreatedDto> createdTickets = this.ticketService.bulkCreateTicket(companyId, calendarEntity.getCalendarId(), createCalendarDto.getTickets());
 
         LOGGER.debug("Retrieving created calendar");
         CalendarDetailsWithTicketsDto calendarDetailsDto = CalendarConverter.fromCalendarEntityToCalendarDetailsWithTicketsDto(createdCalendar);
@@ -112,11 +110,6 @@ public class CalendarServiceImp implements CalendarService {
                 workerListResponse.size(),
                 calendarList.getTotalPages(),
                 calendarList.getTotalElements());
-    }
-
-    private Map<TicketType, Long> createTickets(List<CreateTicketDto> createTicketDtoList, CalendarEntity calendarEntity) {
-        List<TicketDetailsDto> createdTickets = this.ticketService.bulkCreateTicket(createTicketDtoList, calendarEntity);
-        return createdTickets.stream().collect(Collectors.groupingBy(TicketDetailsDto::getType, Collectors.summingLong(t -> 1L)));
     }
 
     /**
