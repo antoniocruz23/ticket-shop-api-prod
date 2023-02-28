@@ -16,12 +16,12 @@ import java.util.List;
 public interface PriceRepository extends CrudRepository<PriceEntity, Long> {
 
     /**
-     * Get list of prices
+     * Get list of prices by types and event entity
      *
      * @param ticketTypes {@link List<TicketType>}
      * @param eventEntity event entity
      * @return {@link List<PriceEntity>}
      */
     @Query("SELECT DISTINCT p FROM PriceEntity p WHERE p.type IN :ticketTypes AND p.eventEntity = :eventEntity")
-    List<PriceEntity> findByValuesAndEventEntity(List<TicketType> ticketTypes, EventEntity eventEntity);
+    List<PriceEntity> findByTypesAndEventEntity(List<TicketType> ticketTypes, EventEntity eventEntity);
 }

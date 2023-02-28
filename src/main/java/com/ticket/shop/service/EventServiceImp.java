@@ -3,22 +3,27 @@ package com.ticket.shop.service;
 import com.ticket.shop.command.address.AddressDetailsDto;
 import com.ticket.shop.command.event.CreateEventDto;
 import com.ticket.shop.command.event.EventDetailsDto;
+import com.ticket.shop.command.event.EventDetailsWithCalendarIdsDto;
 import com.ticket.shop.command.price.PriceDetailsDto;
 import com.ticket.shop.converter.EventConverter;
 import com.ticket.shop.error.ErrorMessages;
 import com.ticket.shop.exception.DatabaseCommunicationException;
 import com.ticket.shop.exception.address.AddressNotFoundException;
 import com.ticket.shop.exception.company.CompanyNotFoundException;
+import com.ticket.shop.exception.event.EventNotFoundException;
 import com.ticket.shop.persistence.entity.AddressEntity;
+import com.ticket.shop.persistence.entity.CalendarEntity;
 import com.ticket.shop.persistence.entity.CompanyEntity;
 import com.ticket.shop.persistence.entity.CountryEntity;
 import com.ticket.shop.persistence.entity.EventEntity;
+import com.ticket.shop.persistence.entity.PriceEntity;
 import com.ticket.shop.persistence.repository.AddressRepository;
 import com.ticket.shop.persistence.repository.CompanyRepository;
 import com.ticket.shop.persistence.repository.EventRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -47,10 +52,11 @@ public class EventServiceImp implements EventService {
     /**
      * @see EventService#createEvent(CreateEventDto, Long)
      */
+    @Transactional
     @Override
     public EventDetailsDto createEvent(CreateEventDto createEventDto, Long companyId) {
 
-        EventEntity eventEntity = EventConverter.fromCreateCompanyDtoToCompanyEntity(createEventDto);
+        EventEntity eventEntity = EventConverter.fromCreateEventDtoToEventEntity(createEventDto);
 
         AddressDetailsDto address = this.addressService.createAddress(createEventDto.getAddress());
         AddressEntity addressEntity = getAddressEntityById(address.getAddressId());
@@ -73,7 +79,19 @@ public class EventServiceImp implements EventService {
         List<PriceDetailsDto> prices = this.priceServiceImp.bulkCreatePrice(createEventDto.getPrices(), createdEvent);
 
         LOGGER.debug("Retrieving created event");
-        return EventConverter.fromCompanyEntityToCompanyDetailsDto(createdEvent, prices);
+        return EventConverter.fromEventEntityToEventDetailsDto(createdEvent, prices);
+    }
+
+    /**
+     * @see EventService#getEventById(Long)
+     */
+    @Override
+    public EventDetailsWithCalendarIdsDto getEventById(Long eventId) {
+        EventEntity eventEntity = getEventEntityById(eventId);
+        List<PriceEntity> prices = eventEntity.getPrices();
+        List<Long> calendarIds = eventEntity.getCalendars().stream().map(CalendarEntity::getCalendarId).toList();
+
+        return EventConverter.fromEventEntityToEventDetailsWithCalendarIdsDto(eventEntity, prices, calendarIds);
     }
 
     /**
@@ -107,18 +125,17 @@ public class EventServiceImp implements EventService {
     }
 
     /**
-     * Get event by company id and event id
+     * Get Event by id
      *
-     * @param companyId company id
-     * @param eventId   event id
+     * @param eventId event id
      * @return {@link EventEntity}
      */
-    private EventEntity getEventEntityByCompanyIdAndEventId(Long companyId, Long eventId) {
+    private EventEntity getEventEntityById(Long eventId) {
         LOGGER.debug("Getting event with id {} from database", eventId);
-        return this.eventRepository.findByCompanyIdAndEventId(companyId, eventId)
+        return this.eventRepository.findById(eventId)
                 .orElseThrow(() -> {
-                    LOGGER.error("The event with id {} does not exist in database", companyId);
-                    return new CompanyNotFoundException(ErrorMessages.EVENT_NOT_FOUND);
+                    LOGGER.error("The event with id {} does not exist in database", eventId);
+                    return new EventNotFoundException(ErrorMessages.EVENT_NOT_FOUND);
                 });
     }
 }

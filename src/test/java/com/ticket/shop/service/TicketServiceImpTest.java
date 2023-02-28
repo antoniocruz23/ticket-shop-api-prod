@@ -63,7 +63,7 @@ public class TicketServiceImpTest {
         // Mock data
         when(this.companyRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedCompanyEntity()));
         when(this.calendarRepository.findByCalendarIdAndCompanyEntity(any(), any())).thenReturn(Optional.ofNullable(getMockedCalendarEntity()));
-        when(this.priceRepository.findByValuesAndEventEntity(any(), any())).thenReturn(getMockedPriceEntities());
+        when(this.priceRepository.findByTypesAndEventEntity(any(), any())).thenReturn(getMockedPriceEntities());
         when(this.ticketRepository.saveAll(any())).thenReturn(List.of(getMockedTicketEntity()));
 
         // Method to be tested
@@ -99,7 +99,7 @@ public class TicketServiceImpTest {
         // Mock data
         when(this.companyRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedCompanyEntity()));
         when(this.calendarRepository.findByCalendarIdAndCompanyEntity(any(), any())).thenReturn(Optional.ofNullable(getMockedCalendarEntity()));
-        when(this.priceRepository.findByValuesAndEventEntity(any(), any())).thenReturn(List.of());
+        when(this.priceRepository.findByTypesAndEventEntity(any(), any())).thenReturn(List.of());
 
         // Assert exception
         assertThrows(InvalidTicketTypeException.class,
@@ -111,7 +111,7 @@ public class TicketServiceImpTest {
         // Mock data
         when(this.companyRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedCompanyEntity()));
         when(this.calendarRepository.findByCalendarIdAndCompanyEntity(any(), any())).thenReturn(Optional.ofNullable(getMockedCalendarEntity()));
-        when(this.priceRepository.findByValuesAndEventEntity(any(), any())).thenReturn(getMockedPriceEntities());
+        when(this.priceRepository.findByTypesAndEventEntity(any(), any())).thenReturn(getMockedPriceEntities());
         when(this.ticketRepository.saveAll(any())).thenThrow(RuntimeException.class);
 
         // Assert exception

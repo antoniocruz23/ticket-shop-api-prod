@@ -81,7 +81,7 @@ public class CalendarServiceImpTest {
         when(this.calendarRepository.save(any())).thenReturn(getMockedCalendarEntity());
         when(this.companyRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedCompanyEntity()));
         when(this.calendarRepository.findByCalendarIdAndCompanyEntity(any(), any())).thenReturn(Optional.ofNullable(getMockedCalendarEntity()));
-        when(this.priceRepository.findByValuesAndEventEntity(any(), any())).thenReturn(getMockedPriceEntity());
+        when(this.priceRepository.findByTypesAndEventEntity(any(), any())).thenReturn(getMockedPriceEntity());
         when(this.ticketRepository.saveAll(any())).thenReturn(List.of(getMockedTicketEntity()));
 
         // Method to be tested
@@ -145,7 +145,7 @@ public class CalendarServiceImpTest {
         when(this.calendarRepository.save(any())).thenReturn(getMockedCalendarEntity());
         when(this.companyRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedCompanyEntity()));
         when(this.calendarRepository.findByCalendarIdAndCompanyEntity(any(), any())).thenReturn(Optional.ofNullable(getMockedCalendarEntity()));
-        when(this.priceRepository.findByValuesAndEventEntity(any(), any())).thenReturn(List.of());
+        when(this.priceRepository.findByTypesAndEventEntity(any(), any())).thenReturn(List.of());
 
         // assert
         assertThrows(InvalidTicketTypeException.class,
@@ -159,7 +159,7 @@ public class CalendarServiceImpTest {
         when(this.calendarRepository.save(any())).thenReturn(getMockedCalendarEntity());
         when(this.companyRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedCompanyEntity()));
         when(this.calendarRepository.findByCalendarIdAndCompanyEntity(any(), any())).thenReturn(Optional.ofNullable(getMockedCalendarEntity()));
-        when(this.priceRepository.findByValuesAndEventEntity(any(), any())).thenReturn(getMockedPriceEntity());
+        when(this.priceRepository.findByTypesAndEventEntity(any(), any())).thenReturn(getMockedPriceEntity());
         when(this.ticketRepository.saveAll(any())).thenThrow(RuntimeException.class);
 
         // assert

@@ -109,7 +109,7 @@ public class TicketServiceImp implements TicketService {
      */
     private List<PriceEntity> getTicketPriceEntityByType(List<TicketType> ticketTypes, EventEntity eventEntity) {
         LOGGER.debug("Getting prices with types {} from database", ticketTypes);
-        return this.priceRepository.findByValuesAndEventEntity(ticketTypes, eventEntity);
+        return this.priceRepository.findByTypesAndEventEntity(ticketTypes, eventEntity);
     }
 
     /**

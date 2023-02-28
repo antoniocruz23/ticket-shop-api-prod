@@ -4,6 +4,7 @@ import com.ticket.shop.command.address.AddressDetailsDto;
 import com.ticket.shop.command.address.CreateAddressDto;
 import com.ticket.shop.command.event.CreateEventDto;
 import com.ticket.shop.command.event.EventDetailsDto;
+import com.ticket.shop.command.event.EventDetailsWithCalendarIdsDto;
 import com.ticket.shop.command.price.CreatePriceDto;
 import com.ticket.shop.command.price.PriceDetailsDto;
 import com.ticket.shop.enumerators.TicketType;
@@ -11,7 +12,9 @@ import com.ticket.shop.exception.DatabaseCommunicationException;
 import com.ticket.shop.exception.address.AddressNotFoundException;
 import com.ticket.shop.exception.company.CompanyNotFoundException;
 import com.ticket.shop.exception.country.CountryNotFoundException;
+import com.ticket.shop.exception.event.EventNotFoundException;
 import com.ticket.shop.persistence.entity.AddressEntity;
+import com.ticket.shop.persistence.entity.CalendarEntity;
 import com.ticket.shop.persistence.entity.CompanyEntity;
 import com.ticket.shop.persistence.entity.CountryEntity;
 import com.ticket.shop.persistence.entity.EventEntity;
@@ -162,6 +165,32 @@ public class EventServiceImpTest {
                 () -> this.eventServiceImp.createEvent(getMockedCreateEventDto(), getMockedCompanyEntity().getCompanyId()));
     }
 
+    /**
+     * Get event by id
+     */
+    @Test
+    public void testGetEventByIdSuccessfully() {
+        // Mock data
+        when(this.eventRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedEventEntity()));
+
+        // Method to be tested
+        EventDetailsWithCalendarIdsDto calendar = this.eventServiceImp.getEventById(getMockedEventEntity().getEventId());
+
+        // Assert
+        assertNotNull(calendar);
+        assertEquals(getMockedEventDetailsWithCalendarIdsDto(), calendar);
+    }
+
+    @Test
+    public void testGetEventByIdFailureDueToEventNotFound() {
+        // Mock data
+        when(this.eventRepository.findById(any())).thenReturn(Optional.empty());
+
+        // assert
+        assertThrows(EventNotFoundException.class,
+                () -> this.eventServiceImp.getEventById(getMockedEventEntity().getEventId()));
+    }
+
     private CountryEntity getMockedCountryEntity() {
         return CountryEntity.builder()
                 .countryId(1L)
@@ -199,6 +228,8 @@ public class EventServiceImpTest {
                 .description("test")
                 .companyEntity(getMockedCompanyEntity())
                 .addressEntity(getMockedAddressEntity())
+                .calendars(List.of(CalendarEntity.builder().calendarId(1L).build()))
+                .prices(List.of(getMockedPriceEntity()))
                 .build();
     }
 
@@ -245,7 +276,6 @@ public class EventServiceImpTest {
                 .priceId(2L)
                 .price(12.1)
                 .type(TicketType.VIP)
-                .eventEntity(getMockedEventEntity())
                 .build();
     }
 
@@ -262,5 +292,12 @@ public class EventServiceImpTest {
                 .price(getMockedPriceEntity().getPrice())
                 .type(getMockedPriceEntity().getType())
                 .build());
+    }
+
+    private EventDetailsWithCalendarIdsDto getMockedEventDetailsWithCalendarIdsDto() {
+        return EventDetailsWithCalendarIdsDto.builder()
+                .eventDetailsDto(getMockedEventDetailsDto())
+                .calendarIds(List.of(1L))
+                .build();
     }
 }

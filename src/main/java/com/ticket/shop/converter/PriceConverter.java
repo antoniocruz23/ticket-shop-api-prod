@@ -17,7 +17,7 @@ public class PriceConverter {
      * From {@link List<CreateTicketDto>} to {@link List<PriceEntity>}
      *
      * @param createPriceDto {@link List<CreatePriceDto>}
-     * @param eventEntity {@link EventEntity}
+     * @param eventEntity    {@link EventEntity}
      * @return {@link PriceEntity}
      */
     public static List<PriceEntity> fromListOfCreatePriceDtoToListOfPriceEntity(List<CreatePriceDto> createPriceDto, EventEntity eventEntity) {
@@ -43,6 +43,7 @@ public class PriceConverter {
                         .priceId(price.getPriceId())
                         .price(price.getPrice())
                         .type(price.getType())
-                        .build()).toList();
+                        .build())
+                .toList();
     }
 }
