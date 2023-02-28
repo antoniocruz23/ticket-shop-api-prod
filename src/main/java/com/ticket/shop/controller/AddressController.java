@@ -42,6 +42,13 @@ public class AddressController {
         this.addressServiceImp = addressServiceImp;
     }
 
+    /**
+     * Create address for a user
+     *
+     * @param userId           user id
+     * @param createAddressDto {@link CreateAddressDto}
+     * @return {@link AddressDetailsDto}
+     */
     @PostMapping("/{userId}")
     @PreAuthorize("@authorized.hasRole('ADMIN') || " +
             "((@authorized.hasRole('CUSTOMER') || @authorized.hasRole('WORKER')) && @authorized.isUser(#userId))")
