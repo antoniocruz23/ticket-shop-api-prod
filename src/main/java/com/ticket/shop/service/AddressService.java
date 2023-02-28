@@ -16,4 +16,13 @@ public interface AddressService {
      */
     AddressDetailsDto createAddress(CreateAddressDto createAddressDto);
 
+    /**
+     * Create Address for a user (Customer or worker)
+     *
+     * @param userId           user id
+     * @param createAddressDto {@link CreateAddressDto}
+     * @return {@link AddressDetailsDto}
+     */
+    AddressDetailsDto createUserAddress(Long userId, CreateAddressDto createAddressDto);
+
 }

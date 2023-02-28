@@ -95,7 +95,7 @@ public class CustomerController {
     @GetMapping("/{customerId}")
     @PreAuthorize("@authorized.hasRole('ADMIN') || (@authorized.hasRole('CUSTOMER') && @authorized.isUser(#customerId))")
     @Operation(summary = "Get customer",
-            description = "Get customer by id - Restrict for users with 'CUSTOMER' role and the logged in user id needs to be the same as the request")
+            description = "Get customer by id - Access only for the own user")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful Operation",
                     content = @Content(schema = @Schema(implementation = CustomerDetailsDto.class))),
@@ -169,7 +169,7 @@ public class CustomerController {
     @PutMapping("/{customerId}")
     @PreAuthorize("@authorized.hasRole('ADMIN') || (@authorized.hasRole('CUSTOMER') && @authorized.isUser(#customerId))")
     @Operation(summary = "Update customer",
-            description = "Update customer - Restrict for users with 'CUSTOMER' role and the logged in user id needs to be the same as the request")
+            description = "Update customer - Access only for the own user")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful Operation",
                     content = @Content(schema = @Schema(implementation = CustomerDetailsDto.class))),

@@ -16,6 +16,7 @@ import com.ticket.shop.persistence.entity.CountryEntity;
 import com.ticket.shop.persistence.repository.AddressRepository;
 import com.ticket.shop.persistence.repository.CompanyRepository;
 import com.ticket.shop.persistence.repository.CountryRepository;
+import com.ticket.shop.persistence.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -43,6 +44,9 @@ public class CompanyServiceImpTest {
     @Mock
     private CountryRepository countryRepository;
 
+    @Mock
+    private UserRepository userRepository;
+
     private CompanyServiceImp companyServiceImp;
 
     private final static Long COMPANY_ID = 245L;
@@ -52,7 +56,7 @@ public class CompanyServiceImpTest {
 
     @BeforeEach
     public void setUp() {
-        AddressServiceImp addressService = new AddressServiceImp(this.addressRepository, this.countryRepository);
+        AddressServiceImp addressService = new AddressServiceImp(this.addressRepository, this.countryRepository, this.userRepository);
         this.companyServiceImp = new CompanyServiceImp(this.companyRepository, this.addressRepository, addressService, this.countryRepository);
     }
 

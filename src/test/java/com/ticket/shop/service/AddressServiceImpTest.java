@@ -4,10 +4,13 @@ import com.ticket.shop.command.address.AddressDetailsDto;
 import com.ticket.shop.command.address.CreateAddressDto;
 import com.ticket.shop.exception.DatabaseCommunicationException;
 import com.ticket.shop.exception.country.CountryNotFoundException;
+import com.ticket.shop.exception.user.UserNotFoundException;
 import com.ticket.shop.persistence.entity.AddressEntity;
 import com.ticket.shop.persistence.entity.CountryEntity;
+import com.ticket.shop.persistence.entity.UserEntity;
 import com.ticket.shop.persistence.repository.AddressRepository;
 import com.ticket.shop.persistence.repository.CountryRepository;
+import com.ticket.shop.persistence.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -30,11 +33,14 @@ public class AddressServiceImpTest {
     @Mock
     private CountryRepository countryRepository;
 
+    @Mock
+    private UserRepository userRepository;
+
     private AddressServiceImp addressServiceImp;
 
     @BeforeEach
     public void setUp() {
-        this.addressServiceImp = new AddressServiceImp(addressRepository, countryRepository);
+        this.addressServiceImp = new AddressServiceImp(this.addressRepository, this.countryRepository, this.userRepository);
     }
 
     /**
@@ -75,6 +81,57 @@ public class AddressServiceImpTest {
                 () -> this.addressServiceImp.createAddress(getMockedCreateAddressDto()));
     }
 
+    /**
+     * Create user address tests
+     */
+    @Test
+    public void testCreateUserAddressSuccessfully() {
+        // Mock
+        when(this.countryRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedCountryEntity()));
+        when(this.userRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedUserEntity()));
+        when(this.addressRepository.save(any())).thenReturn(getMockedAddressEntity());
+
+        // Method to be tested
+        AddressDetailsDto address = this.addressServiceImp.createUserAddress(1L, getMockedCreateAddressDto());
+
+        // Assert
+        assertNotNull(address);
+        assertEquals(getMockedAddressDetailsDto(), address);
+    }
+
+    @Test
+    public void testCreateUserAddressFailureDueToCountryNotFound() {
+        // Mock data
+        when(this.countryRepository.findById(any())).thenReturn(Optional.empty());
+
+        // Assert
+        assertThrows(CountryNotFoundException.class,
+                () -> this.addressServiceImp.createUserAddress(1L, getMockedCreateAddressDto()));
+    }
+
+    @Test
+    public void testCreateUserAddressFailureDueToUserNotFound() {
+        // Mock data
+        when(this.countryRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedCountryEntity()));
+        when(this.userRepository.findById(any())).thenReturn(Optional.empty());
+
+        // Assert
+        assertThrows(UserNotFoundException.class,
+                () -> this.addressServiceImp.createUserAddress(1L, getMockedCreateAddressDto()));
+    }
+
+    @Test
+    public void testCreateUserAddressFailureDueToDatabaseCommunication() {
+        // Mock data
+        when(this.countryRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedCountryEntity()));
+        when(this.userRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedUserEntity()));
+        when(this.addressRepository.save(any())).thenThrow(RuntimeException.class);
+
+        // Assert
+        assertThrows(DatabaseCommunicationException.class,
+                () -> this.addressServiceImp.createUserAddress(1L, getMockedCreateAddressDto()));
+    }
+
     private CountryEntity getMockedCountryEntity() {
         return CountryEntity.builder()
                 .countryId(1L)
@@ -112,6 +169,13 @@ public class AddressServiceImpTest {
                 .postCode("code")
                 .city("city")
                 .countryId(getMockedCountryEntity().getCountryId())
+                .build();
+    }
+
+    private UserEntity getMockedUserEntity() {
+        return UserEntity.builder()
+                .userId(1L)
+                .countryEntity(getMockedCountryEntity())
                 .build();
     }
 }
