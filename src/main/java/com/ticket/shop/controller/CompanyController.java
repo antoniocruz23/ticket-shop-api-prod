@@ -53,7 +53,7 @@ public class CompanyController {
      */
     @PostMapping()
     @PreAuthorize("@authorized.hasRole('ADMIN')")
-    @Operation(summary = "Registration", description = "Register new company")
+    @Operation(summary = "Create new company", description = "Register new company")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Successfully Created",
                     content = @Content(schema = @Schema(implementation = CompanyDetailsDto.class))),
