@@ -98,7 +98,7 @@ public class CalendarController {
      * @param calendarId calendar id
      * @return {@link CalendarDetailsDto} the calendar wanted and Ok httpStatus
      */
-    @GetMapping("/events/calendars/{calendarId}")
+    @GetMapping("/calendars/{calendarId}")
     @Operation(summary = "Get calendar by id", description = "Get calendar by id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful Operation",
