@@ -47,7 +47,7 @@ public interface CompanyService {
     void deleteCompany(Long companyId);
 
     /**
-     * Get companies by Pagination
+     * Get companies with Pagination
      *
      * @param page page
      * @param size size

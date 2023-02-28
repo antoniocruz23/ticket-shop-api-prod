@@ -143,8 +143,8 @@ public class WorkerController {
      */
     @GetMapping("/companies/{companyId}/workers")
     @PreAuthorize("@authorized.hasRole('ADMIN') || (@authorized.hasRole('COMPANY_ADMIN') && @authorized.isOnCompany(#companyId))")
-    @Operation(summary = "Get workers from a company by pagination",
-            description = "Get workers from a company by pagination - Access only for users with 'COMPANY_ADMIN' role and the logged in user company id needs to be the same as the request")
+    @Operation(summary = "Get workers from a company with pagination",
+            description = "Get workers from a company with pagination - Access only for users with 'COMPANY_ADMIN' role and the logged in user company id needs to be the same as the request")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful Operation",
                     content = @Content(schema = @Schema(implementation = WorkerDetailsDto.class))),

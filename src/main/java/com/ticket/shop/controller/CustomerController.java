@@ -131,7 +131,7 @@ public class CustomerController {
      */
     @GetMapping()
     @PreAuthorize("@authorized.hasRole('ADMIN')")
-    @Operation(summary = "Get customers by pagination", description = "Get customers by pagination - Access only for application Admins")
+    @Operation(summary = "Get customers with pagination", description = "Get customers with pagination - Access only for application Admins")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful Operation",
                     content = @Content(schema = @Schema(implementation = Paginated.class))),

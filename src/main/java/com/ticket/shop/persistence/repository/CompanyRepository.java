@@ -38,7 +38,7 @@ public interface CompanyRepository extends CrudRepository<CompanyEntity, Long> {
     Optional<CompanyEntity> findByWebsite(String website);
 
     /**
-     * Get companies by pagination
+     * Get companies with pagination
      *
      * @param pageable {@link Pageable}
      * @return {@link Page<CompanyEntity>}

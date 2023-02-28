@@ -40,7 +40,7 @@ public interface WorkerService {
     WorkerDetailsDto getWorkerById(Long companyId, Long workerId);
 
     /**
-     * Get workers list by pagination
+     * Get workers list with pagination
      *
      * @param companyId company id
      * @param page      page number

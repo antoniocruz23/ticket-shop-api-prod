@@ -190,14 +190,14 @@ public class CompanyController {
     }
 
     /**
-     * Get all companies by pagination
+     * Get all companies with pagination
      *
      * @param page page number
      * @param size page size
      * @return {@link Paginated<CompanyDetailsDto>}
      */
     @GetMapping()
-    @Operation(summary = "Get companies by pagination", description = "Get companies by pagination")
+    @Operation(summary = "Get companies with pagination", description = "Get companies with pagination")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful Operation",
                     content = @Content(schema = @Schema(implementation = CompanyDetailsDto.class))),
