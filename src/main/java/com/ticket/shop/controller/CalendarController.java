@@ -104,8 +104,6 @@ public class CalendarController {
             @ApiResponse(responseCode = "200", description = "Successful Operation",
                     content = @Content(schema = @Schema(implementation = CalendarDetailsDto.class))),
             @ApiResponse(responseCode = "404", description = ErrorMessages.CALENDAR_NOT_FOUND,
-                    content = @Content(schema = @Schema(implementation = Error.class))),
-            @ApiResponse(responseCode = "500", description = ErrorMessages.ACCESS_DENIED,
                     content = @Content(schema = @Schema(implementation = Error.class)))})
     public ResponseEntity<CalendarDetailsDto> getCalendarById(@PathVariable Long calendarId) {
 
@@ -139,7 +137,7 @@ public class CalendarController {
                     content = @Content(schema = @Schema(implementation = CalendarDetailsDto.class))),
             @ApiResponse(responseCode = "404", description = ErrorMessages.EVENT_NOT_FOUND,
                     content = @Content(schema = @Schema(implementation = Error.class))),
-            @ApiResponse(responseCode = "500", description = ErrorMessages.ACCESS_DENIED,
+            @ApiResponse(responseCode = "400", description = ErrorMessages.DATABASE_COMMUNICATION_ERROR,
                     content = @Content(schema = @Schema(implementation = Error.class)))})
     public ResponseEntity<Paginated<CalendarDetailsDto>> getCalendarByEventId(@PathVariable Long eventId,
                                                                               @RequestParam(defaultValue = "0") int page,
@@ -177,6 +175,8 @@ public class CalendarController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Successful Operation"),
             @ApiResponse(responseCode = "404", description = ErrorMessages.EVENT_NOT_FOUND + " || " + ErrorMessages.CALENDAR_NOT_FOUND,
+                    content = @Content(schema = @Schema(implementation = Error.class))),
+            @ApiResponse(responseCode = "500", description = ErrorMessages.ACCESS_DENIED,
                     content = @Content(schema = @Schema(implementation = Error.class))),
             @ApiResponse(responseCode = "400", description = ErrorMessages.DATABASE_COMMUNICATION_ERROR,
                     content = @Content(schema = @Schema(implementation = Error.class)))})

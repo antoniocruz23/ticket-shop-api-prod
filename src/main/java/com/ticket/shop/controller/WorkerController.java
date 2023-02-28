@@ -53,7 +53,7 @@ public class WorkerController {
     /**
      * Create new worker
      *
-     * @param companyId company id
+     * @param companyId       company id
      * @param createWorkerDto new worker data
      * @return {@link WorkerDetailsDto} the response entity
      */
@@ -235,9 +235,11 @@ public class WorkerController {
             @ApiResponse(responseCode = "404", description = ErrorMessages.USER_NOT_FOUND,
                     content = @Content(schema = @Schema(implementation = Error.class))),
             @ApiResponse(responseCode = "400", description = ErrorMessages.DATABASE_COMMUNICATION_ERROR,
+                    content = @Content(schema = @Schema(implementation = Error.class))),
+            @ApiResponse(responseCode = "403", description = ErrorMessages.ACCESS_DENIED,
                     content = @Content(schema = @Schema(implementation = Error.class)))})
     public ResponseEntity<Void> deleteWorker(@PathVariable Long companyId,
-                                       @PathVariable Long workerId) {
+                                             @PathVariable Long workerId) {
 
         LOGGER.info("Request to delete worker with id - {}", workerId);
         try {

@@ -1,5 +1,6 @@
 package com.ticket.shop.service;
 
+import com.ticket.shop.command.Paginated;
 import com.ticket.shop.command.address.AddressDetailsDto;
 import com.ticket.shop.command.address.CreateAddressDto;
 import com.ticket.shop.command.company.CompanyDetailsDto;
@@ -19,7 +20,12 @@ import com.ticket.shop.persistence.repository.CompanyRepository;
 import com.ticket.shop.persistence.repository.CountryRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * An {@link CompanyService} implementation
@@ -117,6 +123,35 @@ public class CompanyServiceImp implements CompanyService {
             LOGGER.error("Failed while deleting company with id {} from database", companyId, e);
             throw new DatabaseCommunicationException(ErrorMessages.DATABASE_COMMUNICATION_ERROR, e);
         }
+    }
+
+    /**
+     * @see CompanyService#getCompanyList(int, int)
+     */
+    @Override
+    public Paginated<CompanyDetailsDto> getCompanyList(int page, int size) {
+        LOGGER.debug("Getting companies page {} from database", page);
+        Page<CompanyEntity> companyList;
+        try {
+            companyList = this.companyRepository.findAll(PageRequest.of(page, size));
+
+        } catch (Exception e) {
+            LOGGER.error("Failed at getting companies page {} from database", page, e);
+            throw new DatabaseCommunicationException(ErrorMessages.DATABASE_COMMUNICATION_ERROR, e);
+        }
+
+        LOGGER.debug("Converting company list to CompanyDetailsDto");
+        List<CompanyDetailsDto> companyListResponse = new ArrayList<>();
+        for (CompanyEntity companyEntity : companyList) {
+            companyListResponse.add(CompanyConverter.fromCompanyEntityToCompanyDetailsDto(companyEntity));
+        }
+
+        return new Paginated<>(
+                companyListResponse,
+                page,
+                companyListResponse.size(),
+                companyList.getTotalPages(),
+                companyList.getTotalElements());
     }
 
     /**

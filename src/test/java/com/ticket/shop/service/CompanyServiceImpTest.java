@@ -1,5 +1,6 @@
 package com.ticket.shop.service;
 
+import com.ticket.shop.command.Paginated;
 import com.ticket.shop.command.address.AddressDetailsDto;
 import com.ticket.shop.command.address.CreateAddressDto;
 import com.ticket.shop.command.company.CompanyDetailsDto;
@@ -21,7 +22,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -289,6 +295,31 @@ public class CompanyServiceImpTest {
                 () -> this.companyServiceImp.deleteCompany(COMPANY_ID));
     }
 
+    /**
+     * Get company list tests
+     */
+    @Test
+    public void testGetCompanyListSuccessfully() {
+        //Mocks
+        when(this.companyRepository.findAll(any())).thenReturn(getMockedPagedCompanyEntity());
+
+        //Call method
+        Paginated<CompanyDetailsDto> workerDetailsDto = this.companyServiceImp.getCompanyList(0, 1);
+
+        //Assert result
+        assertNotNull(workerDetailsDto);
+        assertEquals(getMockedPaginatedCompanyDetailsDto(), workerDetailsDto);
+    }
+
+    @Test
+    public void testGetCompanyListFailureDueToDatabaseConnectionFailure() {
+        //Mocks
+        when(this.companyRepository.findAll(any())).thenThrow(RuntimeException.class);
+
+        assertThrows(DatabaseCommunicationException.class,
+                () -> this.companyServiceImp.getCompanyList(0, 1));
+    }
+
     private CreateOrUpdateCompanyDto getMockedCreateOrUpdateCompanyDto() {
         return CreateOrUpdateCompanyDto.builder()
                 .name(NAME)
@@ -365,5 +396,23 @@ public class CompanyServiceImpTest {
                 .city("city")
                 .countryEntity(getMockedCountryEntity())
                 .build();
+    }
+
+    private Page<CompanyEntity> getMockedPagedCompanyEntity() {
+        List<CompanyEntity> content = List.of(getMockedCompanyEntity());
+        Pageable pageable = PageRequest.of(0, 1);
+
+        return new PageImpl<>(content, pageable, 1);
+    }
+
+    private Paginated<CompanyDetailsDto> getMockedPaginatedCompanyDetailsDto() {
+        List<CompanyDetailsDto> companyDetailsDto = List.of(getMockedCompanyDetailsDto());
+
+        return new Paginated<>(
+                companyDetailsDto,
+                0,
+                companyDetailsDto.size(),
+                1,
+                1);
     }
 }

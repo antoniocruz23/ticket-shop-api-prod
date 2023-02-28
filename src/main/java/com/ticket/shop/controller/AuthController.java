@@ -125,8 +125,7 @@ public class AuthController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Ok",
                     content = @Content(schema = @Schema(implementation = ResetPasswordTokenDto.class))),
-            @ApiResponse(responseCode = "422", description = "Unprocessable Entity",
-                    content = @Content(schema = @Schema(implementation = ResetPasswordTokenDto.class)))})
+            @ApiResponse(responseCode = "422", description = "Unprocessable Entity")})
     public ResponseEntity<ResetPasswordTokenDto> validateResetPasswordToken(@RequestParam String token) {
 
         ResetPasswordTokenDto resetPasswordTokenDto;

@@ -1,5 +1,6 @@
 package com.ticket.shop.controller;
 
+import com.ticket.shop.command.Paginated;
 import com.ticket.shop.command.company.CompanyDetailsDto;
 import com.ticket.shop.command.company.CreateOrUpdateCompanyDto;
 import com.ticket.shop.error.Error;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -94,8 +96,6 @@ public class CompanyController {
             @ApiResponse(responseCode = "200", description = "Successful Operation",
                     content = @Content(schema = @Schema(implementation = CompanyDetailsDto.class))),
             @ApiResponse(responseCode = "404", description = ErrorMessages.COMPANY_NOT_FOUND,
-                    content = @Content(schema = @Schema(implementation = Error.class))),
-            @ApiResponse(responseCode = "500", description = ErrorMessages.ACCESS_DENIED,
                     content = @Content(schema = @Schema(implementation = Error.class)))})
     public ResponseEntity<CompanyDetailsDto> getCompanyById(@PathVariable Long companyId) {
 
@@ -168,6 +168,8 @@ public class CompanyController {
             @ApiResponse(responseCode = "404", description = ErrorMessages.COMPANY_NOT_FOUND,
                     content = @Content(schema = @Schema(implementation = Error.class))),
             @ApiResponse(responseCode = "400", description = ErrorMessages.DATABASE_COMMUNICATION_ERROR,
+                    content = @Content(schema = @Schema(implementation = Error.class))),
+            @ApiResponse(responseCode = "403", description = ErrorMessages.ACCESS_DENIED,
                     content = @Content(schema = @Schema(implementation = Error.class)))})
     public ResponseEntity<Void> deleteCompany(@PathVariable Long companyId) {
 
@@ -185,5 +187,39 @@ public class CompanyController {
 
         LOGGER.info("Company with id {} deleted successfully", companyId);
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Get all companies by pagination
+     *
+     * @param page page number
+     * @param size page size
+     * @return {@link Paginated<CompanyDetailsDto>}
+     */
+    @GetMapping()
+    @Operation(summary = "Get companies by pagination", description = "Get companies by pagination")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful Operation",
+                    content = @Content(schema = @Schema(implementation = CompanyDetailsDto.class))),
+            @ApiResponse(responseCode = "400", description = ErrorMessages.DATABASE_COMMUNICATION_ERROR,
+                    content = @Content(schema = @Schema(implementation = Error.class)))})
+    public ResponseEntity<Paginated<CompanyDetailsDto>> getAllCompanies(@RequestParam(defaultValue = "0") int page,
+                                                                        @RequestParam(defaultValue = "10") int size) {
+
+        LOGGER.info("Request to get company list - page: {}, size: {}", page, size);
+        Paginated<CompanyDetailsDto> companyDetailsDtoList;
+        try {
+            companyDetailsDtoList = this.companyServiceImp.getCompanyList(page, size);
+
+        } catch (TicketShopException e) {
+            throw e;
+
+        } catch (Exception e) {
+            LOGGER.error("Failed to get company list - page: {}, size: {}", page, size, e);
+            throw new TicketShopException(ErrorMessages.OPERATION_FAILED, e);
+        }
+
+        LOGGER.info("Retrieved company list");
+        return new ResponseEntity<>(companyDetailsDtoList, OK);
     }
 }

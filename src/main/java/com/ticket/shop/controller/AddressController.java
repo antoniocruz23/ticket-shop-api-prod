@@ -60,6 +60,8 @@ public class AddressController {
             @ApiResponse(responseCode = "404", description = ErrorMessages.COUNTRY_NOT_FOUND + " || " + ErrorMessages.USER_NOT_FOUND,
                     content = @Content(schema = @Schema(implementation = Error.class))),
             @ApiResponse(responseCode = "400", description = ErrorMessages.DATABASE_COMMUNICATION_ERROR,
+                    content = @Content(schema = @Schema(implementation = Error.class))),
+            @ApiResponse(responseCode = "500", description = ErrorMessages.ACCESS_DENIED,
                     content = @Content(schema = @Schema(implementation = Error.class)))})
     public ResponseEntity<AddressDetailsDto> createUserAddress(@PathVariable Long userId,
                                                                @Valid @RequestBody CreateAddressDto createAddressDto) {

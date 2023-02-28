@@ -55,6 +55,8 @@ public class OrderController {
                     + ErrorMessages.USER_NOT_FOUND + " || " + ErrorMessages.TICKET_UNAVAILABLE,
                     content = @Content(schema = @Schema(implementation = Error.class))),
             @ApiResponse(responseCode = "400", description = ErrorMessages.DATABASE_COMMUNICATION_ERROR + " || " + "PayPal Order Error",
+                    content = @Content(schema = @Schema(implementation = Error.class))),
+            @ApiResponse(responseCode = "403", description = ErrorMessages.ACCESS_DENIED,
                     content = @Content(schema = @Schema(implementation = Error.class)))})
     public ResponseEntity<OrderDetailsDto> createOrder(@Valid @RequestBody CreateOrderDto createOrderDto,
                                                        HttpServletRequest request) {

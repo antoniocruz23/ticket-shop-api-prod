@@ -1,5 +1,6 @@
 package com.ticket.shop.service;
 
+import com.ticket.shop.command.Paginated;
 import com.ticket.shop.command.company.CompanyDetailsDto;
 import com.ticket.shop.command.company.CreateOrUpdateCompanyDto;
 import com.ticket.shop.exception.company.CompanyAlreadyExistsException;
@@ -44,4 +45,13 @@ public interface CompanyService {
      * @param companyId company id
      */
     void deleteCompany(Long companyId);
+
+    /**
+     * Get companies by Pagination
+     *
+     * @param page page
+     * @param size size
+     * @return {@link Paginated<CompanyDetailsDto>}
+     */
+    Paginated<CompanyDetailsDto> getCompanyList(int page, int size);
 }
