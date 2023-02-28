@@ -49,7 +49,7 @@ public class EventController {
     @PostMapping("/companies/{companyId}/events")
     @PreAuthorize("@authorized.hasRole('ADMIN') || " +
             "((@authorized.hasRole('COMPANY_ADMIN') || @authorized.hasRole('WORKER')) && @authorized.isOnCompany(#companyId))")
-    @Operation(summary = "Registration", description = "Register new event - Restrict for users with 'COMPANY_ADMIN' or 'WORKER' roles and the logged in user company id needs to be the same as the request")
+    @Operation(summary = "Registration", description = "Register new event - Access only for users with 'COMPANY_ADMIN' or 'WORKER' roles and the logged in user company id needs to be the same as the request")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Successful Operation",
                     content = @Content(schema = @Schema(implementation = EventDetailsDto.class))),

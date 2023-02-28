@@ -44,7 +44,7 @@ public class TicketController {
     @PostMapping("/companies/{companyId}/calendars/{calendarId}/tickets")
     @PreAuthorize("@authorized.hasRole('ADMIN') || ((@authorized.hasRole('COMPANY_ADMIN') || @authorized.hasRole('WORKER')) && @authorized.isOnCompany(#companyId))")
     @Operation(summary = "Create new tickets",
-            description = "Create tickets - Restrict for users with 'COMPANY_ADMIN' or 'WORKER' roles and the logged in user company id needs to be the same as the request")
+            description = "Create tickets - Access only for users with 'COMPANY_ADMIN' or 'WORKER' roles and the logged in user company id needs to be the same as the request")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Successfully Created",
                     content = @Content(schema = @Schema(implementation = TicketDetailsWhenCreatedDto.class))),

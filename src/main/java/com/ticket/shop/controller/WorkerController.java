@@ -144,7 +144,7 @@ public class WorkerController {
     @GetMapping("/companies/{companyId}/workers")
     @PreAuthorize("@authorized.hasRole('ADMIN') || (@authorized.hasRole('COMPANY_ADMIN') && @authorized.isOnCompany(#companyId))")
     @Operation(summary = "Get workers from a company by pagination",
-            description = "Get workers from a company by pagination - Restrict for users with 'COMPANY_ADMIN' role and the logged in user company id needs to be the same as the request")
+            description = "Get workers from a company by pagination - Access only for users with 'COMPANY_ADMIN' role and the logged in user company id needs to be the same as the request")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful Operation",
                     content = @Content(schema = @Schema(implementation = WorkerDetailsDto.class))),
@@ -187,7 +187,7 @@ public class WorkerController {
     @PreAuthorize("@authorized.hasRole('ADMIN') || (@authorized.hasRole('COMPANY_ADMIN') && @authorized.isOnCompany(#companyId)) || @authorized.isUser(#workerId)")
     @Operation(summary = "Update worker",
             description = "Update worker - " +
-                    "Restrict for users with 'COMPANY_ADMIN' role and the logged in user company id needs to be the same as the request - Or the logged in user id needs to be the same as the request")
+                    "Access only for users with 'COMPANY_ADMIN' role and the logged in user company id needs to be the same as the request - Or the logged in user id needs to be the same as the request")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful Operation",
                     content = @Content(schema = @Schema(implementation = CustomerDetailsDto.class))),
@@ -229,7 +229,7 @@ public class WorkerController {
     @DeleteMapping("/companies/{companyId}/workers/{workerId}")
     @PreAuthorize("@authorized.hasRole('ADMIN') || (@authorized.hasRole('COMPANY_ADMIN') && @authorized.isOnCompany(#companyId))")
     @Operation(summary = "Delete Customer",
-            description = "Delete Customer - Restrict for users with 'COMPANY_ADMIN' role and the logged in user company id needs to be the same as the request")
+            description = "Delete Customer - Access only for users with 'COMPANY_ADMIN' role and the logged in user company id needs to be the same as the request")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Successful Operation"),
             @ApiResponse(responseCode = "404", description = ErrorMessages.USER_NOT_FOUND,
