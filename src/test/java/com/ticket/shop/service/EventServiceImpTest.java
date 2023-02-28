@@ -296,7 +296,7 @@ public class EventServiceImpTest {
 
     private EventDetailsWithCalendarIdsDto getMockedEventDetailsWithCalendarIdsDto() {
         return EventDetailsWithCalendarIdsDto.builder()
-                .eventDetailsDto(getMockedEventDetailsDto())
+                .event(getMockedEventDetailsDto())
                 .calendarIds(List.of(1L))
                 .build();
     }
