@@ -11,6 +11,6 @@ import java.util.List;
 @Data
 @Builder
 public class EventDetailsWithCalendarIdsDto {
-    private EventDetailsDto eventDetailsDto;
+    private EventDetailsDto event;
     private List<Long> calendarIds;
 }
