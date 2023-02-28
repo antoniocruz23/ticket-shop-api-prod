@@ -57,7 +57,7 @@ public class EventConverter {
         List<PriceDetailsDto> priceDetailsDto = PriceConverter.fromPriceEntityToPriceDetailsDtoList(prices);
 
         return EventDetailsWithCalendarIdsDto.builder()
-                .eventDetailsDto(fromEventEntityToEventDetailsDto(eventEntity, priceDetailsDto))
+                .event(fromEventEntityToEventDetailsDto(eventEntity, priceDetailsDto))
                 .calendarIds(calendarIds)
                 .build();
     }
