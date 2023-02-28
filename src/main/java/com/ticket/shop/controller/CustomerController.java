@@ -94,7 +94,8 @@ public class CustomerController {
      */
     @GetMapping("/{customerId}")
     @PreAuthorize("@authorized.hasRole('ADMIN') || (@authorized.hasRole('CUSTOMER') && @authorized.isUser(#customerId))")
-    @Operation(summary = "Get customer", description = "Get customer by id")
+    @Operation(summary = "Get customer",
+            description = "Get customer by id - Restrict for users with 'CUSTOMER' role and the logged in user id needs to be the same as the request")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful Operation",
                     content = @Content(schema = @Schema(implementation = CustomerDetailsDto.class))),
@@ -130,7 +131,7 @@ public class CustomerController {
      */
     @GetMapping()
     @PreAuthorize("@authorized.hasRole('ADMIN')")
-    @Operation(summary = "Get customers by pagination", description = "Get customers by pagination")
+    @Operation(summary = "Get customers by pagination", description = "Get customers by pagination - Access only for application Admins")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful Operation",
                     content = @Content(schema = @Schema(implementation = Paginated.class))),
@@ -167,7 +168,8 @@ public class CustomerController {
      */
     @PutMapping("/{customerId}")
     @PreAuthorize("@authorized.hasRole('ADMIN') || (@authorized.hasRole('CUSTOMER') && @authorized.isUser(#customerId))")
-    @Operation(summary = "Update customer", description = "Update customer")
+    @Operation(summary = "Update customer",
+            description = "Update customer - Restrict for users with 'CUSTOMER' role and the logged in user id needs to be the same as the request")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful Operation",
                     content = @Content(schema = @Schema(implementation = CustomerDetailsDto.class))),
@@ -204,7 +206,7 @@ public class CustomerController {
      */
     @DeleteMapping("/{customerId}")
     @PreAuthorize("@authorized.hasRole(\"ADMIN\")")
-    @Operation(summary = "Delete Customer", description = "Delete Customer")
+    @Operation(summary = "Delete Customer", description = "Delete Customer - Access only for application Admins")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Successful Operation"),
             @ApiResponse(responseCode = "404", description = ErrorMessages.USER_NOT_FOUND,

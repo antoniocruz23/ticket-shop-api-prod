@@ -44,7 +44,8 @@ public class OrderController {
 
     @PostMapping
     @PreAuthorize("@authorized.hasRole('ADMIN') || (@authorized.hasRole('CUSTOMER') && @authorized.isUser(#createOrderDto.customerId))")
-    @Operation(summary = "Create Order", description = "Create Order and provide payment link")
+    @Operation(summary = "Create Order",
+            description = "Create Order and provide payment link - Restrict for users with 'CUSTOMER' role and the logged in user id needs to be the same as the request")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Successfully Created",
                     content = @Content(schema = @Schema(implementation = OrderDetailsDto.class))),

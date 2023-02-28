@@ -53,7 +53,7 @@ public class CompanyController {
      */
     @PostMapping()
     @PreAuthorize("@authorized.hasRole('ADMIN')")
-    @Operation(summary = "Create new company", description = "Register new company")
+    @Operation(summary = "Create new company", description = "Register new company - Access only for application Admins")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Successfully Created",
                     content = @Content(schema = @Schema(implementation = CompanyDetailsDto.class))),
@@ -124,7 +124,8 @@ public class CompanyController {
      */
     @PutMapping("/{companyId}")
     @PreAuthorize("@authorized.hasRole('ADMIN') || (@authorized.hasRole('COMPANY_ADMIN') && @authorized.isOnCompany(#companyId))")
-    @Operation(summary = "Update company", description = "Update company")
+    @Operation(summary = "Update company",
+            description = "Update company - Restrict for users with 'COMPANY_ADMIN' role and the logged in user company id needs to be the same as the request")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful Operation",
                     content = @Content(schema = @Schema(implementation = CompanyDetailsDto.class))),
@@ -161,7 +162,7 @@ public class CompanyController {
      */
     @DeleteMapping("/{companyId}")
     @PreAuthorize("@authorized.hasRole('ADMIN')")
-    @Operation(summary = "Delete Company", description = "Delete Company and everything related to it")
+    @Operation(summary = "Delete Company", description = "Delete Company and everything related to it - Access only for application Admins")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Successful Operation"),
             @ApiResponse(responseCode = "404", description = ErrorMessages.COMPANY_NOT_FOUND,

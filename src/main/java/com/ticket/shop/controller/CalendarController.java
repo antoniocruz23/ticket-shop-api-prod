@@ -58,7 +58,8 @@ public class CalendarController {
     @PostMapping("/companies/{companyId}/events/{eventId}/calendars")
     @PreAuthorize("@authorized.hasRole('ADMIN') || " +
             "((@authorized.hasRole('COMPANY_ADMIN') || @authorized.hasRole('WORKER')) && @authorized.isOnCompany(#companyId))")
-    @Operation(summary = "Create new calendar", description = "Create new calendar")
+    @Operation(summary = "Create new calendar",
+            description = "Create new calendar - Restrict for users with 'COMPANY_ADMIN' or 'WORKER' roles and the logged in user company id needs to be the same as the request")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Successful Operation",
                     content = @Content(schema = @Schema(implementation = CalendarDetailsWithTicketsDto.class))),
@@ -171,7 +172,8 @@ public class CalendarController {
     @DeleteMapping("/companies/{companyId}/events/{eventId}/calendars/{calendarId}")
     @PreAuthorize("@authorized.hasRole('ADMIN') || " +
             "((@authorized.hasRole('COMPANY_ADMIN') || @authorized.hasRole('WORKER')) && @authorized.isOnCompany(#companyId))")
-    @Operation(summary = "Delete Calendar", description = "Delete Calendar and associated tickets")
+    @Operation(summary = "Delete Calendar",
+            description = "Delete Calendar and associated tickets - Restrict for users with 'COMPANY_ADMIN' or 'WORKER' roles and the logged in user company id needs to be the same as the request")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Successful Operation"),
             @ApiResponse(responseCode = "404", description = ErrorMessages.EVENT_NOT_FOUND + " || " + ErrorMessages.CALENDAR_NOT_FOUND,
