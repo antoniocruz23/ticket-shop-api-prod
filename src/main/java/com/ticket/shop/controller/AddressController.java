@@ -49,7 +49,7 @@ public class AddressController {
      * @param createAddressDto {@link CreateAddressDto}
      * @return {@link AddressDetailsDto}
      */
-    @PostMapping("/{userId}")
+    @PostMapping("/users/{userId}")
     @PreAuthorize("@authorized.hasRole('ADMIN') || " +
             "((@authorized.hasRole('CUSTOMER') || @authorized.hasRole('WORKER')) && @authorized.isUser(#userId))")
     @Operation(summary = "Create User Address",
