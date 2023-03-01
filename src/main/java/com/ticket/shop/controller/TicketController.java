@@ -2,6 +2,7 @@ package com.ticket.shop.controller;
 
 import com.ticket.shop.command.ticket.CreateTicketDto;
 import com.ticket.shop.command.ticket.TicketDetailsWhenCreatedDto;
+import com.ticket.shop.command.ticket.TotalOfTicketsDto;
 import com.ticket.shop.error.Error;
 import com.ticket.shop.error.ErrorMessages;
 import com.ticket.shop.exception.TicketShopException;
@@ -17,6 +18,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,6 +27,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.List;
+
+import static org.springframework.http.HttpStatus.OK;
 
 /**
  * REST controller responsible for ticket operations
@@ -75,5 +79,30 @@ public class TicketController {
 
         LOGGER.info("Ticket list created successfully. Retrieving created ticket list for calendar id {}", calendarId);
         return new ResponseEntity<>(ticketDetailsDtoList, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/calendars/{calendarId}/tickets")
+    @Operation(summary = "Get total of tickets by calendar", description = "Get total of tickets, per type and per status by calendar id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful Operation",
+                    content = @Content(schema = @Schema(implementation = TotalOfTicketsDto.class)))})
+
+    public ResponseEntity<TotalOfTicketsDto> getTotalOfTicketsByCalendarId(@PathVariable Long calendarId) {
+
+        LOGGER.info("Request to get total of ticket on calendar id {}", calendarId);
+        TotalOfTicketsDto totalOfTicketsDto;
+        try {
+            totalOfTicketsDto = this.ticketServiceImp.getTotalOfTicketsByCalendarId(calendarId);
+
+        } catch (TicketShopException e) {
+            throw e;
+
+        } catch (Exception e) {
+            LOGGER.error("Failed to get total of ticket on calendar id {}", calendarId, e);
+            throw new TicketShopException(ErrorMessages.OPERATION_FAILED, e);
+        }
+
+        LOGGER.info("Retrieved total of ticket on calendar id {}", calendarId);
+        return new ResponseEntity<>(totalOfTicketsDto, OK);
     }
 }

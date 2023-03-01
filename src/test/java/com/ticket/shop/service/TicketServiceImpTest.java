@@ -2,6 +2,7 @@ package com.ticket.shop.service;
 
 import com.ticket.shop.command.ticket.CreateTicketDto;
 import com.ticket.shop.command.ticket.TicketDetailsWhenCreatedDto;
+import com.ticket.shop.command.ticket.TotalOfTicketsDto;
 import com.ticket.shop.enumerators.TicketStatus;
 import com.ticket.shop.enumerators.TicketType;
 import com.ticket.shop.exception.DatabaseCommunicationException;
@@ -24,9 +25,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -119,6 +122,22 @@ public class TicketServiceImpTest {
                 () -> this.ticketServiceImp.bulkCreateTicket(1L, getMockedCalendarEntity().getCalendarId(), getMockedCreateTicketDto()));
     }
 
+    /**
+     * Get Total Of Tickets By Calendar id tests
+     */
+    @Test
+    public void testGetTotalOfTicketsByCalendarIdSuccessfully() {
+        // Mock data
+        when(this.ticketRepository.findByCalendarId(any())).thenReturn(List.of(getMockedTicketEntity()));
+
+        // Method to be tested
+        TotalOfTicketsDto totalOfTicketsDto = this.ticketServiceImp.getTotalOfTicketsByCalendarId(getMockedCalendarEntity().getCalendarId());
+
+        // Assert
+        assertNotNull(totalOfTicketsDto);
+        assertEquals(getMockedTotalOfTicketsDto(), totalOfTicketsDto);
+    }
+
     private TicketEntity getMockedTicketEntity() {
         return TicketEntity.builder()
                 .ticketId(2L)
@@ -171,6 +190,14 @@ public class TicketServiceImpTest {
     private CompanyEntity getMockedCompanyEntity() {
         return CompanyEntity.builder()
                 .companyId(1L)
+                .build();
+    }
+
+    private TotalOfTicketsDto getMockedTotalOfTicketsDto() {
+        return TotalOfTicketsDto.builder()
+                .totalOfTickets(1)
+                .totalByTypes(Map.of(TicketType.VIP, 1L))
+                .totalByStatus(Map.of(TicketStatus.AVAILABLE, 1L))
                 .build();
     }
 

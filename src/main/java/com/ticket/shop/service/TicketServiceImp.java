@@ -2,6 +2,7 @@ package com.ticket.shop.service;
 
 import com.ticket.shop.command.ticket.CreateTicketDto;
 import com.ticket.shop.command.ticket.TicketDetailsWhenCreatedDto;
+import com.ticket.shop.command.ticket.TotalOfTicketsDto;
 import com.ticket.shop.converter.TicketConverter;
 import com.ticket.shop.enumerators.TicketType;
 import com.ticket.shop.error.ErrorMessages;
@@ -34,7 +35,6 @@ import java.util.stream.StreamSupport;
 public class TicketServiceImp implements TicketService {
 
     private static final Logger LOGGER = LogManager.getLogger(TicketService.class);
-
     private final TicketRepository ticketRepository;
     private final PriceRepository priceRepository;
     private final CompanyRepository companyRepository;
@@ -98,6 +98,26 @@ public class TicketServiceImp implements TicketService {
             LOGGER.error("Failed while deleting tickets with calendar id {} from database", calendarId, e);
             throw new DatabaseCommunicationException(ErrorMessages.DATABASE_COMMUNICATION_ERROR, e);
         }
+    }
+
+    /**
+     * @see TicketService#getTotalOfTicketsByCalendarId(Long)
+     */
+    @Override
+    public TotalOfTicketsDto getTotalOfTicketsByCalendarId(Long calendarId) {
+        List<TicketEntity> ticketEntities = getTicketsByCalendarId(calendarId);
+
+        var totalByType = ticketEntities.stream()
+                .collect(Collectors.groupingBy(TicketEntity::getType, Collectors.summingLong(t -> 1L)));
+
+        var totalByStatus = ticketEntities.stream()
+                .collect(Collectors.groupingBy(TicketEntity::getStatus, Collectors.summingLong(t -> 1L)));
+
+        return TotalOfTicketsDto.builder()
+                .totalOfTickets(ticketEntities.size())
+                .totalByTypes(totalByType)
+                .totalByStatus(totalByStatus)
+                .build();
     }
 
     /**
@@ -168,5 +188,10 @@ public class TicketServiceImp implements TicketService {
             throw new InvalidTicketTypeException(ErrorMessages.INVALID_TICKET_TYPE);
         }
         return prices;
+    }
+
+    private List<TicketEntity> getTicketsByCalendarId(Long calendarId) {
+        LOGGER.debug("Getting tickets by calendar id {} from database", calendarId);
+        return this.ticketRepository.findByCalendarId(calendarId);
     }
 }

@@ -79,4 +79,13 @@ public interface TicketRepository extends CrudRepository<TicketEntity, Long> {
      * @return true if it doesn't have a customer associated and false if it has
      */
     boolean existsByCalendarEntityAndUserEntityNull(CalendarEntity calendarEntity);
+
+    /**
+     * Get tickets by calendar id
+     *
+     * @param calendarId calendar id
+     * @return {@link List<TicketEntity>}
+     */
+    @Query("select e from TicketEntity e where e.calendarEntity.calendarId = :calendarId")
+    List<TicketEntity> findByCalendarId(Long calendarId);
 }

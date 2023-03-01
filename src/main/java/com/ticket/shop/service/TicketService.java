@@ -2,6 +2,7 @@ package com.ticket.shop.service;
 
 import com.ticket.shop.command.ticket.CreateTicketDto;
 import com.ticket.shop.command.ticket.TicketDetailsWhenCreatedDto;
+import com.ticket.shop.command.ticket.TotalOfTicketsDto;
 
 import java.util.List;
 
@@ -27,4 +28,12 @@ public interface TicketService {
      * @param calendarId calendar id
      */
     void deleteTicketsByCalendarId(Long companyId, Long calendarId);
+
+    /**
+     * Get total of tickets and total of tickets per type and per status by calendar id
+     *
+     * @param calendarId calendar id
+     * @return {@link TotalOfTicketsDto}
+     */
+    TotalOfTicketsDto getTotalOfTicketsByCalendarId(Long calendarId);
 }
