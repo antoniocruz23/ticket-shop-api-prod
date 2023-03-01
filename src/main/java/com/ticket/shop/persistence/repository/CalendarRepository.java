@@ -5,6 +5,7 @@ import com.ticket.shop.persistence.entity.CompanyEntity;
 import com.ticket.shop.persistence.entity.EventEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.Optional;
@@ -42,4 +43,14 @@ public interface CalendarRepository extends CrudRepository<CalendarEntity, Long>
      * @return {@link Optional<CalendarEntity>}
      */
     Optional<CalendarEntity> findByCalendarIdAndEventEntityAndCompanyEntityCompanyId(Long calendarId, EventEntity eventEntity, Long companyId);
+
+    /**
+     * Get calendar by company id and calendar id
+     *
+     * @param companyId  company id
+     * @param calendarId calendar id
+     * @return {@link Optional<CalendarEntity>}
+     */
+    @Query("select e from CalendarEntity e where e.companyEntity.companyId = :companyId and e.calendarId = :calendarId")
+    Optional<CalendarEntity> findByCompanyIdAndCalendarId(Long companyId, Long calendarId);
 }

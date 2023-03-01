@@ -4,6 +4,7 @@ import com.ticket.shop.command.Paginated;
 import com.ticket.shop.command.calendar.CalendarDetailsDto;
 import com.ticket.shop.command.calendar.CalendarDetailsWithTicketsDto;
 import com.ticket.shop.command.calendar.CreateCalendarDto;
+import com.ticket.shop.command.calendar.UpdateCalendarDto;
 
 /**
  * Common interface for calendar services, provides methods to manage calendars
@@ -44,4 +45,14 @@ public interface CalendarService {
      * @param calendarId calendar id
      */
     void deleteCalendar(Long companyId, Long eventId, Long calendarId);
+
+    /**
+     * Update calendar by id
+     *
+     * @param companyId         company id
+     * @param calendarId        calendar id
+     * @param updateCalendarDto {@link UpdateCalendarDto}
+     * @return {@link CalendarDetailsDto}
+     */
+    CalendarDetailsDto updateCalendar(Long companyId, Long calendarId, UpdateCalendarDto updateCalendarDto);
 }

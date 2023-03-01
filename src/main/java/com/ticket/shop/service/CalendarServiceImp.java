@@ -4,6 +4,7 @@ import com.ticket.shop.command.Paginated;
 import com.ticket.shop.command.calendar.CalendarDetailsDto;
 import com.ticket.shop.command.calendar.CalendarDetailsWithTicketsDto;
 import com.ticket.shop.command.calendar.CreateCalendarDto;
+import com.ticket.shop.command.calendar.UpdateCalendarDto;
 import com.ticket.shop.command.ticket.TicketDetailsWhenCreatedDto;
 import com.ticket.shop.converter.CalendarConverter;
 import com.ticket.shop.error.ErrorMessages;
@@ -132,6 +133,27 @@ public class CalendarServiceImp implements CalendarService {
     }
 
     /**
+     * @see CalendarService#updateCalendar(Long, Long, UpdateCalendarDto)
+     */
+    @Override
+    public CalendarDetailsDto updateCalendar(Long companyId, Long calendarId, UpdateCalendarDto updateCalendarDto) {
+        CalendarEntity calendarEntity = getCalendarEntityByCompanyIdAndCalendarId(companyId, calendarId);
+        calendarEntity.setStartDate(updateCalendarDto.getStartDate());
+        calendarEntity.setEndDate(updateCalendarDto.getEndDate());
+
+        LOGGER.debug("Updating calendar id {} with new data", companyId);
+        try {
+            this.calendarRepository.save(calendarEntity);
+
+        } catch (Exception e) {
+            LOGGER.error("Failed while updating calendar id {} with new data - {}", companyId, calendarEntity, e);
+            throw new DatabaseCommunicationException(ErrorMessages.DATABASE_COMMUNICATION_ERROR, e);
+        }
+
+        return CalendarConverter.fromCalendarEntityToCalendarDetailsDto(calendarEntity);
+    }
+
+    /**
      * Get Event by company id and event id
      *
      * @param companyId company id
@@ -191,6 +213,22 @@ public class CalendarServiceImp implements CalendarService {
                 .orElseThrow(() -> {
                     LOGGER.error("The event with id {} does not exist in database", eventId);
                     return new EventNotFoundException(ErrorMessages.EVENT_NOT_FOUND);
+                });
+    }
+
+    /**
+     * Get calendar by id and company id
+     *
+     * @param companyId  company id
+     * @param calendarId calendar id
+     * @return {@link CalendarEntity}
+     */
+    private CalendarEntity getCalendarEntityByCompanyIdAndCalendarId(Long companyId, Long calendarId) {
+        LOGGER.debug("Getting calendar with id {} from database", calendarId);
+        return this.calendarRepository.findByCompanyIdAndCalendarId(companyId, calendarId)
+                .orElseThrow(() -> {
+                    LOGGER.error("The calendar with id {} does not exist in database", calendarId);
+                    return new CalendarNotFoundException(ErrorMessages.CALENDAR_NOT_FOUND);
                 });
     }
 }

@@ -4,6 +4,8 @@ import com.ticket.shop.command.Paginated;
 import com.ticket.shop.command.calendar.CalendarDetailsDto;
 import com.ticket.shop.command.calendar.CalendarDetailsWithTicketsDto;
 import com.ticket.shop.command.calendar.CreateCalendarDto;
+import com.ticket.shop.command.calendar.UpdateCalendarDto;
+import com.ticket.shop.command.company.CompanyDetailsDto;
 import com.ticket.shop.error.Error;
 import com.ticket.shop.error.ErrorMessages;
 import com.ticket.shop.exception.TicketShopException;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -200,5 +203,47 @@ public class CalendarController {
 
         LOGGER.info("Calendar with id {} deleted successfully", calendarId);
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Update calendar
+     *
+     * @param companyId  company id
+     * @param calendarId calendar id
+     * @return {@link CalendarDetailsDto}
+     */
+    @PutMapping("/companies/{companyId}/calendars/{calendarId}")
+    @PreAuthorize("@authorized.hasRole('ADMIN') || " +
+            "((@authorized.hasRole('COMPANY_ADMIN') || @authorized.hasRole('WORKER')) && @authorized.isOnCompany(#companyId))")
+    @Operation(summary = "Update calendar",
+            description = "Update calendar - Access only for users with 'COMPANY_ADMIN' or 'WORKER' roles and the logged-in user company id needs to be the same as the request")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful Operation",
+                    content = @Content(schema = @Schema(implementation = CompanyDetailsDto.class))),
+            @ApiResponse(responseCode = "404", description = ErrorMessages.CALENDAR_NOT_FOUND,
+                    content = @Content(schema = @Schema(implementation = Error.class))),
+            @ApiResponse(responseCode = "400", description = ErrorMessages.DATABASE_COMMUNICATION_ERROR,
+                    content = @Content(schema = @Schema(implementation = Error.class))),
+            @ApiResponse(responseCode = "403", description = ErrorMessages.ACCESS_DENIED,
+                    content = @Content(schema = @Schema(implementation = Error.class)))})
+    public ResponseEntity<CalendarDetailsDto> updateCalendar(@PathVariable Long companyId,
+                                                             @PathVariable Long calendarId,
+                                                             @Valid @RequestBody UpdateCalendarDto updateCalendarDto) {
+
+        LOGGER.info("Request to update calendar with id {} - {}", companyId, updateCalendarDto);
+        CalendarDetailsDto calendarDetailsDto;
+        try {
+            calendarDetailsDto = this.calendarServiceImp.updateCalendar(companyId, calendarId, updateCalendarDto);
+
+        } catch (TicketShopException e) {
+            throw e;
+
+        } catch (Exception e) {
+            LOGGER.error("Failed to update calendar with id {} - {}", companyId, updateCalendarDto, e);
+            throw new TicketShopException(ErrorMessages.OPERATION_FAILED, e);
+        }
+
+        LOGGER.info("Calendar with id {} updated successfully. Retrieving updated calendar", companyId);
+        return new ResponseEntity<>(calendarDetailsDto, HttpStatus.OK);
     }
 }
