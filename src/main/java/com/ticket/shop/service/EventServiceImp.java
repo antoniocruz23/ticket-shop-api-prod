@@ -5,6 +5,7 @@ import com.ticket.shop.command.address.AddressDetailsDto;
 import com.ticket.shop.command.event.CreateEventDto;
 import com.ticket.shop.command.event.EventDetailsDto;
 import com.ticket.shop.command.event.EventDetailsWithCalendarIdsDto;
+import com.ticket.shop.command.event.UpdateEventDto;
 import com.ticket.shop.converter.EventConverter;
 import com.ticket.shop.error.ErrorMessages;
 import com.ticket.shop.exception.DatabaseCommunicationException;
@@ -40,13 +41,13 @@ public class EventServiceImp implements EventService {
     private final EventRepository eventRepository;
     private final AddressRepository addressRepository;
     private final CompanyRepository companyRepository;
-    private final AddressServiceImp addressService;
+    private final AddressServiceImp addressServiceImp;
     private final PriceServiceImp priceServiceImp;
 
-    public EventServiceImp(EventRepository eventRepository, AddressServiceImp addressService, AddressRepository addressRepository,
+    public EventServiceImp(EventRepository eventRepository, AddressServiceImp addressServiceImp, AddressRepository addressRepository,
                            CompanyRepository companyRepository, PriceServiceImp priceServiceImp) {
         this.eventRepository = eventRepository;
-        this.addressService = addressService;
+        this.addressServiceImp = addressServiceImp;
         this.addressRepository = addressRepository;
         this.companyRepository = companyRepository;
         this.priceServiceImp = priceServiceImp;
@@ -61,7 +62,7 @@ public class EventServiceImp implements EventService {
 
         EventEntity eventEntity = EventConverter.fromCreateEventDtoToEventEntity(createEventDto);
 
-        AddressDetailsDto address = this.addressService.createAddress(createEventDto.getAddress());
+        AddressDetailsDto address = this.addressServiceImp.createAddress(createEventDto.getAddress());
         AddressEntity addressEntity = getAddressEntityById(address.getAddressId());
         eventEntity.setAddressEntity(addressEntity);
 
@@ -126,6 +127,28 @@ public class EventServiceImp implements EventService {
     }
 
     /**
+     * @see EventService#updateEvent(Long, Long, UpdateEventDto)
+     */
+    @Override
+    public EventDetailsDto updateEvent(Long companyId, Long eventId, UpdateEventDto updateWorkerDto) {
+        EventEntity eventEntity = getEventEntityByCompanyIdAndEventId(companyId, eventId);
+        eventEntity.setName(updateWorkerDto.getName());
+        eventEntity.setDescription(updateWorkerDto.getDescription());
+        this.addressServiceImp.updateAddress(eventEntity.getAddressEntity(), updateWorkerDto.getAddress());
+
+        LOGGER.debug("Updating event with id {} with new data", companyId);
+        try {
+            this.eventRepository.save(eventEntity);
+
+        } catch (Exception e) {
+            LOGGER.error("Failed while updating event with id {} with new data - {}", companyId, eventEntity, e);
+            throw new DatabaseCommunicationException(ErrorMessages.DATABASE_COMMUNICATION_ERROR, e);
+        }
+
+        return EventConverter.fromEventEntityToEventDetailsDto(eventEntity);
+    }
+
+    /**
      * Get Address by id
      *
      * @param addressId address id
@@ -164,6 +187,22 @@ public class EventServiceImp implements EventService {
     private EventEntity getEventEntityById(Long eventId) {
         LOGGER.debug("Getting event with id {} from database", eventId);
         return this.eventRepository.findById(eventId)
+                .orElseThrow(() -> {
+                    LOGGER.error("The event with id {} does not exist in database", eventId);
+                    return new EventNotFoundException(ErrorMessages.EVENT_NOT_FOUND);
+                });
+    }
+
+    /**
+     * Get Event by id and company id
+     *
+     * @param companyId company id
+     * @param eventId   event id
+     * @return {@link EventEntity}
+     */
+    private EventEntity getEventEntityByCompanyIdAndEventId(Long companyId, Long eventId) {
+        LOGGER.debug("Getting event with id {} from database", eventId);
+        return this.eventRepository.findByCompanyIdAndEventId(companyId, eventId)
                 .orElseThrow(() -> {
                     LOGGER.error("The event with id {} does not exist in database", eventId);
                     return new EventNotFoundException(ErrorMessages.EVENT_NOT_FOUND);

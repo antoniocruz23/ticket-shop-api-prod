@@ -84,6 +84,23 @@ public class AddressServiceImp implements AddressService {
     }
 
     /**
+     * Update Address
+     *
+     * @param addressEntity     address
+     * @param addressDetailsDto new address details
+     */
+    protected void updateAddress(AddressEntity addressEntity, CreateAddressDto addressDetailsDto) {
+        addressEntity.setLine1(addressDetailsDto.getLine1());
+        addressEntity.setLine2(addressDetailsDto.getLine2());
+        addressEntity.setLine3(addressDetailsDto.getLine3());
+        addressEntity.setMobileNumber(addressDetailsDto.getMobileNumber());
+        addressEntity.setPostCode(addressDetailsDto.getPostCode());
+        addressEntity.setCity(addressDetailsDto.getCity());
+        CountryEntity countryEntity = getCountryEntityById(addressDetailsDto.getCountryId());
+        addressEntity.setCountryEntity(countryEntity);
+    }
+
+    /**
      * Get Country by id
      *
      * @param countryId country id

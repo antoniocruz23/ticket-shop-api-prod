@@ -2,7 +2,6 @@ package com.ticket.shop.service;
 
 import com.ticket.shop.command.Paginated;
 import com.ticket.shop.command.address.AddressDetailsDto;
-import com.ticket.shop.command.address.CreateAddressDto;
 import com.ticket.shop.command.company.CompanyDetailsDto;
 import com.ticket.shop.command.company.CreateOrUpdateCompanyDto;
 import com.ticket.shop.converter.CompanyConverter;
@@ -11,13 +10,11 @@ import com.ticket.shop.exception.DatabaseCommunicationException;
 import com.ticket.shop.exception.address.AddressNotFoundException;
 import com.ticket.shop.exception.company.CompanyAlreadyExistsException;
 import com.ticket.shop.exception.company.CompanyNotFoundException;
-import com.ticket.shop.exception.country.CountryNotFoundException;
 import com.ticket.shop.persistence.entity.AddressEntity;
 import com.ticket.shop.persistence.entity.CompanyEntity;
 import com.ticket.shop.persistence.entity.CountryEntity;
 import com.ticket.shop.persistence.repository.AddressRepository;
 import com.ticket.shop.persistence.repository.CompanyRepository;
-import com.ticket.shop.persistence.repository.CountryRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Page;
@@ -37,13 +34,11 @@ public class CompanyServiceImp implements CompanyService {
     private final CompanyRepository companyRepository;
     private final AddressRepository addressRepository;
     private final AddressServiceImp addressServiceImp;
-    private final CountryRepository countryRepository;
 
-    public CompanyServiceImp(CompanyRepository companyRepository, AddressRepository addressRepository, AddressServiceImp addressService, CountryRepository countryRepository) {
+    public CompanyServiceImp(CompanyRepository companyRepository, AddressRepository addressRepository, AddressServiceImp addressService) {
         this.companyRepository = companyRepository;
         this.addressRepository = addressRepository;
         this.addressServiceImp = addressService;
-        this.countryRepository = countryRepository;
     }
 
     /**
@@ -93,7 +88,7 @@ public class CompanyServiceImp implements CompanyService {
         companyEntity.setEmail(updateWorkerDto.getEmail());
         companyEntity.setWebsite(updateWorkerDto.getWebsite());
 
-        updateAddress(companyEntity.getAddressEntity(), updateWorkerDto.getAddress());
+        this.addressServiceImp.updateAddress(companyEntity.getAddressEntity(), updateWorkerDto.getAddress());
 
         LOGGER.debug("Updating company with id {} with new data", companyId);
         try {
@@ -155,23 +150,6 @@ public class CompanyServiceImp implements CompanyService {
     }
 
     /**
-     * Update Address
-     *
-     * @param addressEntity     address
-     * @param addressDetailsDto new address details
-     */
-    private void updateAddress(AddressEntity addressEntity, CreateAddressDto addressDetailsDto) {
-        addressEntity.setLine1(addressDetailsDto.getLine1());
-        addressEntity.setLine2(addressDetailsDto.getLine2());
-        addressEntity.setLine3(addressDetailsDto.getLine3());
-        addressEntity.setMobileNumber(addressDetailsDto.getMobileNumber());
-        addressEntity.setPostCode(addressDetailsDto.getPostCode());
-        addressEntity.setCity(addressDetailsDto.getCity());
-        CountryEntity countryEntity = getCountryEntityById(addressDetailsDto.getCountryId());
-        addressEntity.setCountryEntity(countryEntity);
-    }
-
-    /**
      * Validate Company by name, email and website
      *
      * @param name    name
@@ -225,21 +203,6 @@ public class CompanyServiceImp implements CompanyService {
                 .orElseThrow(() -> {
                     LOGGER.error("Address with id {} doesn't exist", addressId);
                     return new AddressNotFoundException(ErrorMessages.ADDRESS_NOT_FOUND);
-                });
-    }
-
-    /**
-     * Get Country by id
-     *
-     * @param countryId country id
-     * @return {@link CountryEntity}
-     */
-    private CountryEntity getCountryEntityById(Long countryId) {
-        LOGGER.debug("Getting country with id {} from database", countryId);
-        return this.countryRepository.findById(countryId)
-                .orElseThrow(() -> {
-                    LOGGER.error("Country with id {} doesn't exist", countryId);
-                    return new CountryNotFoundException(ErrorMessages.COUNTRY_NOT_FOUND);
                 });
     }
 }

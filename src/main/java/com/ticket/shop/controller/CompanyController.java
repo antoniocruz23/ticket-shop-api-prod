@@ -125,7 +125,7 @@ public class CompanyController {
     @PutMapping("/{companyId}")
     @PreAuthorize("@authorized.hasRole('ADMIN') || (@authorized.hasRole('COMPANY_ADMIN') && @authorized.isOnCompany(#companyId))")
     @Operation(summary = "Update company",
-            description = "Update company - Restrict for users with 'COMPANY_ADMIN' role and the logged in user company id needs to be the same as the request")
+            description = "Update company - Access only for users with 'COMPANY_ADMIN' role and the logged-in user company id needs to be the same as the request")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful Operation",
                     content = @Content(schema = @Schema(implementation = CompanyDetailsDto.class))),

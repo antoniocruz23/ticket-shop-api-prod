@@ -60,7 +60,7 @@ public class WorkerController {
     @PostMapping("/companies/{companyId}/workers")
     @PreAuthorize("@authorized.hasRole('ADMIN') || (@authorized.hasRole('COMPANY_ADMIN') && @authorized.isOnCompany(#companyId))")
     @Operation(summary = "Registration",
-            description = "Register new worker - Restrict for users with 'COMPANY_ADMIN' role and the logged in user company id needs to be the same as the request")
+            description = "Register new worker - Access only for users with 'COMPANY_ADMIN' role and the logged-in user company id needs to be the same as the request")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Successfully Created",
                     content = @Content(schema = @Schema(implementation = WorkerDetailsDto.class))),
@@ -105,7 +105,7 @@ public class WorkerController {
     @PreAuthorize("@authorized.hasRole('ADMIN') || (@authorized.hasRole('COMPANY_ADMIN') && @authorized.isOnCompany(#companyId)) || @authorized.isUser(#workerId)")
     @Operation(summary = "Get worker by company",
             description = "Get worker by company - " +
-                    "Restrict for users with 'COMPANY_ADMIN' role and the logged in user company id needs to be the same as the request - Or the logged in user id needs to be the same as the request")
+                    "Access only for users with 'COMPANY_ADMIN' role and the logged in user company id needs to be the same as the request - Or the logged-in user id needs to be the same as the request")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful Operation",
                     content = @Content(schema = @Schema(implementation = WorkerDetailsDto.class))),

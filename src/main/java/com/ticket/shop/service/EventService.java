@@ -4,6 +4,7 @@ import com.ticket.shop.command.Paginated;
 import com.ticket.shop.command.event.CreateEventDto;
 import com.ticket.shop.command.event.EventDetailsDto;
 import com.ticket.shop.command.event.EventDetailsWithCalendarIdsDto;
+import com.ticket.shop.command.event.UpdateEventDto;
 import com.ticket.shop.exception.address.AddressNotFoundException;
 import com.ticket.shop.exception.company.CompanyNotFoundException;
 import com.ticket.shop.exception.country.CountryNotFoundException;
@@ -46,4 +47,14 @@ public interface EventService {
      * @return {@link Paginated<EventDetailsDto>}
      */
     Paginated<EventDetailsDto> getEventList(int page, int size, Long companyId, Date date);
+
+    /**
+     * Update event by id
+     *
+     * @param companyId      company id
+     * @param eventId        event id
+     * @param updateEventDto {@link UpdateEventDto}
+     * @return {@link EventDetailsDto}
+     */
+    EventDetailsDto updateEvent(Long companyId, Long eventId, UpdateEventDto updateEventDto);
 }

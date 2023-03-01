@@ -6,6 +6,7 @@ import com.ticket.shop.command.address.CreateAddressDto;
 import com.ticket.shop.command.event.CreateEventDto;
 import com.ticket.shop.command.event.EventDetailsDto;
 import com.ticket.shop.command.event.EventDetailsWithCalendarIdsDto;
+import com.ticket.shop.command.event.UpdateEventDto;
 import com.ticket.shop.command.price.CreatePriceDto;
 import com.ticket.shop.command.price.PriceDetailsDto;
 import com.ticket.shop.enumerators.TicketType;
@@ -221,6 +222,57 @@ public class EventServiceImpTest {
                 () -> this.eventServiceImp.getEventList(0, 1, null, null));
     }
 
+    /**
+     * Update event tests
+     */
+    @Test
+    public void testUpdateEventSuccessfully() {
+        // Mock data
+        when(this.eventRepository.findByCompanyIdAndEventId(any(), any())).thenReturn(Optional.ofNullable(getMockedEventEntity()));
+        when(this.countryRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedCountryEntity()));
+        when(this.eventRepository.save(any())).thenReturn(getMockedEventEntity());
+
+        // Method to be tested
+        EventDetailsDto event = this.eventServiceImp.updateEvent(2L, 1L, getMockedUpdateEventDto());
+
+        // Assert
+        assertNotNull(event);
+        assertEquals(getMockedEventDetailsDto(), event);
+    }
+
+    @Test
+    public void testUpdateEventFailureDueToEventNotFound() {
+        // Mock data
+        when(this.eventRepository.findByCompanyIdAndEventId(any(), any())).thenReturn(Optional.empty());
+
+        // Assert
+        assertThrows(EventNotFoundException.class,
+                () -> this.eventServiceImp.updateEvent(2L, 1L, getMockedUpdateEventDto()));
+    }
+
+    @Test
+    public void testUpdateEventFailureDueToCountryNotFound() {
+        // Mock data
+        when(this.eventRepository.findByCompanyIdAndEventId(any(), any())).thenReturn(Optional.ofNullable(getMockedEventEntity()));
+        when(this.countryRepository.findById(any())).thenReturn(Optional.empty());
+
+        // Assert
+        assertThrows(CountryNotFoundException.class,
+                () -> this.eventServiceImp.updateEvent(2L, 1L, getMockedUpdateEventDto()));
+    }
+
+    @Test
+    public void testUpdateEventFailureDueToDatabaseCommunication() {
+        // Mock data
+        when(this.eventRepository.findByCompanyIdAndEventId(any(), any())).thenReturn(Optional.ofNullable(getMockedEventEntity()));
+        when(this.countryRepository.findById(any())).thenReturn(Optional.ofNullable(getMockedCountryEntity()));
+        when(this.eventRepository.save(any())).thenThrow(RuntimeException.class);
+
+        // Assert
+        assertThrows(DatabaseCommunicationException.class,
+                () -> this.eventServiceImp.updateEvent(2L, 1L, getMockedUpdateEventDto()));
+    }
+
     private CountryEntity getMockedCountryEntity() {
         return CountryEntity.builder()
                 .countryId(1L)
@@ -347,5 +399,13 @@ public class EventServiceImpTest {
                 eventDetailsDtoList.size(),
                 1,
                 1);
+    }
+
+    private UpdateEventDto getMockedUpdateEventDto() {
+        return UpdateEventDto.builder()
+                .name(getMockedEventDetailsDto().getName())
+                .description(getMockedEventEntity().getDescription())
+                .address(getMockedCreateAddressDto())
+                .build();
     }
 }

@@ -2,9 +2,7 @@ package com.ticket.shop.converter;
 
 import com.ticket.shop.command.address.AddressDetailsDto;
 import com.ticket.shop.command.address.CreateAddressDto;
-import com.ticket.shop.command.customer.CreateCustomerDto;
 import com.ticket.shop.persistence.entity.AddressEntity;
-import com.ticket.shop.persistence.entity.UserEntity;
 
 /**
  * Address converter
@@ -12,9 +10,10 @@ import com.ticket.shop.persistence.entity.UserEntity;
 public class AddressConverter {
 
     /**
-     * From {@link CreateAddressDto} to {@link UserEntity}
-     * @param createAddressDto {@link CreateCustomerDto}
-     * @return {@link UserEntity}
+     * From {@link CreateAddressDto} to {@link AddressEntity}
+     *
+     * @param createAddressDto {@link CreateAddressDto}
+     * @return {@link AddressEntity}
      */
     public static AddressEntity fromCreateAddressDtoToAddressEntity(CreateAddressDto createAddressDto) {
         return AddressEntity.builder()
@@ -29,6 +28,7 @@ public class AddressConverter {
 
     /**
      * From {@link AddressEntity} to {@link AddressDetailsDto}
+     *
      * @param addressEntity {@link AddressEntity}
      * @return {@link AddressDetailsDto}
      */
