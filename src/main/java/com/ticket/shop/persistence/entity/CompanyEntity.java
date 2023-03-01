@@ -48,10 +48,10 @@ public class CompanyEntity {
     @JoinColumn(name = "address_id", nullable = false)
     private AddressEntity addressEntity;
 
-    @Column(name = "created_at")
+    @Column()
     private Timestamp createdAt;
 
-    @Column(name = "updated_at")
+    @Column()
     private Timestamp updatedAt;
 
     @OneToMany(mappedBy = "companyEntity", cascade = CascadeType.ALL)

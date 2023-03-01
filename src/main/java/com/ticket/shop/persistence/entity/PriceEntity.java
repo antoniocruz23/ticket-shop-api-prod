@@ -51,10 +51,10 @@ public class PriceEntity {
     @JoinColumn(name = "company_id", nullable = false)
     private CompanyEntity companyEntity;
 
-    @Column(name = "created_at", updatable = false)
+    @Column(updatable = false)
     private Timestamp createdAt;
 
-    @Column(name = "updated_at")
+    @Column()
     private Timestamp updatedAt;
 
     @PrePersist

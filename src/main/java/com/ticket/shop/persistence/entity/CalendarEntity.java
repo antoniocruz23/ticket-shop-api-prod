@@ -43,10 +43,10 @@ public class CalendarEntity {
     @Column(nullable = false)
     private LocalDateTime endDate;
 
-    @Column(name = "created_at", updatable = false)
+    @Column(updatable = false)
     private Timestamp createdAt;
 
-    @Column(name = "updated_at")
+    @Column()
     private Timestamp updatedAt;
 
     @ManyToOne(fetch = FetchType.EAGER)

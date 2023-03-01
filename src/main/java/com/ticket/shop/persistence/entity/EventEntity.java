@@ -43,10 +43,10 @@ public class EventEntity {
     @Column(nullable = false)
     private String description;
 
-    @Column(name = "created_at", updatable = false)
+    @Column(updatable = false)
     private Timestamp createdAt;
 
-    @Column(name = "updated_at")
+    @Column()
     private Timestamp updatedAt;
 
     @OneToOne(cascade = CascadeType.ALL)
