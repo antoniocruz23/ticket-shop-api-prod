@@ -21,6 +21,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -196,6 +197,45 @@ public class EventController {
 
         LOGGER.info("Event with id {} updated successfully. Retrieving updated event", eventId);
         return new ResponseEntity<>(eventDetailsDto, HttpStatus.OK);
+    }
+
+    /**
+     * Delete event
+     *
+     * @param companyId company id
+     * @param eventId   event id
+     */
+    @DeleteMapping("/companies/{companyId}/events/{eventId}")
+    @PreAuthorize("@authorized.hasRole('ADMIN') || " +
+            "((@authorized.hasRole('COMPANY_ADMIN') || @authorized.hasRole('WORKER')) && @authorized.isOnCompany(#companyId))")
+    @Operation(summary = "Delete Event",
+            description = "Delete Event and everything related to it - " +
+                    "Access only for users with 'COMPANY_ADMIN' or 'WORKER' roles and the logged in user company id needs to be the same as the request")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Successful Operation"),
+            @ApiResponse(responseCode = "404", description = ErrorMessages.EVENT_NOT_FOUND,
+                    content = @Content(schema = @Schema(implementation = Error.class))),
+            @ApiResponse(responseCode = "400", description = ErrorMessages.DATABASE_COMMUNICATION_ERROR,
+                    content = @Content(schema = @Schema(implementation = Error.class))),
+            @ApiResponse(responseCode = "403", description = ErrorMessages.ACCESS_DENIED,
+                    content = @Content(schema = @Schema(implementation = Error.class)))})
+    public ResponseEntity<Void> deleteEvent(@PathVariable Long companyId,
+                                            @PathVariable Long eventId) {
+
+        LOGGER.info("Request to delete event with id - {}", companyId);
+        try {
+            this.eventServiceImp.deleteEvent(companyId, eventId);
+
+        } catch (TicketShopException e) {
+            throw e;
+
+        } catch (Exception e) {
+            LOGGER.error("Failed to delete event with id {}", companyId, e);
+            throw new TicketShopException(ErrorMessages.OPERATION_FAILED, e);
+        }
+
+        LOGGER.info("Event with id {} deleted successfully", companyId);
+        return ResponseEntity.noContent().build();
     }
 }
 

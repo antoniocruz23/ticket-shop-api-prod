@@ -43,6 +43,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -271,6 +273,39 @@ public class EventServiceImpTest {
         // Assert
         assertThrows(DatabaseCommunicationException.class,
                 () -> this.eventServiceImp.updateEvent(2L, 1L, getMockedUpdateEventDto()));
+    }
+
+    /**
+     * Delete event tests
+     */
+    @Test
+    public void testDeleteEventSuccessfully() {
+        // Mocks
+        when(this.eventRepository.findByCompanyIdAndEventId(any(), any())).thenReturn(Optional.of(getMockedEventEntity()));
+
+        // Call method to be tested
+        this.eventServiceImp.deleteEvent(2L, 1L);
+
+        verify(this.eventRepository).delete(any());
+    }
+
+    @Test
+    public void testDeleteEventFailureDueToEventNotFound() {
+        // Mocks
+        when(this.eventRepository.findByCompanyIdAndEventId(any(), any())).thenReturn(Optional.empty());
+
+        assertThrows(EventNotFoundException.class,
+                () -> this.eventServiceImp.deleteEvent(2L, 1L));
+    }
+
+    @Test
+    public void testDeleteEventFailureDueToDatabaseConnectionFailure() {
+        // Mocks
+        when(this.eventRepository.findByCompanyIdAndEventId(any(), any())).thenReturn(Optional.of(getMockedEventEntity()));
+        doThrow(RuntimeException.class).when(this.eventRepository).delete(any());
+
+        assertThrows(DatabaseCommunicationException.class,
+                () -> this.eventServiceImp.deleteEvent(2L, 1L));
     }
 
     private CountryEntity getMockedCountryEntity() {

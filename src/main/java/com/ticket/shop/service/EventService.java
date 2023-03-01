@@ -57,4 +57,12 @@ public interface EventService {
      * @return {@link EventDetailsDto}
      */
     EventDetailsDto updateEvent(Long companyId, Long eventId, UpdateEventDto updateEventDto);
+
+    /**
+     * Delete event
+     *
+     * @param companyId company id
+     * @param eventId   event id
+     */
+    void deleteEvent(Long companyId, Long eventId);
 }

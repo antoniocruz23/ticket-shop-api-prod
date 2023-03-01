@@ -51,6 +51,6 @@ public class EventEntity {
     @OneToMany(mappedBy = "eventEntity", cascade = CascadeType.ALL)
     private List<PriceEntity> prices;
 
-    @OneToMany(mappedBy = "eventEntity")
+    @OneToMany(mappedBy = "eventEntity", cascade = CascadeType.ALL)
     private List<CalendarEntity> calendars;
 }

@@ -149,6 +149,24 @@ public class EventServiceImp implements EventService {
     }
 
     /**
+     * @see EventService#deleteEvent(Long, Long)
+     */
+    @Override
+    public void deleteEvent(Long companyId, Long eventId) {
+        LOGGER.debug("Getting event with id {} from database", companyId);
+        EventEntity eventEntity = getEventEntityByCompanyIdAndEventId(companyId, eventId);
+
+        LOGGER.debug("Deleting event with id {} from database", companyId);
+        try {
+            this.eventRepository.delete(eventEntity);
+
+        } catch (Exception e) {
+            LOGGER.error("Failed while deleting event with id {} from database", companyId, e);
+            throw new DatabaseCommunicationException(ErrorMessages.DATABASE_COMMUNICATION_ERROR, e);
+        }
+    }
+
+    /**
      * Get Address by id
      *
      * @param addressId address id
