@@ -18,6 +18,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.sql.Timestamp;
 
 /**
  * Ticket Entity
@@ -56,4 +57,7 @@ public class TicketEntity {
 
     @Column
     private String paypalOrderId;
+
+    @Column
+    private Timestamp purchasedAt;
 }

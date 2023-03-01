@@ -61,7 +61,7 @@ public interface TicketRepository extends CrudRepository<TicketEntity, Long> {
      */
     @Transactional
     @Modifying
-    @Query("update TicketEntity t set t.status = 'SOLD' where t.paypalOrderId = :paypalOrderId")
+    @Query("update TicketEntity t set t.status = 'SOLD', t.purchasedAt = now() where t.paypalOrderId = :paypalOrderId")
     void updateStatusByPaypalOrderId(String paypalOrderId);
 
     /**
