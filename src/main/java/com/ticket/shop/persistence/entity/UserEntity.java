@@ -66,7 +66,7 @@ public class UserEntity {
     @JoinColumn(name = "company_id")
     private CompanyEntity companyEntity;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", updatable = false)
     private Timestamp createdAt;
 
     @Column(name = "updated_at")

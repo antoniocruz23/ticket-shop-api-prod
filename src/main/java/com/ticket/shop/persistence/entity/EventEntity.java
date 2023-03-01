@@ -16,7 +16,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
+import java.sql.Timestamp;
 import java.util.List;
 
 /**
@@ -40,6 +43,12 @@ public class EventEntity {
     @Column(nullable = false)
     private String description;
 
+    @Column(name = "created_at", updatable = false)
+    private Timestamp createdAt;
+
+    @Column(name = "updated_at")
+    private Timestamp updatedAt;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "address_id", nullable = false)
     private AddressEntity addressEntity;
@@ -53,4 +62,14 @@ public class EventEntity {
 
     @OneToMany(mappedBy = "eventEntity", cascade = CascadeType.ALL)
     private List<CalendarEntity> calendars;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = new Timestamp(System.currentTimeMillis());
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = new Timestamp(System.currentTimeMillis());
+    }
 }
