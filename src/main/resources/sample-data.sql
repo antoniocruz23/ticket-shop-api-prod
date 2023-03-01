@@ -6,7 +6,7 @@ INSERT INTO countries (country_id, currency, iso_code2, iso_code3, language, nam
 VALUES (2, 'GBP', 'UK', 'GBR', 'GB', 'United Kingdom', '44');
 
 INSERT INTO countries (country_id, currency, iso_code2, iso_code3, language, name, phone_code)
-VALUES (3, 'EUR', 'FR', 'FRA', 'GB', 'France', '33');
+VALUES (3, 'EUR', 'FR', 'FRA', 'FR', 'France', '33');
 
 -- 7 Addresses
 INSERT INTO addresses (address_id, city, line1, post_code, country_id)
@@ -83,7 +83,7 @@ VALUES (2, '2023-04-12 19:00:00.000000', '2023-04-12 14:00:00.000000', 2, 1, now
 
 -- 2 Prices
 INSERT INTO prices (price_id, price, type, company_id, event_id, created_at) VALUES (1, 20, 'GENERAL', 2, 1, now());
-INSERT INTO prices (price_id, price, type, company_id, event_id, created_at) VALUES (1, 50, 'VIP', 2, 1, now());
+INSERT INTO prices (price_id, price, type, company_id, event_id, created_at) VALUES (2, 50, 'VIP', 2, 1, now());
 
 -- 10 Tickets
 INSERT INTO tickets (ticket_id, paypal_order_id, status, type, calendar_id, company_id, user_id, purchased_at)

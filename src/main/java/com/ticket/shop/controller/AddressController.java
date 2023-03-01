@@ -35,7 +35,7 @@ import static org.springframework.http.HttpStatus.OK;
 @Tag(name = "Addresses", description = "Address endpoints")
 public class AddressController {
 
-    private static final Logger LOGGER = LogManager.getLogger(CustomerController.class);
+    private static final Logger LOGGER = LogManager.getLogger(AddressController.class);
     private final AddressServiceImp addressServiceImp;
 
     public AddressController(AddressServiceImp addressServiceImp) {
