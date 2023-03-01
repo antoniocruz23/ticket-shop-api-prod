@@ -48,7 +48,7 @@ dependencies {
 
     implementation 'com.sendgrid:sendgrid-java:4.9.3'
 
-    implementation 'com.paypal.sdk:checkout-sdk:1.0.2'
+    implementation 'com.paypal.sdk:checkout-sdk:2.0.0'
 
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
