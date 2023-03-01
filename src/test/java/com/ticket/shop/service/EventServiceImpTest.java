@@ -1,5 +1,6 @@
 package com.ticket.shop.service;
 
+import com.ticket.shop.command.Paginated;
 import com.ticket.shop.command.address.AddressDetailsDto;
 import com.ticket.shop.command.address.CreateAddressDto;
 import com.ticket.shop.command.event.CreateEventDto;
@@ -29,6 +30,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -191,6 +196,31 @@ public class EventServiceImpTest {
                 () -> this.eventServiceImp.getEventById(getMockedEventEntity().getEventId()));
     }
 
+    /**
+     * Get event list tests
+     */
+    @Test
+    public void testGetEventListSuccessfully() {
+        //Mocks
+        when(this.eventRepository.findByAll(any(), any(), any())).thenReturn(getMockedPagedEventEntity());
+
+        //Call method
+        Paginated<EventDetailsDto> eventList = this.eventServiceImp.getEventList(0, 1, null, null);
+
+        //Assert result
+        assertNotNull(eventList);
+        assertEquals(getMockedPaginatedEventDetailsDto(), eventList);
+    }
+
+    @Test
+    public void testGetEventListFailureDueToDatabaseConnectionFailure() {
+        //Mocks
+        when(this.eventRepository.findByAll(any(), any(), any())).thenThrow(RuntimeException.class);
+
+        assertThrows(DatabaseCommunicationException.class,
+                () -> this.eventServiceImp.getEventList(0, 1, null, null));
+    }
+
     private CountryEntity getMockedCountryEntity() {
         return CountryEntity.builder()
                 .countryId(1L)
@@ -299,5 +329,23 @@ public class EventServiceImpTest {
                 .event(getMockedEventDetailsDto())
                 .calendarIds(List.of(1L))
                 .build();
+    }
+
+    private Page<EventEntity> getMockedPagedEventEntity() {
+        List<EventEntity> content = List.of(getMockedEventEntity());
+        Pageable pageable = PageRequest.of(0, 1);
+
+        return new PageImpl<>(content, pageable, 1);
+    }
+
+    private Paginated<EventDetailsDto> getMockedPaginatedEventDetailsDto() {
+        List<EventDetailsDto> eventDetailsDtoList = List.of(getMockedEventDetailsDto());
+
+        return new Paginated<>(
+                eventDetailsDtoList,
+                0,
+                eventDetailsDtoList.size(),
+                1,
+                1);
     }
 }

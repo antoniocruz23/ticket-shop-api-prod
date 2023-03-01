@@ -18,5 +18,5 @@ public interface PriceService {
      * @param eventEntity    {@link EventEntity}
      * @return {@link PriceDetailsDto} the price created
      */
-    List<PriceDetailsDto> bulkCreatePrice(List<CreatePriceDto> createPriceDto, EventEntity eventEntity);
+    List<PriceDetailsDto> bulkCreatePrices(List<CreatePriceDto> createPriceDto, EventEntity eventEntity);
 }

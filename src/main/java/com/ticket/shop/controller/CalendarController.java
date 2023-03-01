@@ -128,6 +128,8 @@ public class CalendarController {
      * Get calendar list by event id
      *
      * @param eventId event id
+     * @param page    page number
+     * @param size    page size
      * @return {@link Paginated<CalendarDetailsDto>} calendar list and Ok httpStatus
      */
     @GetMapping("/events/{eventId}/calendars")
@@ -139,9 +141,9 @@ public class CalendarController {
                     content = @Content(schema = @Schema(implementation = Error.class))),
             @ApiResponse(responseCode = "400", description = ErrorMessages.DATABASE_COMMUNICATION_ERROR,
                     content = @Content(schema = @Schema(implementation = Error.class)))})
-    public ResponseEntity<Paginated<CalendarDetailsDto>> getCalendarByEventId(@PathVariable Long eventId,
-                                                                              @RequestParam(defaultValue = "0") int page,
-                                                                              @RequestParam(defaultValue = "10") int size) {
+    public ResponseEntity<Paginated<CalendarDetailsDto>> getCalendarListByEventId(@PathVariable Long eventId,
+                                                                                  @RequestParam(defaultValue = "0") int page,
+                                                                                  @RequestParam(defaultValue = "10") int size) {
 
         LOGGER.info("Request to get calendar list with event id {}", eventId);
         Paginated<CalendarDetailsDto> calendarList;

@@ -41,7 +41,7 @@ public class PriceServiceImpTest {
         when(this.priceRepository.saveAll(any())).thenReturn(List.of(getMockedPriceEntity()));
 
         // Method to be tested
-        List<PriceDetailsDto> prices = this.priceServiceImp.bulkCreatePrice(getMockedCreatePriceDtoList(), getMockedEventEntity());
+        List<PriceDetailsDto> prices = this.priceServiceImp.bulkCreatePrices(getMockedCreatePriceDtoList(), getMockedEventEntity());
 
         // Assert result
         assertEquals(getMockedPriceDetailsDtoList(), prices);
@@ -54,7 +54,7 @@ public class PriceServiceImpTest {
 
         // Assert exception
         assertThrows(DatabaseCommunicationException.class,
-                () -> this.priceServiceImp.bulkCreatePrice(getMockedCreatePriceDtoList(), getMockedEventEntity()));
+                () -> this.priceServiceImp.bulkCreatePrices(getMockedCreatePriceDtoList(), getMockedEventEntity()));
     }
 
     private PriceEntity getMockedPriceEntity() {

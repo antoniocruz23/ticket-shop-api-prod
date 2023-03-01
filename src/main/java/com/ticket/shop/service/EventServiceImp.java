@@ -1,10 +1,10 @@
 package com.ticket.shop.service;
 
+import com.ticket.shop.command.Paginated;
 import com.ticket.shop.command.address.AddressDetailsDto;
 import com.ticket.shop.command.event.CreateEventDto;
 import com.ticket.shop.command.event.EventDetailsDto;
 import com.ticket.shop.command.event.EventDetailsWithCalendarIdsDto;
-import com.ticket.shop.command.price.PriceDetailsDto;
 import com.ticket.shop.converter.EventConverter;
 import com.ticket.shop.error.ErrorMessages;
 import com.ticket.shop.exception.DatabaseCommunicationException;
@@ -16,15 +16,18 @@ import com.ticket.shop.persistence.entity.CalendarEntity;
 import com.ticket.shop.persistence.entity.CompanyEntity;
 import com.ticket.shop.persistence.entity.CountryEntity;
 import com.ticket.shop.persistence.entity.EventEntity;
-import com.ticket.shop.persistence.entity.PriceEntity;
 import com.ticket.shop.persistence.repository.AddressRepository;
 import com.ticket.shop.persistence.repository.CompanyRepository;
 import com.ticket.shop.persistence.repository.EventRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -76,10 +79,10 @@ public class EventServiceImp implements EventService {
             throw new DatabaseCommunicationException(ErrorMessages.DATABASE_COMMUNICATION_ERROR, e);
         }
 
-        List<PriceDetailsDto> prices = this.priceServiceImp.bulkCreatePrice(createEventDto.getPrices(), createdEvent);
+        this.priceServiceImp.bulkCreatePrices(createEventDto.getPrices(), createdEvent);
 
         LOGGER.debug("Retrieving created event");
-        return EventConverter.fromEventEntityToEventDetailsDto(createdEvent, prices);
+        return EventConverter.fromEventEntityToEventDetailsDto(createdEvent);
     }
 
     /**
@@ -88,10 +91,38 @@ public class EventServiceImp implements EventService {
     @Override
     public EventDetailsWithCalendarIdsDto getEventById(Long eventId) {
         EventEntity eventEntity = getEventEntityById(eventId);
-        List<PriceEntity> prices = eventEntity.getPrices();
         List<Long> calendarIds = eventEntity.getCalendars().stream().map(CalendarEntity::getCalendarId).toList();
 
-        return EventConverter.fromEventEntityToEventDetailsWithCalendarIdsDto(eventEntity, prices, calendarIds);
+        return EventConverter.fromEventEntityToEventDetailsWithCalendarIdsDto(eventEntity, calendarIds);
+    }
+
+    /**
+     * @see EventService#getEventList(int, int, Long, Date)
+     */
+    @Override
+    public Paginated<EventDetailsDto> getEventList(int page, int size, Long companyId, Date date) {
+        LOGGER.debug("Getting all events from database");
+        Page<EventEntity> eventList;
+        try {
+            eventList = this.eventRepository.findByAll(companyId, date, PageRequest.of(page, size));
+
+        } catch (Exception e) {
+            LOGGER.error("Failed at getting events page from database", e);
+            throw new DatabaseCommunicationException(ErrorMessages.DATABASE_COMMUNICATION_ERROR, e);
+        }
+
+        LOGGER.debug("Converting event list to EventDetailsDto");
+        List<EventDetailsDto> eventListResponse = new ArrayList<>();
+        for (EventEntity event : eventList) {
+            eventListResponse.add(EventConverter.fromEventEntityToEventDetailsDto(event));
+        }
+
+        return new Paginated<>(
+                eventListResponse,
+                page,
+                eventListResponse.size(),
+                eventList.getTotalPages(),
+                eventList.getTotalElements());
     }
 
     /**

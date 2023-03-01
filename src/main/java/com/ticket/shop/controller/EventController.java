@@ -1,5 +1,6 @@
 package com.ticket.shop.controller;
 
+import com.ticket.shop.command.Paginated;
 import com.ticket.shop.command.calendar.CalendarDetailsDto;
 import com.ticket.shop.command.event.CreateEventDto;
 import com.ticket.shop.command.event.EventDetailsDto;
@@ -16,6 +17,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,9 +26,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+
+import java.util.Date;
 
 import static org.springframework.http.HttpStatus.OK;
 
@@ -107,6 +112,43 @@ public class EventController {
 
         LOGGER.info("Retrieved event with id {}", eventId);
         return new ResponseEntity<>(eventDetailsDto, OK);
+    }
+
+    /**
+     * Get event list
+     *
+     * @param page page number
+     * @param size page size
+     * @return {@link Paginated<EventDetailsDto>} event list and Ok httpStatus
+     */
+    @GetMapping("/events")
+    @Operation(summary = "Get event list with pagination", description = "Get event list with pagination")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful Operation",
+                    content = @Content(schema = @Schema(implementation = EventDetailsDto.class))),
+            @ApiResponse(responseCode = "400", description = ErrorMessages.DATABASE_COMMUNICATION_ERROR,
+                    content = @Content(schema = @Schema(implementation = Error.class)))})
+    public ResponseEntity<Paginated<EventDetailsDto>> getEventList(@RequestParam(defaultValue = "0") int page,
+                                                                   @RequestParam(defaultValue = "10") int size,
+                                                                   @RequestParam(required = false) Long companyId,
+                                                                   @DateTimeFormat(pattern = "yyyy-MM-dd")
+                                                                   @RequestParam(required = false) Date date) {
+
+        LOGGER.info("Request to get event list - page: {}, size: {}", page, size);
+        Paginated<EventDetailsDto> eventList;
+        try {
+            eventList = this.eventServiceImp.getEventList(page, size, companyId, date);
+
+        } catch (TicketShopException e) {
+            throw e;
+
+        } catch (Exception e) {
+            LOGGER.error("Failed to get event list - page: {}, size: {}", page, size, e);
+            throw new TicketShopException(ErrorMessages.OPERATION_FAILED, e);
+        }
+
+        LOGGER.info("Retrieved event list");
+        return new ResponseEntity<>(eventList, OK);
     }
 }
 

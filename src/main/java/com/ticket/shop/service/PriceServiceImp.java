@@ -30,10 +30,10 @@ public class PriceServiceImp implements PriceService {
     }
 
     /**
-     * @see PriceService#bulkCreatePrice(List, EventEntity)
+     * @see PriceService#bulkCreatePrices(List, EventEntity)
      */
     @Override
-    public List<PriceDetailsDto> bulkCreatePrice(List<CreatePriceDto> createPriceDto, EventEntity eventEntity) {
+    public List<PriceDetailsDto> bulkCreatePrices(List<CreatePriceDto> createPriceDto, EventEntity eventEntity) {
         LOGGER.debug("Creating prices - {}", createPriceDto);
         List<PriceEntity> priceEntityList = PriceConverter.fromListOfCreatePriceDtoToListOfPriceEntity(createPriceDto, eventEntity);
 
@@ -50,6 +50,7 @@ public class PriceServiceImp implements PriceService {
 
         LOGGER.debug("Retrieving created prices");
         List<PriceEntity> prices = StreamSupport.stream(createdTicketPrice.spliterator(), false).collect(Collectors.toList());
+        eventEntity.setPrices(prices);
         return PriceConverter.fromPriceEntityToPriceDetailsDtoList(prices);
     }
 }
