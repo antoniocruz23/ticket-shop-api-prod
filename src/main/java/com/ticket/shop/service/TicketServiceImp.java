@@ -4,6 +4,7 @@ import com.ticket.shop.command.ticket.CreateTicketDto;
 import com.ticket.shop.command.ticket.TicketDetailsWhenCreatedDto;
 import com.ticket.shop.command.ticket.TotalOfTicketsDto;
 import com.ticket.shop.converter.TicketConverter;
+import com.ticket.shop.enumerators.TicketStatus;
 import com.ticket.shop.enumerators.TicketType;
 import com.ticket.shop.error.ErrorMessages;
 import com.ticket.shop.exception.DatabaseCommunicationException;
@@ -24,7 +25,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -106,17 +109,19 @@ public class TicketServiceImp implements TicketService {
     @Override
     public TotalOfTicketsDto getTotalOfTicketsByCalendarId(Long calendarId) {
         List<TicketEntity> ticketEntities = getTicketsByCalendarId(calendarId);
+        Map<TicketType, Map<TicketStatus, Long>> totalGroup = new HashMap<>();
 
-        var totalByType = ticketEntities.stream()
-                .collect(Collectors.groupingBy(TicketEntity::getType, Collectors.summingLong(t -> 1L)));
+        ticketEntities.forEach(ticket -> {
+            // Get the map for the current type, or create a new one if it doesn't exist
+            Map<TicketStatus, Long> statusMap = totalGroup.computeIfAbsent(ticket.getType(), type -> new HashMap<>());
 
-        var totalByStatus = ticketEntities.stream()
-                .collect(Collectors.groupingBy(TicketEntity::getStatus, Collectors.summingLong(t -> 1L)));
+            // Increment the count for the current status in the status map
+            statusMap.merge(ticket.getStatus(), 1L, Long::sum);
+        });
 
         return TotalOfTicketsDto.builder()
                 .totalOfTickets(ticketEntities.size())
-                .totalByTypes(totalByType)
-                .totalByStatus(totalByStatus)
+                .totalByTypeStatus(totalGroup)
                 .build();
     }
 

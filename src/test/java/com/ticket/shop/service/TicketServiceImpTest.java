@@ -196,8 +196,7 @@ public class TicketServiceImpTest {
     private TotalOfTicketsDto getMockedTotalOfTicketsDto() {
         return TotalOfTicketsDto.builder()
                 .totalOfTickets(1)
-                .totalByTypes(Map.of(TicketType.VIP, 1L))
-                .totalByStatus(Map.of(TicketStatus.AVAILABLE, 1L))
+                .totalByTypeStatus(Map.of(TicketType.VIP, Map.of(TicketStatus.AVAILABLE, 1L)))
                 .build();
     }
 

@@ -16,9 +16,10 @@ import java.util.Map;
 public class TotalOfTicketsDto {
     private int totalOfTickets;
 
-    @Schema(example = "{\"VIP\": 2}")
-    private Map<TicketType, Long> totalByTypes;
-
-    @Schema(example = "{\"AVAILABLE\": 3}")
-    private Map<TicketStatus, Long> totalByStatus;
+    @Schema(example = """
+            {"VIP":
+                \n{"SOLD": 2
+                \n}
+            }""")
+    private Map<TicketType, Map<TicketStatus, Long>> totalByTypeStatus;
 }
