@@ -57,7 +57,6 @@ public class UserEntity {
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "roles", joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)
-    @Column(unique = true)
     private Set<UserRole> roles;
 
     @ManyToOne(fetch = FetchType.LAZY)
