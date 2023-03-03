@@ -25,6 +25,7 @@ import javax.persistence.Table;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * User entity
@@ -56,7 +57,8 @@ public class UserEntity {
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "roles", joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)
-    private List<UserRole> roles;
+    @Column(unique = true)
+    private Set<UserRole> roles;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "country_id", nullable = false)

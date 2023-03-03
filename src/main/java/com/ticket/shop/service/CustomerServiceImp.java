@@ -28,6 +28,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * An {@link CustomerService} implementation
@@ -91,7 +92,7 @@ public class CustomerServiceImp implements CustomerService {
     private UserEntity buildUserEntity(CreateCustomerDto createCustomerDto) {
         LOGGER.debug("Creating customer - {}", createCustomerDto);
         UserEntity userEntity = UserConverter.fromCreateCustomerDtoToUserEntity(createCustomerDto);
-        userEntity.setRoles(List.of(UserRole.CUSTOMER));
+        userEntity.setRoles(Set.of(UserRole.CUSTOMER));
 
         CountryEntity countryEntity = getCountryEntityById(createCustomerDto.getCountryId());
         userEntity.setCountryEntity(countryEntity);

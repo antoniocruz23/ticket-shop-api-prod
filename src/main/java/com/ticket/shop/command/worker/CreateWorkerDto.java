@@ -7,7 +7,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.List;
+import java.util.Set;
 
 /**
  * CreateWorkerDto used to store worker info when created
@@ -34,7 +34,7 @@ public class CreateWorkerDto {
 
     @Schema(example = "[\"Worker\"]")
     @NotNull(message = "Must have role")
-    private List<UserRole> roles;
+    private Set<UserRole> roles;
 
     @Schema(example = "1")
     @NotNull(message = "Must have a country")

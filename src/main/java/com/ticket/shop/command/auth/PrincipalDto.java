@@ -4,7 +4,7 @@ import com.ticket.shop.enumerators.UserRole;
 import lombok.Builder;
 import lombok.Data;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * Principal information
@@ -16,7 +16,7 @@ public class PrincipalDto {
     private Long userId;
     private String name;
     private String email;
-    private List<UserRole> roles;
+    private Set<UserRole> roles;
     private Long countryId;
     private Long companyId;
 }

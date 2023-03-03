@@ -31,6 +31,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * An {@link WorkerService} implementation
@@ -260,7 +261,7 @@ public class WorkerServiceImp implements WorkerService {
      *
      * @param roles list of roles
      */
-    private static void validateRoles(List<UserRole> roles) {
+    private static void validateRoles(Set<UserRole> roles) {
         if (roles.contains(UserRole.ADMIN) || roles.contains(UserRole.CUSTOMER)) {
             LOGGER.debug("Failed while trying to create the worker with an invalid role for workers");
             throw new InvalidRoleException(ErrorMessages.INVALID_ROLE);

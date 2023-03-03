@@ -31,6 +31,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -69,7 +70,7 @@ public class WorkerServiceImpTest {
     private final static String ENCRYPTED_PASSWORD = "adub1bb891b";
     private final static Long WORKER_ID = 2L;
     private final static Long COMPANY_ID = 245L;
-    private final static List<UserRole> USER_ROLE = Collections.singletonList(UserRole.WORKER);
+    private final static Set<UserRole> USER_ROLE = Collections.singleton(UserRole.WORKER);
 
     @BeforeEach
     public void setUp() {
@@ -186,7 +187,7 @@ public class WorkerServiceImpTest {
                 .firstname(FIRSTNAME + 11)
                 .lastname(LASTNAME + 11)
                 .email(EMAIL)
-                .roles(List.of(UserRole.COMPANY_ADMIN))
+                .roles(Set.of(UserRole.COMPANY_ADMIN))
                 .countryId(getMockedCountryEntity().getCountryId())
                 .companyId(getMockedCompanyEntity().getCompanyId())
                 .build();
@@ -197,7 +198,7 @@ public class WorkerServiceImpTest {
                 .lastname(LASTNAME + 11)
                 .email(EMAIL)
                 .encryptedPassword(ENCRYPTED_PASSWORD)
-                .roles(List.of(UserRole.COMPANY_ADMIN))
+                .roles(Set.of(UserRole.COMPANY_ADMIN))
                 .countryEntity(getMockedCountryEntity())
                 .companyEntity(getMockedCompanyEntity())
                 .build();
@@ -366,7 +367,7 @@ public class WorkerServiceImpTest {
                 .lastname(LASTNAME)
                 .email(EMAIL)
                 .password(PASSWORD)
-                .roles(List.of(UserRole.WORKER))
+                .roles(Set.of(UserRole.WORKER))
                 .countryId(getMockedCountryEntity().getCountryId())
                 .build();
     }
@@ -386,7 +387,7 @@ public class WorkerServiceImpTest {
                 .lastname(LASTNAME + 11)
                 .email(EMAIL)
                 .password(PASSWORD + 11)
-                .roles(List.of(UserRole.ADMIN, UserRole.COMPANY_ADMIN))
+                .roles(Set.of(UserRole.ADMIN, UserRole.COMPANY_ADMIN))
                 .countryId(getMockedCountryEntity().getCountryId())
                 .build();
     }
@@ -397,7 +398,7 @@ public class WorkerServiceImpTest {
                 .lastname(LASTNAME + 11)
                 .email(EMAIL)
                 .password(PASSWORD + 11)
-                .roles(List.of(UserRole.COMPANY_ADMIN))
+                .roles(Set.of(UserRole.COMPANY_ADMIN))
                 .countryId(getMockedCountryEntity().getCountryId())
                 .build();
     }

@@ -4,7 +4,7 @@ import com.ticket.shop.enumerators.UserRole;
 import lombok.Builder;
 import lombok.Data;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * WorkerDetailsDto used to respond with worker details
@@ -16,7 +16,7 @@ public class WorkerDetailsDto {
     private String firstname;
     private String lastname;
     private String email;
-    private List<UserRole> roles;
+    private Set<UserRole> roles;
     private Long countryId;
     private Long companyId;
 }

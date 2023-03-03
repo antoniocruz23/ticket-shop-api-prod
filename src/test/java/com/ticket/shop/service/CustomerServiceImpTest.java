@@ -27,6 +27,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -61,7 +62,7 @@ public class CustomerServiceImpTest {
     private final static String PASSWORD = "Password123!";
     private final static String ENCRYPTED_PASSWORD = "adub1bb891b";
     private final static Long CUSTOMER_ID = 3L;
-    private final static List<UserRole> USER_ROLE = Collections.singletonList(UserRole.CUSTOMER);
+    private final static Set<UserRole> USER_ROLE = Collections.singleton(UserRole.CUSTOMER);
 
     @BeforeEach
     public void setUp() {
@@ -187,7 +188,7 @@ public class CustomerServiceImpTest {
                 .lastname(LASTNAME + 11)
                 .email(EMAIL)
                 .encryptedPassword(ENCRYPTED_PASSWORD)
-                .roles(List.of(UserRole.CUSTOMER))
+                .roles(Set.of(UserRole.CUSTOMER))
                 .countryEntity(getMockedCountryEntity()).build();
 
         // Method to be tested

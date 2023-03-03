@@ -24,8 +24,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -54,7 +54,7 @@ public class AuthServiceImpTest {
     private final static String PASSWORD = "Password123";
     private final static String ENCRYPTED_PASSWORD = "321drowssaP";
     private final static Long USER_ID = 10L;
-    private final static List<UserRole> USER_ROLE = Collections.singletonList(UserRole.ADMIN);
+    private final static Set<UserRole> USER_ROLE = Collections.singleton(UserRole.ADMIN);
     private final static String TOKEN = "ajdehjkahnsd";
     private final static Date DATE_TOKEN = new DateTime().plusDays(4).toDate();
 
