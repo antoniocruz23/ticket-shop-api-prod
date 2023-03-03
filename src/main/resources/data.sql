@@ -46,7 +46,7 @@ VALUES (3, now(), 'mindthegap@group.com', 'Mind the Gap', 'mindthegap.com', 1);
 INSERT INTO companies (company_id, created_at, email, name, website, address_id)
 VALUES (4, now(), 'pyromusical@mail.com', 'Pyro Musical', 'pyromusical.com', 4);
 
--- 4 users
+-- 4 users -- all passwords are 'admin'
 INSERT INTO users (user_id, created_at, email, encrypted_password, firstname, lastname, company_id, country_id)
 VALUES (1, now(), 'admin@admin.com', '$2a$12$QcYlGG/vhXmwUb5nsf.gx.tcOC0DIk0R7P2NOjAwZH/aSZe1fuctq', 'Admin', 'Super', 3, 1);
 
